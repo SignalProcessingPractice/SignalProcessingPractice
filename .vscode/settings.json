@@ -1,0 +1,3 @@
+{
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/app/compile_commands.json"
+}
