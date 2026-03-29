@@ -1,3 +1,9 @@
+///
+/// @file   main.c
+/// @brief  Windows App のメイン関数.
+/// @todo   要リファクタリング
+///
+
 #include <RtAudio.h>
 #include <iostream>
 #include <vector>
@@ -111,9 +117,14 @@ void senderThread() {
 //==============================
 int main()
 {
+    std::cout << "HELLO!" << std::endl;
+
     RtAudio adc;
 
+    std::cout << "getDeviceCount=" << adc.getDeviceCount() << std::endl;
+
     if (adc.getDeviceCount() < 1) {
+
         std::cerr << "No audio devices found\n";
         return 1;
     }

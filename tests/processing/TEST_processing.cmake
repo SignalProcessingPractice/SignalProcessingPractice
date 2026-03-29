@@ -15,6 +15,7 @@ target_link_libraries(
     TEST_PROCESSING_LIB
     PUBLIC
     GTest::gtest_main
+    Threads::Threads
     SIGNAL_PROCESSING_PRACTICE_LIB
 )
 

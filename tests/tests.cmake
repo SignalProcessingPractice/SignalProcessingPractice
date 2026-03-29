@@ -1,4 +1,9 @@
 #
+# XXX: gtest は pthread に依存するため, 予め find_package() しておく.
+#
+find_package(Threads REQUIRED)
+
+#
 # Include the Google Test framework
 #
 include(FetchContent)

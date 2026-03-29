@@ -16,7 +16,7 @@ target_include_directories(APP_WINDOWS
 
 
 #
-# TODO: RtAudio を FetchContent で取り込む。プラットフォーム依存のスクリプトなので後で要見直し
+# TODO: RtAudio を FetchContent で取り込む。プラットフォーム依存のスクリプトなので後で見直し
 #
 include(FetchContent)
 
@@ -28,14 +28,20 @@ FetchContent_Declare(
 
 # RtAudioのオプション設定（Fetch前に指定）
 set(RTAUDIO_API_WASAPI ON CACHE BOOL "" FORCE)
+set(RTAUDIO_API_DS OFF CACHE BOOL "" FORCE)
+set(RTAUDIO_USE_PTHREADS OFF CACHE BOOL "" FORCE)
 set(RTAUDIO_BUILD_C OFF CACHE BOOL "" FORCE)
 set(RTAUDIO_BUILD_CPP ON CACHE BOOL "" FORCE)
 set(RTAUDIO_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(RTAUDIO_BUILD_TESTING OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(rtaudio)
 
+find_package(Threads REQUIRED)
+
 target_link_libraries(APP_WINDOWS
      PRIVATE
      rtaudio
+     Threads::Threads
 )

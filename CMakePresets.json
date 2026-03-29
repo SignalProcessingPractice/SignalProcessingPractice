@@ -12,7 +12,7 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/app",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x64-gcc-toolchain.cmake",
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x64-clang-toolchain.cmake",
         "CMAKE_BUILD_TYPE": "Debug"
       }
     },
