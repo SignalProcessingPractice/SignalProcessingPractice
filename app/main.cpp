@@ -1,108 +1,107 @@
 #include <RtAudio.h>
-
 #include <iostream>
 #include <vector>
-#include <queue>
 #include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
 #include <cstring>
+#include <chrono>
+#include <algorithm>
 
-struct AudioBuffer {
-    std::vector<float> data;
+// ロックフリーなSPSCリングバッファ
+class LockFreeRingBuffer {
+private:
+    std::vector<float> buffer_;
+    std::atomic<size_t> write_idx_{0};
+    std::atomic<size_t> read_idx_{0};
+    size_t capacity_;
+
+public:
+    LockFreeRingBuffer(size_t capacity) : buffer_(capacity + 1), capacity_(capacity + 1) {}
+
+    size_t write(const float* data, size_t count) {
+        size_t write_pos = write_idx_.load(std::memory_order_relaxed);
+        size_t read_pos = read_idx_.load(std::memory_order_acquire);
+        
+        size_t available = (read_pos + capacity_ - write_pos - 1) % capacity_;
+        size_t to_write = std::min(count, available);
+
+        // 簡略化のため1サンプルずつコピー（実運用ではラップアラウンドを考慮したmemcpyが高速です）
+        for (size_t i = 0; i < to_write; ++i) {
+            buffer_[(write_pos + i) % capacity_] = data[i];
+        }
+
+        write_idx_.store((write_pos + to_write) % capacity_, std::memory_order_release);
+        return to_write;
+    }
+
+    size_t read(float* data, size_t count) {
+        size_t read_pos = read_idx_.load(std::memory_order_relaxed);
+        size_t write_pos = write_idx_.load(std::memory_order_acquire);
+
+        size_t available = (write_pos + capacity_ - read_pos) % capacity_;
+        size_t to_read = std::min(count, available);
+
+        for (size_t i = 0; i < to_read; ++i) {
+            data[i] = buffer_[(read_pos + i) % capacity_];
+        }
+
+        read_idx_.store((read_pos + to_read) % capacity_, std::memory_order_release);
+        return to_read;
+    }
 };
 
-// 入力→処理キュー
-std::queue<AudioBuffer> g_inQueue;
-// 処理→出力キュー
-std::queue<AudioBuffer> g_outQueue;
+// バッファサイズは余裕を持たせて確保（例: 48000サンプル = 1秒分）
+LockFreeRingBuffer g_inBuffer(48000);
+LockFreeRingBuffer g_outBuffer(48000);
 
-std::mutex g_mutex;
-std::condition_variable g_cv;
 std::atomic<bool> g_running{true};
 
 //==============================
-// 入力コールバック（producer）
+// 入力コールバック（Producer）
 //==============================
-int inputCallback(void*,
-                  void* inputBuffer,
-                  unsigned int nFrames,
-                  double,
-                  RtAudioStreamStatus status,
-                  void*)
-{
-    if (status) {
-        std::cerr << "Stream underflow/overflow\n";
-    }
+int inputCallback(void*, void* inputBuffer, unsigned int nFrames, double, RtAudioStreamStatus status, void*) {
+    if (status) std::cerr << "Stream underflow/overflow\n";
 
     float* in = static_cast<float*>(inputBuffer);
     if (!in) return 0;
 
-    AudioBuffer buf;
-    buf.data.assign(in, in + nFrames);
-
-    {
-        std::lock_guard<std::mutex> lock(g_mutex);
-        g_inQueue.push(std::move(buf));
-    }
-    g_cv.notify_one();
-
+    // ロックなし、アロケーションなしで直接書き込む
+    g_inBuffer.write(in, nFrames);
     return 0;
 }
 
 //==============================
-// 出力コールバック（consumer側の最終段）
+// 出力コールバック（Consumer）
 //==============================
-int outputCallback(void* outputBuffer,
-                   void*,
-                   unsigned int nFrames,
-                   double,
-                   RtAudioStreamStatus,
-                   void*)
-{
+int outputCallback(void* outputBuffer, void*, unsigned int nFrames, double, RtAudioStreamStatus, void*) {
     float* out = static_cast<float*>(outputBuffer);
 
-    std::lock_guard<std::mutex> lock(g_mutex);
+    // 読み込める分だけ読み込む
+    size_t readCount = g_outBuffer.read(out, nFrames);
 
-    if (!g_outQueue.empty()) {
-        auto& buf = g_outQueue.front();
-
-        size_t copySize = std::min<size_t>(buf.data.size(), nFrames);
-        std::memcpy(out, buf.data.data(), sizeof(float) * copySize);
-
-        if (copySize < nFrames) {
-            std::memset(out + copySize, 0, sizeof(float) * (nFrames - copySize));
-        }
-
-        g_outQueue.pop();
-    } else {
-        std::memset(out, 0, sizeof(float) * nFrames);
+    // 足りない分は0埋め（無音を出力してノイズを防ぐ）
+    if (readCount < nFrames) {
+        std::memset(out + readCount, 0, sizeof(float) * (nFrames - readCount));
     }
-
     return 0;
 }
 
 //==============================
-// 中継スレッド（consumer）
+// 中継スレッド
 //==============================
-void senderThread()
-{
+void senderThread() {
+    std::vector<float> tempBuffer(1024); // 一時的な作業用バッファ
+    
     while (g_running) {
-        std::unique_lock<std::mutex> lock(g_mutex);
-
-        g_cv.wait(lock, [] {
-            return !g_inQueue.empty() || !g_running;
-        });
-
-        while (!g_inQueue.empty()) {
-            auto buf = std::move(g_inQueue.front());
-            g_inQueue.pop();
-
-            // ===== ここで処理可能 =====
+        size_t readCount = g_inBuffer.read(tempBuffer.data(), tempBuffer.size());
+        
+        if (readCount > 0) {
+            // ===== ここで音声処理を行う =====
             // 例：そのまま通す
-
-            g_outQueue.push(std::move(buf));
+            g_outBuffer.write(tempBuffer.data(), readCount);
+        } else {
+            // CPUを100%専有しないように、データがない時は少しスリープ
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 }
@@ -162,7 +161,6 @@ int main()
         std::cin.get();
 
         g_running = false;
-        g_cv.notify_all();
         th.join();
 
         adc.stopStream();
