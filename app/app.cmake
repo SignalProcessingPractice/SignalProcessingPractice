@@ -2,13 +2,13 @@
 # カレントディレクトリ配下のファイルをすべて取得 (再帰探索はしない)
 #
 file(GLOB SRC_FILES 
-     ${CMAKE_CURRENT_LIST_DIR}/*.cpp
-     ${CMAKE_CURRENT_LIST_DIR}/*.h
-     ${CMAKE_CURRENT_LIST_DIR}/*.hpp
-     )
+    ${CMAKE_CURRENT_LIST_DIR}/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/*.h
+    ${CMAKE_CURRENT_LIST_DIR}/*.hpp
+    )
 
 add_executable(APP_WINDOWS
-               ${SRC_FILES})
+    ${SRC_FILES})
 
 target_include_directories(APP_WINDOWS
                          PUBLIC
@@ -21,9 +21,9 @@ target_include_directories(APP_WINDOWS
 include(FetchContent)
 
 FetchContent_Declare(
-  rtaudio
-  GIT_REPOSITORY https://github.com/thestk/rtaudio.git
-  GIT_TAG        6.0.1  # 必要に応じて固定（例: 6.0.1 など）
+    rtaudio
+    GIT_REPOSITORY https://github.com/thestk/rtaudio.git
+    GIT_TAG        6.0.1  # 必要に応じて固定（例: 6.0.1 など）
 )
 
 # RtAudioのオプション設定（Fetch前に指定）
@@ -41,7 +41,7 @@ FetchContent_MakeAvailable(rtaudio)
 find_package(Threads REQUIRED)
 
 target_link_libraries(APP_WINDOWS
-     PRIVATE
-     rtaudio
-     Threads::Threads
+    PRIVATE
+    rtaudio
+    Threads::Threads
 )
