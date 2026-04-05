@@ -1,29 +1,11 @@
 ///
 /// @file processing.hpp
 ///
-
 #include <functional>
-#include <array>
 
 #include "AudioFrame.hpp"
 
 class PipelineContext {
-
-#if 0
-public:
-    bool attach( SignalProcessingObserver* observer );
-    bool detach( SignalProcessingObserver* observer );
-
-    void notify( StateChange property );
-
-private:
-
-
-    std::set<PersonObserver*> observers_;
-#endif
-
-private:
-
 
 public:
 
@@ -64,24 +46,37 @@ public:
 
 private:
 
+    ///
+    /// オーディオフレーム獲得.
+    ///
     AudioFrame
         acquire (
             void
         ) const;
 
+    ///
+    /// 前処理.
+    ///
     AudioFrame
         preprocess (
             const AudioFrame& input_frame
         ) const;
 
+    ///
+    /// 推論.
+    ///
     AudioFrame
         infer (
             const AudioFrame& preprocessed_frame
         ) const;
 
     ///
-    /// TODO: 出力処理は Observer パターンで実装したい.
+    /// オーディオ出力.
     ///
+    void
+        out (
+            const AudioFrame& infered_frame
+        ) const;
 
     AudioInputStrategy audio_input_strategy_;
 

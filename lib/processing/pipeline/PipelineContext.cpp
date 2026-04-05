@@ -45,4 +45,8 @@ void
     ///
     auto infered = this->infer(pp);
 
+    ///
+    /// Out.
+    ///
+    this->out(infered);
 }
