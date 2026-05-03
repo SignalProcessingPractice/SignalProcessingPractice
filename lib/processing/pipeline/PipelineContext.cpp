@@ -7,9 +7,7 @@
 #include "AudioFrame.hpp"
 
 PipelineContext::PipelineContext ( 
-        PipelineContext::AudioInputStrategy audio_input_strategy 
     )
-    : audio_input_strategy_( std::move(audio_input_strategy) )
 {
     /* do nothing. */
 }
@@ -19,7 +17,7 @@ PipelineContext::AudioFrame
         void
     ) const
 {
-    return this->audio_input_strategy_();
+    return this->audio_aquire_strategy_();
 }
 
 void 

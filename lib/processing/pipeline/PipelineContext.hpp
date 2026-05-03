@@ -25,7 +25,7 @@ public:
     ///
     /// TODO: 要素数は後で再検討
     ///
-    using AudioInputStrategy = 
+    using AudioAquireStrategy = 
         std::function< AudioFrame( void ) >;
 
 
@@ -33,7 +33,6 @@ public:
     /// コンストラクタ.
     ///
     explicit PipelineContext (
-            AudioInputStrategy audio_input_strategy
         );
 
     ///
@@ -78,6 +77,6 @@ private:
             const AudioFrame& infered_frame
         ) const;
 
-    AudioInputStrategy audio_input_strategy_;
+    AudioAquireStrategy audio_aquire_strategy_;
 
 };
