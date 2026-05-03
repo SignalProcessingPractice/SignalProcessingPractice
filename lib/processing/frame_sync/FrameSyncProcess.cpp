@@ -20,6 +20,13 @@ struct FrameSyncProcess::Impl
 {
 
 public:
+    Impl() = default;
+
+    Impl(const Impl&) = default;
+    Impl& operator=(const Impl&) = default;
+
+    Impl(Impl&&) = default;
+    Impl& operator=(Impl&&) = default;
 
     ///
     /// @todo pipeline_ の, 各 Strategy 初期値の設定方法を検討する.
@@ -62,7 +69,7 @@ const FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr() const
 ///
 FrameSyncProcess::FrameSyncProcess()
 {
-    std::construct_at(reinterpret_cast<Impl*>(&storage_));
+    std::construct_at(ImplPtr());
 }
 
 FrameSyncProcess::~FrameSyncProcess()

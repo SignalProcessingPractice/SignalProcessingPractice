@@ -4,20 +4,10 @@
 
 #include "PipelineContext.hpp"
 
-#include "AudioFrame.hpp"
-
-PipelineContext::PipelineContext ( 
+PipelineContext::PipelineContext (
     )
 {
     /* do nothing. */
-}
-
-PipelineContext::AudioFrame
-    PipelineContext::acquire (
-        void
-    ) const
-{
-    return this->audio_aquire_strategy_();
 }
 
 void 
@@ -28,23 +18,36 @@ void
     ///
     /// Acquire Audio Data.
     ///
-    /// TODO:   データ獲得に失敗した場合のエラー処理を実装する.
-    ///         構造体をムーブセマンティクスで返却するのがモダンらしい.
-    ///
     auto in = this->acquire();
 
     ///
     /// Pre-Processing.
     ///
-    auto pp = this->preprocess(in); 
+    auto pp = this->preprocess(std::move(in)); 
 
     ///
     /// Infering.
     ///
-    auto infered = this->infer(pp);
+    auto infered = this->infer(std::move(pp));
 
     ///
-    /// Out.
+    /// Output.
     ///
-    this->out(infered);
+    this->output(std::move(infered));
+}
+
+PipelineContext::AudioFrame
+    PipelineContext::acquire (
+        void
+    ) const
+{
+    return this->audio_aquire_strategy_();
+}
+
+PipelineContext::AudioFrame
+    PipelineContext::preprocess (
+        AudioFrame &&frame
+    ) const
+{
+    return this->pre_process_strategy_(std::move(frame));
 }

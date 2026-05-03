@@ -21,3 +21,18 @@ target_include_directories(
     SIGNAL_PROCESSING_PRACTICE_LIB
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/inc/)
+
+#
+# ETL の取り込み
+#
+include(FetchContent)
+
+FetchContent_Declare(
+    etl
+    GIT_REPOSITORY https://github.com/ETLCPP/etl.git
+    GIT_TAG        20.47.1
+)
+
+FetchContent_MakeAvailable(etl)
+
+target_link_libraries(SIGNAL_PROCESSING_PRACTICE_LIB PRIVATE etl::etl)
