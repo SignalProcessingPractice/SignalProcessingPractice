@@ -2,10 +2,10 @@
 # カレントディレクトリ配下のファイルをすべて取得 (再帰探索はしない)
 #
 file(GLOB SRC_FILES 
-    ${CMAKE_CURRENT_LIST_DIR}/processing/frame_sync/*.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/processing/frame_sync/*.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/processing/pipeline/*.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/processing/pipeline/*.hpp)
+    ${CMAKE_CURRENT_LIST_DIR}/src/common/frame_sync/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/common/frame_sync/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/common/pipeline/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/common/pipeline/*.hpp)
 
 #
 # Add a library target
