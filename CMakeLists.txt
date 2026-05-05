@@ -17,4 +17,3 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #
 include(${CMAKE_SOURCE_DIR}/app/app.cmake)
 include(${CMAKE_SOURCE_DIR}/lib/lib.cmake)
-include(${CMAKE_SOURCE_DIR}/tests/tests.cmake)

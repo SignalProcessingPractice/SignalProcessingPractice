@@ -1,11 +1,18 @@
 #
+# ユニットテスト用の CMake スクリプトをインクルード.
+#
+# TODO: ユニットテストを, 設定で OFF できるように検討する.
+#
+include(${CMAKE_CURRENT_LIST_DIR}/test/TEST.cmake)
+
+#
 # カレントディレクトリ配下のファイルをすべて取得 (再帰探索はしない)
 #
 file(GLOB SRC_FILES 
-    ${CMAKE_CURRENT_LIST_DIR}/src/common/frame_sync/*.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/common/frame_sync/*.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/common/pipeline/*.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/common/pipeline/*.hpp)
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/frame_sync/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/frame_sync/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/pipeline/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/pipeline/*.hpp)
 
 #
 # Add a library target
