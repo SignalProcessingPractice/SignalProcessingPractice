@@ -21,4 +21,4 @@ FetchContent_MakeAvailable(googletest)
 #
 # Add subdirectories
 #
-include(${CMAKE_CURRENT_LIST_DIR}/processing/TEST_processing.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/core/frame_sync/TEST_FrameSyncProcess.cmake)

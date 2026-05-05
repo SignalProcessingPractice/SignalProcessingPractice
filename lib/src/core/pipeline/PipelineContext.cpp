@@ -51,3 +51,19 @@ PipelineContext::AudioFrame
 {
     return this->pre_process_strategy_(std::move(frame));
 }
+
+PipelineContext::AudioFrame
+    PipelineContext::infer (
+        AudioFrame &&frame
+    ) const
+{
+    return this->infer_strategy_ (std::move(frame));
+}
+
+void
+    PipelineContext::output (
+        AudioFrame &&frame
+    ) const
+{
+    this->audio_output_startegy_(std::move(frame));
+}

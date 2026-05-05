@@ -1,7 +1,7 @@
 #
 # ユニットテスト用の CMake スクリプトをインクルード.
 #
-# TODO: ユニットテストを, 設定で OFF できるように検討する.
+# TODO: ユニットテストを, 設定で OFF を切り替えられるようにする.
 #
 include(${CMAKE_CURRENT_LIST_DIR}/test/TEST.cmake)
 
