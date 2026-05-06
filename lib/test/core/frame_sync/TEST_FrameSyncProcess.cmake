@@ -19,9 +19,12 @@ target_link_libraries(
     SIGNAL_PROCESSING_PRACTICE_LIB
 )
 
+target_include_directories(
+    TEST_FrameSyncProcess
+    PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/../../../../inc/)
+
 add_test(
     NAME TEST_FrameSyncProcess
     COMMAND TEST_FrameSyncProcess
 )
-
-enable_testing()

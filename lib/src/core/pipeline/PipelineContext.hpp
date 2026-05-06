@@ -1,64 +1,11 @@
 ///
 /// @file processing.hpp
 ///
-#include <etl/delegate.h>
-
-#include "AudioFrame.hpp"
+#include "FrameSyncProcess.hpp"
 
 class PipelineContext {
 
 public:
-
-///
-/// @name オーディオフレーム.
-/// {@
-
-    ///
-    /// オーディオフレームの 1 フレーム辺りのサンプル数.
-    ///
-    /// TODO: サンプル数は後で再検討する.
-    ///
-    static constexpr std::size_t audio_frame_length = 256;
-
-    ///
-    /// オーディオフレーム.
-    ///
-    using AudioFrame =
-        AudioFrameTemplate<audio_frame_length, double>;
-
-/// @}
-
-///
-/// @name Strategy.
-/// {@
-
-    static constexpr std::size_t strategy_size = 64;
-
-    ///
-    /// オーディオフレーム獲得.
-    ///
-    using AudioAquireStrategy = 
-        etl::delegate< AudioFrame( void ) >;
-
-    ///
-    /// オーディオ前処理.
-    ///
-    using PreProcessStrategy = 
-        etl::delegate< AudioFrame( AudioFrame &&frame ) >;
-
-    ///
-    /// 推論.
-    ///
-    using InferStrategy = 
-        etl::delegate< AudioFrame( AudioFrame &&frame ) >;
-
-    ///
-    /// オーディオ出力.
-    ///
-    using AudioOutputStrategy = 
-        etl::delegate< void( AudioFrame &&frame ) >;
-
-/// @}
 
 ///
 /// @name ctor, dtor.

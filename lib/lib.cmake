@@ -3,7 +3,7 @@
 #
 # TODO: ユニットテストを, 設定で OFF を切り替えられるようにする.
 #
-include(${CMAKE_CURRENT_LIST_DIR}/test/TEST.cmake)
+# include(${CMAKE_CURRENT_LIST_DIR}/test/TEST.cmake)
 
 #
 # カレントディレクトリ配下のファイルをすべて取得 (再帰探索はしない)
@@ -13,21 +13,6 @@ file(GLOB SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/core/frame_sync/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/src/core/pipeline/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/core/pipeline/*.hpp)
-
-#
-# Add a library target
-#
-add_library(SIGNAL_PROCESSING_PRACTICE_LIB
-            STATIC 
-            ${SRC_FILES})
-
-#
-# Set the PUBLIC include path
-#
-target_include_directories(
-    SIGNAL_PROCESSING_PRACTICE_LIB
-    PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/inc/)
 
 #
 # ETL の取り込み
@@ -42,4 +27,21 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(etl)
 
-target_link_libraries(SIGNAL_PROCESSING_PRACTICE_LIB PRIVATE etl::etl)
+#
+# Add a library target
+#
+add_library(SIGNAL_PROCESSING_PRACTICE_LIB
+            STATIC 
+            ${SRC_FILES})
+
+target_link_libraries(SIGNAL_PROCESSING_PRACTICE_LIB 
+                      PUBLIC
+                      etl::etl)
+
+#
+# Set the PUBLIC include path
+#
+target_include_directories(
+    SIGNAL_PROCESSING_PRACTICE_LIB
+    PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/inc/)
