@@ -37,7 +37,7 @@ private:
     ///
     /// オーディオフレーム獲得.
     ///
-    AudioFrame
+    FrameSyncProcess::AudioFrame
         acquire (
             void
         ) const;
@@ -45,17 +45,17 @@ private:
     ///
     /// 前処理.
     ///
-    AudioFrame
+    FrameSyncProcess::AudioFrame
         preprocess (
-            AudioFrame&& frame
+            FrameSyncProcess::AudioFrame&& frame
         ) const;
 
     ///
     /// 推論.
     ///
-    AudioFrame
+    FrameSyncProcess::AudioFrame
         infer (
-            AudioFrame&& frame
+            FrameSyncProcess::AudioFrame&& frame
         ) const;
 
     ///
@@ -63,13 +63,13 @@ private:
     ///
     void
         output (
-            AudioFrame&& frame
+            FrameSyncProcess::AudioFrame&& frame
         ) const;
 
 
-    AudioAquireStrategy     audio_aquire_strategy_;
-    PreProcessStrategy      pre_process_strategy_;
-    InferStrategy           infer_strategy_;
-    AudioOutputStrategy     audio_output_startegy_;
+    FrameSyncProcess::AudioAquireStrategy     audio_aquire_strategy_;
+    FrameSyncProcess::PreProcessStrategy      pre_process_strategy_;
+    FrameSyncProcess::InferStrategy           infer_strategy_;
+    FrameSyncProcess::AudioOutputStrategy     audio_output_startegy_;
 
 };

@@ -3,6 +3,7 @@
 ///
 
 #include "PipelineContext.hpp"
+#include "FrameSyncProcess.hpp"
 
 PipelineContext::PipelineContext (
     )
@@ -36,7 +37,7 @@ void
     this->output(std::move(infered));
 }
 
-PipelineContext::AudioFrame
+FrameSyncProcess::AudioFrame
     PipelineContext::acquire (
         void
     ) const
@@ -44,17 +45,17 @@ PipelineContext::AudioFrame
     return this->audio_aquire_strategy_();
 }
 
-PipelineContext::AudioFrame
+FrameSyncProcess::AudioFrame
     PipelineContext::preprocess (
-        AudioFrame &&frame
+        FrameSyncProcess::AudioFrame &&frame
     ) const
 {
     return this->pre_process_strategy_(std::move(frame));
 }
 
-PipelineContext::AudioFrame
+FrameSyncProcess::AudioFrame
     PipelineContext::infer (
-        AudioFrame &&frame
+        FrameSyncProcess::AudioFrame &&frame
     ) const
 {
     return this->infer_strategy_ (std::move(frame));
@@ -62,7 +63,7 @@ PipelineContext::AudioFrame
 
 void
     PipelineContext::output (
-        AudioFrame &&frame
+        FrameSyncProcess::AudioFrame &&frame
     ) const
 {
     this->audio_output_startegy_(std::move(frame));
