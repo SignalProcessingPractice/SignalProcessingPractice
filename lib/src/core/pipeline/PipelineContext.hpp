@@ -30,6 +30,30 @@ public:
         exec (
             void
         ) const;
+
+    ///
+    /// 各 Strategy 設定.
+    ///
+    void 
+        SetConfig(
+            FrameSyncProcess::AquireTag tag, 
+            FrameSyncProcess::AudioAquireStrategy strategy
+        );
+    void 
+        SetConfig(
+            FrameSyncProcess::PreProcessTag tag, 
+            FrameSyncProcess::PreProcessStrategy strategy
+        );
+    void 
+        SetConfig(
+            FrameSyncProcess::InferTag tag, 
+            FrameSyncProcess::InferStrategy strategy
+        );
+    void 
+        SetConfig(
+            FrameSyncProcess::OutputTag tag, 
+            FrameSyncProcess::AudioOutputStrategy strategy
+        );
 /// @}
 
 private:
@@ -70,6 +94,6 @@ private:
     FrameSyncProcess::AudioAquireStrategy     audio_aquire_strategy_;
     FrameSyncProcess::PreProcessStrategy      pre_process_strategy_;
     FrameSyncProcess::InferStrategy           infer_strategy_;
-    FrameSyncProcess::AudioOutputStrategy     audio_output_startegy_;
+    FrameSyncProcess::AudioOutputStrategy     audio_output_strategy_;
 
 };

@@ -113,12 +113,53 @@ void FrameSyncProcess::Detach(void)
     ///
 }
 
-void FrameSyncProcess::SetConfig(void)
+
+///
+/// @brief SetConfig 共通処理.
+///
+template<typename Tag, typename Strategy>
+    void SetConfigImpl(
+        FrameSyncProcess::Impl* impl, 
+        Tag tag, 
+        Strategy strategy
+    )
 {
-    ///
-    /// TODO: 実装.
-    ///
+    impl->pipeline_.SetConfig(tag, strategy);
 }
+
+void 
+    FrameSyncProcess::SetConfig(
+        AquireTag tag, 
+        AudioAquireStrategy strategy
+    )
+{
+    SetConfigImpl(ImplPtr(), tag, strategy);
+}
+void 
+    FrameSyncProcess::SetConfig(
+        PreProcessTag tag, 
+        PreProcessStrategy strategy
+    )
+{
+    SetConfigImpl(ImplPtr(), tag, strategy);
+}
+void 
+    FrameSyncProcess::SetConfig(
+        InferTag tag, 
+        InferStrategy strategy
+    )
+{
+    SetConfigImpl(ImplPtr(), tag, strategy);
+}
+void 
+    FrameSyncProcess::SetConfig(
+        OutputTag tag, 
+        AudioOutputStrategy strategy
+    )
+{
+    SetConfigImpl(ImplPtr(), tag, strategy);
+}
+
 
 void FrameSyncProcess::ProcessFrame(void)
 {

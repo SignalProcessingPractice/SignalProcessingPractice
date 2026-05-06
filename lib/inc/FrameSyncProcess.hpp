@@ -107,13 +107,21 @@ public:
     ///
     /// 処理設定.
     ///
-    void SetConfig();
+    void SetConfig(AquireTag tag, AudioAquireStrategy strategy);
+    void SetConfig(PreProcessTag tag, PreProcessStrategy strategy);
+    void SetConfig(InferTag tag, InferStrategy strategy);
+    void SetConfig(OutputTag tag, AudioOutputStrategy strategy);
 
     ///
     /// 1 フレーム分の処理を実行.
     ///
     void ProcessFrame(void);
 /// @}
+
+    ///
+    /// Impl 前方宣言.
+    ///
+    struct Impl;
 
 private:
 
@@ -128,7 +136,6 @@ private:
     ///
     /// Impl へのキャスト用.
     ///
-    struct Impl;
     Impl* ImplPtr();
     const Impl* ImplPtr() const;
 

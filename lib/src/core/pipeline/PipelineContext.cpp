@@ -66,5 +66,5 @@ void
         FrameSyncProcess::AudioFrame &&frame
     ) const
 {
-    this->audio_output_startegy_(std::move(frame));
+    this->audio_output_strategy_(std::move(frame));
 }
