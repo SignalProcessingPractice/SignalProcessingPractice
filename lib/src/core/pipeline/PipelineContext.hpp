@@ -34,6 +34,8 @@ public:
     ///
     /// 各 Strategy 設定.
     ///
+    /// @todo 設定処理の共通化を検討する. (Visitor パターンなど)
+    ///
     void 
         SetConfig(
             FrameSyncProcess::AquireTag tag, 

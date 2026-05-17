@@ -68,3 +68,40 @@ void
 {
     this->audio_output_strategy_(std::move(frame));
 }
+
+
+void 
+    PipelineContext::SetConfig(
+        FrameSyncProcess::AquireTag tag, 
+        FrameSyncProcess::AudioAquireStrategy strategy
+    )
+{
+    this->audio_aquire_strategy_ = strategy;
+}
+
+void 
+    PipelineContext::SetConfig(
+        FrameSyncProcess::PreProcessTag tag, 
+        FrameSyncProcess::PreProcessStrategy strategy
+    )
+{
+    this->pre_process_strategy_ = strategy;
+}
+
+void 
+    PipelineContext::SetConfig(
+        FrameSyncProcess::InferTag tag, 
+        FrameSyncProcess::InferStrategy strategy
+    )
+{
+    this->infer_strategy_ = strategy;
+}
+
+void 
+    PipelineContext::SetConfig(
+        FrameSyncProcess::OutputTag tag, 
+        FrameSyncProcess::AudioOutputStrategy strategy
+    )
+{
+    this->audio_output_strategy_ = strategy;
+}
