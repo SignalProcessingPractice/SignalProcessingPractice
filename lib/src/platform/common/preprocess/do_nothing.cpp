@@ -9,5 +9,5 @@ FrameSyncProcess::AudioFrame
     )
 {
     // 何もしないでフレームをそのまま返す.
-    return std::move(frame);
+    return frame;
 }

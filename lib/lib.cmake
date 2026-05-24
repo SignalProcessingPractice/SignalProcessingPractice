@@ -3,7 +3,7 @@
 #
 # TODO: ユニットテストを, 設定で OFF を切り替えられるようにする.
 #
-# include(${CMAKE_CURRENT_LIST_DIR}/test/TEST.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/test/TEST.cmake)
 
 #
 # カレントディレクトリ配下のファイルをすべて取得 (再帰探索はしない)
@@ -12,7 +12,11 @@ file(GLOB SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/core/frame_sync/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/core/frame_sync/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/src/core/pipeline/*.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/core/pipeline/*.hpp)
+    ${CMAKE_CURRENT_LIST_DIR}/src/core/pipeline/*.hpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/acquire/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/acquire/*.hpp
+    )
 
 #
 # ETL の取り込み
