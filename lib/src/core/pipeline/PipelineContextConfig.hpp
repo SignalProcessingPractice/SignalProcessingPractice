@@ -10,6 +10,7 @@
 #include "Strategies/null_strategies.hpp"
 #include "Strategies/Overlapper.hpp"
 #include "Strategies/OverlapAdder.hpp"
+#include "Strategies/HannWindow.hpp"
 
 struct PipelineContextConfig
 {
@@ -17,7 +18,7 @@ struct PipelineContextConfig
     FrameSyncProcess::PreProcessStrategy      pre_process_strategy     = null_preprocess;
     FrameSyncProcess::OverlapStrategy         overlap_strategy         = default_overlapper_delegate_;
 
-    FrameSyncProcess::WindowStrategy          window_strategy          = null_window;
+    FrameSyncProcess::WindowStrategy          window_strategy          = default_window_delegate_;
     FrameSyncProcess::FftStrategy             fft_strateg;
     FrameSyncProcess::InferStrategy           infer_strategy;
 
@@ -34,6 +35,11 @@ private:
     FrameSyncProcess::OverlapStrategy default_overlapper_delegate_ =
         FrameSyncProcess::OverlapStrategy
             ::create<Overlapper, &Overlapper::Execute>(default_overlapper_);
+    
+    HannWindow default_window_;
+    FrameSyncProcess::WindowStrategy default_window_delegate_ =
+        FrameSyncProcess::WindowStrategy
+            ::create<HannWindow, &HannWindow::Execute>(default_window_);
 
     OverlapAdder default_overlap_adder_;
     FrameSyncProcess::OverlapAddStrategy default_overlap_adder_delegate_ =

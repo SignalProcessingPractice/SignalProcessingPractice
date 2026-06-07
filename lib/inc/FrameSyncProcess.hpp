@@ -28,13 +28,13 @@ public:
     /// オーディオホップ.
     ///
     using AudioHop =
-        AudioFrameTemplate<audio_hop_length, double>;
+        AudioFrameTemplate<audio_hop_length, float>;
 
     ///
     /// オーディオフレーム.
     ///
     using AudioFrame =
-        AudioFrameTemplate<audio_frame_length, double>;
+        AudioFrameTemplate<audio_frame_length, float>;
 
 /// @}
 
