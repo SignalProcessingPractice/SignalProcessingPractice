@@ -38,6 +38,14 @@ FrameSyncProcess::AudioFrame
     );
 
 ///
+/// @brief Null Infer strategy.
+///
+FrameSyncProcess::AudioFrame
+    null_infer (
+        FrameSyncProcess::AudioFrame &&frame
+    );
+
+///
 /// @brief Null output strategy.
 ///
 void

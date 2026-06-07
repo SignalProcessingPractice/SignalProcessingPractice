@@ -103,6 +103,9 @@ public:
     ///
     /// 推論.
     ///
+    /// @note Infer Strategy では, Observer から推論結果を受け取る設計とする.
+    ///       返り値は, 何らかの時間軸または周波数軸の推論結果を返すモデルであれば有効なフレームを返し, そうでなければ空フレームを返す.
+    ///
     using InferStrategy = 
         etl::delegate< AudioFrame( AudioFrame &&frame ) >;
 
