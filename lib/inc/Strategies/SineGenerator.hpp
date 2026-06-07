@@ -13,7 +13,7 @@ public:
         double amplitude = 0.5
     );
 
-    FrameSyncProcess::AudioFrame GenerateOneFrame();
+    FrameSyncProcess::AudioHop GenerateOneHop();
 
     void SetFrequency(double frequency);
 

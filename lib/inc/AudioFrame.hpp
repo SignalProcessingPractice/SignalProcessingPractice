@@ -30,6 +30,10 @@ public:
     constexpr void set_sample_rate(uint32_t rate) noexcept { sample_rate_ = rate; }
     constexpr std::size_t size() const noexcept { return NumSamples; }
 
+    // インデクサで特定のサンプルへアクセス
+    constexpr SampleType& operator[](std::size_t index) noexcept { return data_[index]; }
+    constexpr const SampleType& operator[](std::size_t index) const noexcept { return data_[index]; }
+
     // データへのアクセス
     constexpr SampleType* data() noexcept { return data_.data(); }
     constexpr const SampleType* data() const noexcept { return data_.data(); }

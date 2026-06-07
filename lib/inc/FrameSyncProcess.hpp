@@ -21,7 +21,14 @@ public:
     ///
     /// TODO: サンプル数は後で再検討する.
     ///
-    static constexpr std::size_t audio_frame_length = 256;
+    static constexpr std::size_t audio_frame_length = 1024;
+    static constexpr std::size_t audio_hop_length   = 512;
+
+    ///
+    /// オーディオホップ.
+    ///
+    using AudioHop =
+        AudioFrameTemplate<audio_hop_length, double>;
 
     ///
     /// オーディオフレーム.
@@ -41,13 +48,23 @@ public:
 
     struct Aquire {};
     struct PreProcess {};
+    struct Overlap {};
+    struct Window {};
+    struct Fft {};
     struct Infer {};
+    struct PostProcess {};
+    struct OverlapAdd {};
     struct Output {};
 
-    using AquireTag     = tag_t<Aquire>;
-    using PreProcessTag = tag_t<PreProcess>;
-    using InferTag      = tag_t<Infer>;
-    using OutputTag     = tag_t<Output>;
+    using AquireTag         = tag_t<Aquire>;
+    using PreProcessTag     = tag_t<PreProcess>;
+    using OverlapTag        = tag_t<Overlap>;
+    using WindowTag         = tag_t<Window>;
+    using FftTag            = tag_t<Fft>;
+    using InferTag          = tag_t<Infer>;
+    using PostProcessTag    = tag_t<PostProcess>;
+    using OverlapAddTag     = tag_t<OverlapAdd>;
+    using OutputTag         = tag_t<Output>;
 /// @}
 
 ///
@@ -57,12 +74,30 @@ public:
     /// オーディオフレーム獲得.
     ///
     using AudioAquireStrategy = 
-        etl::delegate< AudioFrame( void ) >;
+        etl::delegate< AudioHop( void ) >;
 
     ///
     /// オーディオ前処理.
     ///
     using PreProcessStrategy = 
+        etl::delegate< AudioHop( AudioHop &&frame ) >;
+
+    ///
+    /// オーバーラッピング.
+    ///
+    using OverlapStrategy = 
+        etl::delegate< AudioFrame( AudioHop &&frame ) >;
+
+    ///
+    /// 窓関数の積算.
+    ///
+    using WindowStrategy = 
+        etl::delegate< AudioFrame( AudioFrame &&frame ) >;
+
+    ///
+    /// FFT.
+    ///
+    using FftStrategy = 
         etl::delegate< AudioFrame( AudioFrame &&frame ) >;
 
     ///
@@ -72,10 +107,22 @@ public:
         etl::delegate< AudioFrame( AudioFrame &&frame ) >;
 
     ///
+    /// オーディオ後処理.
+    ///
+    using PostProcessStrategy = 
+        etl::delegate< AudioFrame( AudioFrame &&frame ) >;
+
+    ///
+    /// Overlap-Add.
+    ///
+    using OverlapAddStrategy = 
+        etl::delegate< AudioHop( AudioFrame &&frame ) >;
+
+    ///
     /// オーディオ出力.
     ///
     using AudioOutputStrategy = 
-        etl::delegate< void( AudioFrame &&frame ) >;
+        etl::delegate< void( AudioHop &&frame ) >;
 /// @}
 
 ///
@@ -109,7 +156,12 @@ public:
     ///
     void SetConfig(AquireTag tag, AudioAquireStrategy strategy);
     void SetConfig(PreProcessTag tag, PreProcessStrategy strategy);
+    void SetConfig(OverlapTag tag, OverlapStrategy strategy);
+    void SetConfig(WindowTag tag, WindowStrategy strategy);
+    void SetConfig(FftTag tag, FftStrategy strategy);
     void SetConfig(InferTag tag, InferStrategy strategy);
+    void SetConfig(PostProcessTag tag, PostProcessStrategy strategy);
+    void SetConfig(OverlapAddTag tag, OverlapAddStrategy strategy);
     void SetConfig(OutputTag tag, AudioOutputStrategy strategy);
 
     ///
@@ -128,7 +180,7 @@ private:
     ///
     /// Impl サイズの上限.
     ///
-    static constexpr std::size_t kImplSize  = 1024;
+    static constexpr std::size_t kImplSize  = 16384; // 16KB
     static constexpr std::size_t kImplAlign = alignof(std::max_align_t);
 
     alignas(kImplAlign) std::byte storage_[kImplSize];

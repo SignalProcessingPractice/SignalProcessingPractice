@@ -14,27 +14,27 @@ SineGenerator sine_gen_validator(440.0, 0.5);
 TEST(FrameSync, InputEqualOutput) {
 
     auto input_delegate =
-    etl::delegate<FrameSyncProcess::AudioFrame(void)>
-        ::create<SineGenerator, &SineGenerator::GenerateOneFrame>(sine_gen_inputer);
+    etl::delegate<FrameSyncProcess::AudioHop(void)>
+        ::create<SineGenerator, &SineGenerator::GenerateOneHop>(sine_gen_inputer);
 
     proc.SetConfig(
         FrameSyncProcess::AquireTag{},
         input_delegate
     );
 
-    auto output_delegate = []( FrameSyncProcess::AudioFrame frame ) {
+    auto output_delegate = []( FrameSyncProcess::AudioHop hop ) {
         // ここでは, 単純に入力と同じフレームを出力することを想定している.
         // つまり, 入力と出力が同一であることを検証する.
-        EXPECT_TRUE(frame == sine_gen_validator.GenerateOneFrame());
+        EXPECT_TRUE(hop == sine_gen_validator.GenerateOneHop());
     };
     proc.SetConfig(
         FrameSyncProcess::OutputTag{},
         output_delegate
     );
 
-    auto preprocess_delegate = []( FrameSyncProcess::AudioFrame frame ) {
+    auto preprocess_delegate = []( FrameSyncProcess::AudioHop hop ) {
         // 何もしないでフレームをそのまま返す.
-        return frame;
+        return hop;
     };
     proc.SetConfig(
         FrameSyncProcess::PreProcessTag{},
