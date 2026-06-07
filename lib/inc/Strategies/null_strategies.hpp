@@ -30,6 +30,14 @@ FrameSyncProcess::AudioFrame
     );
 
 ///
+/// @brief Null Window strategy.
+///
+FrameSyncProcess::AudioFrame
+    null_window (
+        FrameSyncProcess::AudioFrame &&frame
+    );
+
+///
 /// @brief Null output strategy.
 ///
 void

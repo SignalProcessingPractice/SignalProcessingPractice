@@ -33,6 +33,15 @@ FrameSyncProcess::AudioFrame
     return frame;
 }
 
+FrameSyncProcess::AudioFrame
+    null_window (
+        FrameSyncProcess::AudioFrame &&frame
+    )
+{
+    // 何もしないでフレームをそのまま返す.
+    return frame;
+}
+
 void
     null_output (
         FrameSyncProcess::AudioHop &&frame

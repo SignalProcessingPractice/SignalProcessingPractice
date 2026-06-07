@@ -17,8 +17,8 @@ struct PipelineContextConfig
     FrameSyncProcess::PreProcessStrategy      pre_process_strategy     = null_preprocess;
     FrameSyncProcess::OverlapStrategy         overlap_strategy         = default_overlapper_delegate_;
 
-    FrameSyncProcess::WindowStrategy          window_strategy;
-    FrameSyncProcess::FftStrategy             fft_strategy;
+    FrameSyncProcess::WindowStrategy          window_strategy          = null_window;
+    FrameSyncProcess::FftStrategy             fft_strateg;
     FrameSyncProcess::InferStrategy           infer_strategy;
 
     FrameSyncProcess::PostProcessStrategy     post_process_strategy    = null_postprocess;
