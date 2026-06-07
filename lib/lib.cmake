@@ -18,11 +18,11 @@ file(GLOB SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/acquire/*.hpp
     )
 
-#
-# ETL の取り込み
-#
 include(FetchContent)
 
+#
+# ETL のインクルード
+#
 FetchContent_Declare(
     etl
     GIT_REPOSITORY https://github.com/ETLCPP/etl.git
@@ -30,6 +30,17 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(etl)
+
+#
+# CMSIS-DSP のインクルード
+#
+FetchContent_Declare(
+    cmsis_dsp
+    GIT_REPOSITORY https://github.com/ARM-software/CMSIS-DSP.git
+    GIT_TAG        v1.17.0
+)
+
+FetchContent_MakeAvailable(cmsis_dsp)
 
 #
 # Add a library target
@@ -40,7 +51,8 @@ add_library(SIGNAL_PROCESSING_PRACTICE_LIB
 
 target_link_libraries(SIGNAL_PROCESSING_PRACTICE_LIB 
                       PUBLIC
-                      etl::etl)
+                      etl::etl
+                      CMSISDSP)
 
 #
 # Set the PUBLIC include path
