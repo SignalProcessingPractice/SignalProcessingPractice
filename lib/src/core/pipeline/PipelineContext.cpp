@@ -3,10 +3,29 @@
 ///
 
 #include "PipelineContext.hpp"
+
 #include "FrameSyncProcess.hpp"
+#include "FrameSyncProcessConfig.hpp"
+#include <cmath>
 
 PipelineContext::PipelineContext (
     )
+    : PipelineContext(FrameSyncProcessConfig{})
+{
+}
+
+PipelineContext::PipelineContext (
+    const FrameSyncProcessConfig& config
+    )
+    : audio_aquire_strategy_(config.audio_aquire_strategy),
+      pre_process_strategy_(config.pre_process_strategy),
+      overlap_strategy_(config.overlap_strategy),
+      window_strategy_(config.window_strategy),
+      fft_strategy_(config.fft_strategy),
+      infer_strategy_(config.infer_strategy),
+      post_process_strategy_(config.post_process_strategy),
+      overlap_add_strategy_(config.overlap_add_strategy),
+      audio_output_strategy_(config.audio_output_strategy)
 {
     /* do nothing. */
 }

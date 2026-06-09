@@ -16,6 +16,22 @@ file(GLOB SRC_FILES
 
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/acquire/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/acquire/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/fft/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/fft/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/infer/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/infer/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap_adder/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap_adder/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/output/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/output/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/preprocess/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/preprocess/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/shared_logic/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/shared_logic/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/window/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/window/*.hpp
     )
 
 include(FetchContent)

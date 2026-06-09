@@ -42,6 +42,18 @@ FrameSyncProcess::AudioFrame
     return frame;
 }
 
+FrameSyncProcess::AudioFrame
+    null_infer (
+        FrameSyncProcess::AudioFrame &&frame
+    )
+{
+    ///
+    /// 推論を行わず, フレームを無音化して返す.
+    ///
+    std::fill(frame.begin(), frame.end(), 0.0f);
+    return std::move(frame);
+}
+
 void
     null_output (
         FrameSyncProcess::AudioHop &&frame

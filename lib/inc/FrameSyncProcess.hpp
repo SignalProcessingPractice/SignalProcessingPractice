@@ -8,6 +8,15 @@
 
 #include "AudioFrame.hpp"
 
+///
+/// 前方宣言.
+///
+/// TODO: FrameSyncProcess.hpp と FrameSyncProcessConfig.hpp で相互参照が発生している.
+///       現状は FrameSyncProcessConfig の前方宣言によってコンパイルエラーを一時的に
+///       回避しているが, 将来的には依存関係の解消を検討する必要がある.
+///
+struct FrameSyncProcessConfig;
+
 class FrameSyncProcess
 {
 public:
@@ -132,6 +141,7 @@ public:
 /// @name ctor, dtor.
 /// {@
     FrameSyncProcess();
+    FrameSyncProcess(const FrameSyncProcessConfig &config);
     ~FrameSyncProcess();
 
     FrameSyncProcess(FrameSyncProcess&&);
@@ -192,6 +202,7 @@ private:
     /// Impl へのキャスト用.
     ///
     Impl* ImplPtr();
+    Impl* ImplPtr(const FrameSyncProcessConfig &config);
     const Impl* ImplPtr() const;
 
     ///

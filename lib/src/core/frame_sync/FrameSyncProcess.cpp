@@ -6,6 +6,7 @@
 #include <memory>
 #include <utility>
 
+#include "FrameSyncProcessConfig.hpp"
 #include "../pipeline/PipelineContext.hpp"
 
 ///
@@ -20,7 +21,9 @@ struct FrameSyncProcess::Impl
 {
 
 public:
-    Impl() = default;
+    Impl() : pipeline_() {};
+
+    Impl(const FrameSyncProcessConfig &config) : pipeline_(config) {}
 
     Impl(const Impl&) = default;
     Impl& operator=(const Impl&) = default;
@@ -28,11 +31,9 @@ public:
     Impl(Impl&&) = default;
     Impl& operator=(Impl&&) = default;
 
-    ///
-    /// @todo pipeline_ の, 各 Strategy 初期値の設定方法を検討する.
-    ///
-    PipelineContext pipeline_{ };
 
+    PipelineContext pipeline_;
+    
 };
 
 ///
@@ -55,6 +56,11 @@ FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr()
     return reinterpret_cast<Impl*>(&storage_);
 }
 
+FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr(const FrameSyncProcessConfig &config)
+{
+    return reinterpret_cast<Impl*>(&storage_);
+}
+
 const FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr() const
 {
     return reinterpret_cast<const Impl*>(&storage_);
@@ -70,6 +76,11 @@ const FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr() const
 FrameSyncProcess::FrameSyncProcess()
 {
     std::construct_at(ImplPtr());
+}
+
+FrameSyncProcess::FrameSyncProcess(const FrameSyncProcessConfig &config)
+{
+    std::construct_at(ImplPtr(config));
 }
 
 FrameSyncProcess::~FrameSyncProcess()

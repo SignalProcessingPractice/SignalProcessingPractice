@@ -2,7 +2,6 @@
 /// @file PipelineContext.hpp
 ///
 #include "FrameSyncProcess.hpp"
-#include "PipelineContextConfig.hpp"
 
 #include "Strategies/Overlapper.hpp"
 
@@ -14,6 +13,9 @@ public:
 /// @name ctor, dtor.
 /// {@
     explicit PipelineContext (
+        );
+    explicit PipelineContext (
+        const FrameSyncProcessConfig& config
         );
 
     PipelineContext(const PipelineContext&) = default;
