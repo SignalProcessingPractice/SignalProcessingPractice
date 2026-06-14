@@ -1,5 +1,5 @@
 ///
-/// @file OverlapAdder.hpp
+/// @file RectangleOverlapAdder.hpp
 ///
 #pragma once
 
@@ -8,12 +8,10 @@
 ///
 /// @brief 矩形波窓を使用した Overlap-Add.
 ///
-/// @todo  Overlap-Add はあまり真面目に実装していないので, 必要に応じて見直す.
-///
-class OverlapAdder
+class RectangleOverlapAdder
 {
 public:
-    OverlapAdder() = default;
+    RectangleOverlapAdder() = default;
 
     FrameSyncProcess::AudioHop
         Execute(
@@ -22,5 +20,6 @@ public:
 
 private:
 
+    FrameSyncProcess::AudioHop   hop_buffer_{};
     FrameSyncProcess::AudioFrame frame_buffer_{};
 };
