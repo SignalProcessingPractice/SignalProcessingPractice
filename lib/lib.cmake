@@ -28,6 +28,8 @@ file(GLOB SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/output/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/preprocess/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/preprocess/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/postprocess/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/postprocess/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/shared_logic/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/shared_logic/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/window/*.cpp

@@ -13,6 +13,7 @@
 extern FrameSyncProcess::OverlapStrategy    default_overlapper_delegate_;
 extern FrameSyncProcess::WindowStrategy     default_rectangle_window_delegate_;
 extern FrameSyncProcess::FftStrategy        default_fft_delegate_;
+extern FrameSyncProcess::FftStrategy        default_ifft_postprocess_delegate_;
 extern FrameSyncProcess::OverlapAddStrategy default_rectangle_overlap_adder_delegate_;
 
 
@@ -27,7 +28,7 @@ public:
     FrameSyncProcess::FftStrategy             fft_strategy             = default_fft_delegate_;
     FrameSyncProcess::InferStrategy           infer_strategy           = through_infer;
 
-    FrameSyncProcess::PostProcessStrategy     post_process_strategy    = through_postprocess;
+    FrameSyncProcess::PostProcessStrategy     post_process_strategy    = default_ifft_postprocess_delegate_;
     FrameSyncProcess::OverlapAddStrategy      overlap_add_strategy     = default_rectangle_overlap_adder_delegate_;
     FrameSyncProcess::AudioOutputStrategy     audio_output_strategy    = null_output;
 
