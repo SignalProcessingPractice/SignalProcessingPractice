@@ -56,11 +56,6 @@ FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr()
     return reinterpret_cast<Impl*>(&storage_);
 }
 
-FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr(const FrameSyncProcessConfig &config)
-{
-    return reinterpret_cast<Impl*>(&storage_);
-}
-
 const FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr() const
 {
     return reinterpret_cast<const Impl*>(&storage_);
@@ -80,7 +75,7 @@ FrameSyncProcess::FrameSyncProcess()
 
 FrameSyncProcess::FrameSyncProcess(const FrameSyncProcessConfig &config)
 {
-    std::construct_at(ImplPtr(config));
+    std::construct_at(ImplPtr(), config);
 }
 
 FrameSyncProcess::~FrameSyncProcess()
