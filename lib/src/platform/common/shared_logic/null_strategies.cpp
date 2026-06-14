@@ -16,7 +16,7 @@ FrameSyncProcess::AudioHop
 }
 
 FrameSyncProcess::AudioHop
-    null_preprocess (
+    through_preprocess (
         FrameSyncProcess::AudioHop &&frame
     )
 {
@@ -25,7 +25,7 @@ FrameSyncProcess::AudioHop
 }
 
 FrameSyncProcess::AudioFrame
-    null_postprocess (
+    through_postprocess (
         FrameSyncProcess::AudioFrame &&frame
     )
 {
@@ -39,6 +39,17 @@ FrameSyncProcess::AudioFrame
     )
 {
     // 何もしないでフレームをそのまま返す.
+    return frame;
+}
+
+FrameSyncProcess::AudioFrame
+    through_infer (
+        FrameSyncProcess::AudioFrame &&frame
+    )
+{
+    ///
+    /// 推論を行わず, フレームをそのまま返す.
+    ///
     return frame;
 }
 

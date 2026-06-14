@@ -17,7 +17,7 @@ FrameSyncProcess::AudioHop
 /// @brief Null preprocessing strategy.
 ///
 FrameSyncProcess::AudioHop
-    null_preprocess (
+    through_preprocess (
         FrameSyncProcess::AudioHop &&frame
     );
 
@@ -25,7 +25,7 @@ FrameSyncProcess::AudioHop
 /// @brief Null postprocessing strategy.
 ///
 FrameSyncProcess::AudioFrame
-    null_postprocess (
+    through_postprocess (
         FrameSyncProcess::AudioFrame &&frame
     );
 
@@ -34,6 +34,14 @@ FrameSyncProcess::AudioFrame
 ///
 FrameSyncProcess::AudioFrame
     null_window (
+        FrameSyncProcess::AudioFrame &&frame
+    );
+
+///
+/// @brief Through Infer strategy.
+///
+FrameSyncProcess::AudioFrame
+    through_infer (
         FrameSyncProcess::AudioFrame &&frame
     );
 
