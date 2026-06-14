@@ -5,6 +5,14 @@
 
 #include "FrameSyncProcess.hpp"
 
+///
+/// @brief オーバーラッピング処理.
+///
+/// @note  Pipeline 上の各 Strategy と抽象化を合わせておく意図で, 
+///        オーバーラッピング処理の具象ストラテジを本クラスに別けて
+///        実装している. ただし, オーバーラッピング処理に他の具象
+///        ストラテジを実装する状況はまず無いだろう.
+///
 FrameSyncProcess::AudioFrame
     Overlapper::Execute(
         FrameSyncProcess::AudioHop&& hop
