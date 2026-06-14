@@ -10,9 +10,9 @@
 ///
 /// デフォルト Strategy の前方宣言.
 ///
-extern FrameSyncProcess::OverlapStrategy default_overlapper_delegate_;
-extern FrameSyncProcess::WindowStrategy default_window_delegate_;
-extern FrameSyncProcess::FftStrategy default_fft_delegate_;
+extern FrameSyncProcess::OverlapStrategy    default_overlapper_delegate_;
+extern FrameSyncProcess::WindowStrategy     default_window_delegate_;
+extern FrameSyncProcess::FftStrategy        default_fft_delegate_;
 extern FrameSyncProcess::OverlapAddStrategy default_overlap_adder_delegate_;
 
 

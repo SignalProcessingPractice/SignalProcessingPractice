@@ -13,7 +13,7 @@
 ///
 /// TODO: FrameSyncProcess.hpp と FrameSyncProcessConfig.hpp で相互参照が発生している.
 ///       現状は FrameSyncProcessConfig の前方宣言によってコンパイルエラーを一時的に
-///       回避しているが, 将来的には依存関係の解消を検討する必要がある.
+///       回避しているが, 将来的には依存関係の解消を検討する.
 ///
 struct FrameSyncProcessConfig;
 
@@ -27,8 +27,6 @@ public:
 
     ///
     /// オーディオフレームの 1 フレーム辺りのサンプル数.
-    ///
-    /// TODO: サンプル数は後で再検討する.
     ///
     static constexpr std::size_t audio_frame_length = 1024;
     static constexpr std::size_t audio_hop_length   = 512;
