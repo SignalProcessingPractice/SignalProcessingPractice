@@ -35,11 +35,10 @@ FrameSyncProcess::AudioHop
         windowed_buffer_.data(),
         N);
 
-    const auto tail_start = frame.size() - hop;
     std::transform(
-        windowed_buffer_.begin() + tail_start,
-        windowed_buffer_.end(),
-        frame_buffer_.begin(),
+        windowed_buffer_.begin() ,
+        windowed_buffer_.begin() + hop,
+        frame_buffer_.end() - hop,
         hop_buffer_.begin(),
         [](float curr, float prev) { return curr + prev; });
 

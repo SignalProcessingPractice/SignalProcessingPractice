@@ -7,6 +7,10 @@
 #include <algorithm>
 #include <utility>
 
+///
+/// @todo 加算時の係数は, コンストラクタで設定可能にする.
+///
+
 FrameSyncProcess::AudioHop
     RectangleOverlapAdder::Execute(
         FrameSyncProcess::AudioFrame&& frame
@@ -15,15 +19,13 @@ FrameSyncProcess::AudioHop
     constexpr auto hop =
         FrameSyncProcess::audio_hop_length;
 
-    const auto tail_start = frame.size() - hop;
-
-    // frame の末端と frame_buffer_ の先端をそれぞれ 0.5 倍して加算することで矩形波窓を実現する.
+    // frame の先頭部と前フレームの末尾部を加算する.
     std::transform(
-        frame.begin() + tail_start,
-        frame.end(),
-        frame_buffer_.begin(),
+        frame.begin(),
+        frame.begin() + hop,
+        frame_buffer_.end() - hop,
         hop_buffer_.begin(),
-        [](float curr, float prev) { return curr * 0.5f + prev * 0.5f; });
+        [](float curr, float prev) { return curr + prev; });
 
     // 次のフレームのために frame_buffer_ を更新する.
     frame_buffer_ = std::move(frame);

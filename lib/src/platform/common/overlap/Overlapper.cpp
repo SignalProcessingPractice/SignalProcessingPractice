@@ -7,21 +7,21 @@
 
 FrameSyncProcess::AudioFrame
     Overlapper::Execute(
-        FrameSyncProcess::AudioHop&& frame
+        FrameSyncProcess::AudioHop&& hop
     )
 {
-    constexpr auto hop =
+    constexpr auto hop_size =
         FrameSyncProcess::audio_hop_length;
 
     std::move(
-        frame_buffer_.begin() + hop,
+        frame_buffer_.begin() + hop_size,
         frame_buffer_.end(),
         frame_buffer_.begin());
 
     std::copy(
-        frame.begin(),
-        frame.end(),
-        frame_buffer_.end() - hop);
+        hop.begin(),
+        hop.end(),
+        frame_buffer_.end() - hop_size);
 
     return frame_buffer_;
 }
