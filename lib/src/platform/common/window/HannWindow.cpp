@@ -10,15 +10,7 @@ HannWindow::HannWindow()
     constexpr auto N =
         FrameSyncProcess::audio_frame_length;
 
-    for (uint32_t i = 0; i < N; ++i)
-    {
-        window_[i] =
-            0.5f *
-            (1.0f -
-             arm_cos_f32(
-                 2.0f * PI * static_cast<float>(i) /
-                 static_cast<float>(N - 1)));
-    }
+    arm_hanning_f32( window_.data(), N);
 }
 
 FrameSyncProcess::AudioFrame

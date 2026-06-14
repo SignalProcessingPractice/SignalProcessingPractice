@@ -22,8 +22,8 @@ file(GLOB SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/infer/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap/*.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap_adder/*.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap_adder/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap_add/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/overlap_add/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/output/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/output/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/preprocess/*.cpp

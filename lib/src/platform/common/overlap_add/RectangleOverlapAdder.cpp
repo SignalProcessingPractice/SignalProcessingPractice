@@ -15,23 +15,15 @@ FrameSyncProcess::AudioHop
     constexpr auto hop =
         FrameSyncProcess::audio_hop_length;
 
-    std::fill(
-        hop_buffer_.begin(),
-        hop_buffer_.end(),
-        0.0f);
+    const auto tail_start = frame.size() - hop;
 
     // frame の末端と frame_buffer_ の先端をそれぞれ 0.5 倍して加算することで矩形波窓を実現する.
-    {
-        for (std::size_t i = (frame.size() - hop); i < frame.size(); ++i)
-        {
-            hop_buffer_[i] = 0.5f * frame[i];
-        }
-
-        for (std::size_t i = 0; i < hop; ++i)
-        {
-            hop_buffer_[i] += 0.5f * frame_buffer_[i];
-        }
-    }
+    std::transform(
+        frame.begin() + tail_start,
+        frame.end(),
+        frame_buffer_.begin(),
+        hop_buffer_.begin(),
+        [](float curr, float prev) { return curr * 0.5f + prev * 0.5f; });
 
     // 次のフレームのために frame_buffer_ を更新する.
     frame_buffer_ = std::move(frame);

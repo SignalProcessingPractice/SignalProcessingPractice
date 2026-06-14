@@ -17,6 +17,6 @@ public:
 
 private:
 
-    FrameSyncProcess::AudioFrame window_;
-    FrameSyncProcess::AudioFrame frame_buffer_;
+    FrameSyncProcess::AudioFrame window_{};
+    FrameSyncProcess::AudioFrame frame_buffer_{};
 };
