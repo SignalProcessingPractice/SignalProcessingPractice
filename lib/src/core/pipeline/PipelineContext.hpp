@@ -89,93 +89,41 @@ public:
 /// @}
 
 private:
-
     ///
     /// オーディオフレーム獲得.
     ///
-    FrameSyncProcess::AudioHop
-        acquire (
-            void
-        ) const;
-
+    FrameSyncProcess::AudioAquireStrategy     audio_aquire_strategy_;
     ///
     /// 前処理.
     ///
-    FrameSyncProcess::AudioHop
-        preprocess (
-            FrameSyncProcess::AudioHop&& frame
-        ) const;
-
+    FrameSyncProcess::PreProcessStrategy      pre_process_strategy_;
     ///
     /// オーバーラッピング.
     ///
-    FrameSyncProcess::AudioFrame
-        overlap (
-            FrameSyncProcess::AudioHop&& frame
-        ) const;
-
+    FrameSyncProcess::OverlapStrategy         overlap_strategy_;
     ///
     /// 窓関数の積算.
     ///
-    FrameSyncProcess::AudioFrame
-        window (
-            FrameSyncProcess::AudioFrame&& frame
-        ) const;
-
+    FrameSyncProcess::WindowStrategy          window_strategy_;
     ///
     /// FFT.
     ///
-    FrameSyncProcess::AudioFrame
-        fft (
-            FrameSyncProcess::AudioFrame&& frame
-        ) const;
-
+    FrameSyncProcess::FftStrategy             fft_strategy_;
     ///
     /// 推論.
     ///
-    FrameSyncProcess::AudioFrame
-        infer (
-            FrameSyncProcess::AudioFrame&& frame
-        ) const;
-
+    FrameSyncProcess::InferStrategy           infer_strategy_;
     ///
     /// 後処理.
     ///
-    FrameSyncProcess::AudioFrame
-        post_processed (
-            FrameSyncProcess::AudioFrame&& frame
-        ) const;
-
+    FrameSyncProcess::PostProcessStrategy     post_process_strategy_;
     ///
     /// Overlap-Add.
     ///
-    FrameSyncProcess::AudioHop
-        overlap_add (
-            FrameSyncProcess::AudioFrame&& frame
-        ) const;
-
+    FrameSyncProcess::OverlapAddStrategy      overlap_add_strategy_;
     ///
     /// オーディオ出力.
     ///
-    void
-        output (
-            FrameSyncProcess::AudioHop&& frame
-        ) const;
-
-
-    FrameSyncProcess::AudioAquireStrategy     audio_aquire_strategy_;
-    FrameSyncProcess::PreProcessStrategy      pre_process_strategy_;
-    FrameSyncProcess::OverlapStrategy         overlap_strategy_;
-    FrameSyncProcess::WindowStrategy          window_strategy_;
-    FrameSyncProcess::FftStrategy             fft_strategy_;
-    FrameSyncProcess::InferStrategy           infer_strategy_;
-    FrameSyncProcess::PostProcessStrategy     post_process_strategy_;
-    FrameSyncProcess::OverlapAddStrategy      overlap_add_strategy_;
     FrameSyncProcess::AudioOutputStrategy     audio_output_strategy_;
-
-    ///
-    /// デフォルト Strategy.
-    ///
-    Overlapper default_overlapper_;
 
 };

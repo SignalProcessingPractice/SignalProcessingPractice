@@ -78,7 +78,7 @@ TEST(FrameSync, InputEqualOutput) {
     {
         proc.ProcessFrame();
     }
-
+    std::cout << "\n";
     std::cout << "========== Frame Processing Complete ==========\n";
     std::cout << "Total frames processed: " << frame_counter << "\n\n";
 }
