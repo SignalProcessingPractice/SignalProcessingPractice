@@ -1,2 +1,18 @@
 CompileFlags:
   CompilationDatabase: build/app
+
+Diagnostics:
+  ClangTidy:
+    FastCheckFilter: None
+    Add:
+      - bugprone-*
+      - cppcoreguidelines-*
+      - modernize-*
+      - performance-*
+      - readability-*
+
+      # Google Style
+      - google-*
+
+      # 組み込み向け
+      - misc-*

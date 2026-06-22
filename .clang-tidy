@@ -1,0 +1,10 @@
+Checks: >
+  bugprone-*,
+  cppcoreguidelines-*,
+  google-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -cppcoreguidelines-avoid-magic-numbers
+
+WarningsAsErrors: '*'
