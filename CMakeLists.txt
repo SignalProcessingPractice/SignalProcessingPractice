@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 4.00)
+cmake_minimum_required(VERSION 3.28)
 project(CPP_PRACTICE CXX)
 
 #
