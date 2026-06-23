@@ -4,3 +4,5 @@ build/
 CmakeFiles/
 
 _deps/
+
+*.pyc
