@@ -15,6 +15,18 @@
 
 clang-tidy が警告を出力した場合、そのコードは不適合とみなし、ビルド失敗として扱う。
 
+### 検査スクリプト
+
+scripts/ 配下に、ユーザコード全域を対象に clang-format または clang-tidy を実行するスクリプトを用意しています。
+
+```bash
+# clang_format 実行
+python run_clang_format.py
+
+# clang_tidy 実行
+python run_clang_tidy.py
+```
+
 ## ビルドコマンド
 
 `CMakePresets.json` には、2つの CMake Preset が定義されています。
@@ -22,6 +34,10 @@ clang-tidy が警告を出力した場合、そのコードは不適合とみな
 ```bash
 # Windows アプリケーション（Clang、WASAPI オーディオ）
 cmake --preset app-win
+cmake --build build/app
+
+# Linux アプリケーション（Clang、ALSA オーディオ）
+cmake --preset app-linux
 cmake --build build/app
 
 # ユニットテスト（GCC + Google Test）
@@ -34,8 +50,6 @@ ctest --test-dir build/gtest-gcc
 # テストバイナリを直接実行
 ./build/gtest-gcc/TEST_FrameSyncProcess
 ```
-
-`.clangd` の設定では、コンパイルデータベース（IDE の補完や解析機能用）として `build/app` を参照します。
 
 ## アーキテクチャ
 
