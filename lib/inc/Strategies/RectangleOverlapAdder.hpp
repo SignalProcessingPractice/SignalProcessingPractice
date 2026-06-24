@@ -8,18 +8,13 @@
 ///
 /// @brief 矩形波窓を使用した Overlap-Add.
 ///
-class RectangleOverlapAdder
-{
+class RectangleOverlapAdder {
 public:
     RectangleOverlapAdder() = default;
 
-    FrameSyncProcess::AudioHop
-        Execute(
-            FrameSyncProcess::AudioFrame &&frame
-        );
+    FrameSyncProcess::AudioHop Execute(FrameSyncProcess::AudioFrame &&frame);
 
 private:
-
-    FrameSyncProcess::AudioHop   hop_buffer_{};
+    FrameSyncProcess::AudioHop hop_buffer_{};
     FrameSyncProcess::AudioFrame frame_buffer_{};
 };

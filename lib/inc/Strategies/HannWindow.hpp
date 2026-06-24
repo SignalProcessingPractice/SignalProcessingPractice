@@ -5,18 +5,13 @@
 
 #include "FrameSyncProcess.hpp"
 
-class HannWindow
-{
+class HannWindow {
 public:
     HannWindow();
 
-    FrameSyncProcess::AudioFrame
-        Execute(
-            FrameSyncProcess::AudioFrame &&frame
-        );
+    FrameSyncProcess::AudioFrame Execute(FrameSyncProcess::AudioFrame &&frame);
 
 private:
-
     FrameSyncProcess::AudioFrame window_{};
     FrameSyncProcess::AudioFrame frame_buffer_{};
 };

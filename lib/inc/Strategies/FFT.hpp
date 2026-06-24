@@ -4,21 +4,15 @@
 #pragma once
 
 #include "FrameSyncProcess.hpp"
-
 #include "arm_math.h"
 
-class FFT
-{
+class FFT {
 public:
     FFT();
 
-    FrameSyncProcess::AudioFrame
-        Execute(
-            FrameSyncProcess::AudioFrame &&frame
-        );
+    FrameSyncProcess::AudioFrame Execute(FrameSyncProcess::AudioFrame &&frame);
 
 private:
-
     FrameSyncProcess::AudioFrame frame_buffer_;
 
     // ARM CMSIS FFT instance and init flag

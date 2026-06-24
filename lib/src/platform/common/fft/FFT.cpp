@@ -3,30 +3,24 @@
 ///
 #include "Strategies/FFT.hpp"
 
-#include "arm_math.h"
 #include <algorithm>
 
-FFT::FFT()
-{
+#include "arm_math.h"
+
+FFT::FFT() {
     // コンストラクタで FFT インスタンスを初期化する（固定サイズを想定）
     const uint32_t fftSize = static_cast<uint32_t>(FrameSyncProcess::audio_frame_length);
-    if (arm_rfft_fast_init_f32(&rfft_instance_, fftSize) == ARM_MATH_SUCCESS)
-    {
+    if (arm_rfft_fast_init_f32(&rfft_instance_, fftSize) == ARM_MATH_SUCCESS) {
         initialized_ = true;
     }
 }
 
-FrameSyncProcess::AudioFrame
-    FFT::Execute(
-        FrameSyncProcess::AudioFrame&& frame)
-{
+FrameSyncProcess::AudioFrame FFT::Execute(FrameSyncProcess::AudioFrame&& frame) {
     const uint32_t fftSize = static_cast<uint32_t>(frame.size());
-    if (fftSize < 2)
-    {
+    if (fftSize < 2) {
         return frame;
     }
-    if (!initialized_)
-    {
+    if (!initialized_) {
         // 初期化に失敗している場合は入力をそのまま返す
         return frame;
     }

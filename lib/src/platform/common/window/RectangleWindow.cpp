@@ -3,13 +3,9 @@
 ///
 #include "Strategies/RectangleWindow.hpp"
 
-RectangleWindow::RectangleWindow()
-{
+RectangleWindow::RectangleWindow() {
 }
 
-FrameSyncProcess::AudioFrame
-RectangleWindow::Execute(
-    FrameSyncProcess::AudioFrame&& frame)
-{
+FrameSyncProcess::AudioFrame RectangleWindow::Execute(FrameSyncProcess::AudioFrame&& frame) {
     return frame;
 }

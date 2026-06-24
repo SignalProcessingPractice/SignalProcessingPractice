@@ -5,13 +5,14 @@
 ///
 
 #include <RtAudio.h>
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <atomic>
-#include <cstring>
-#include <chrono>
+
 #include <algorithm>
+#include <atomic>
+#include <chrono>
+#include <cstring>
+#include <iostream>
+#include <thread>
+#include <vector>
 
 // ロックフリーなSPSCリングバッファ
 class LockFreeRingBuffer {
@@ -22,12 +23,13 @@ private:
     size_t capacity_;
 
 public:
-    LockFreeRingBuffer(size_t capacity) : buffer_(capacity + 1), capacity_(capacity + 1) {}
+    LockFreeRingBuffer(size_t capacity) : buffer_(capacity + 1), capacity_(capacity + 1) {
+    }
 
     size_t write(const float* data, size_t count) {
         size_t write_pos = write_idx_.load(std::memory_order_relaxed);
         size_t read_pos = read_idx_.load(std::memory_order_acquire);
-        
+
         size_t available = (read_pos + capacity_ - write_pos - 1) % capacity_;
         size_t to_write = std::min(count, available);
 
@@ -65,11 +67,14 @@ std::atomic<bool> g_running{true};
 //==============================
 // 入力コールバック（Producer）
 //==============================
-int inputCallback(void*, void* inputBuffer, unsigned int nFrames, double, RtAudioStreamStatus status, void*) {
-    if (status) std::cerr << "Stream underflow/overflow\n";
+int inputCallback(void*, void* inputBuffer, unsigned int nFrames, double,
+                  RtAudioStreamStatus status, void*) {
+    if (status)
+        std::cerr << "Stream underflow/overflow\n";
 
     float* in = static_cast<float*>(inputBuffer);
-    if (!in) return 0;
+    if (!in)
+        return 0;
 
     // ロックなし、アロケーションなしで直接書き込む
     g_inBuffer.write(in, nFrames);
@@ -79,7 +84,8 @@ int inputCallback(void*, void* inputBuffer, unsigned int nFrames, double, RtAudi
 //==============================
 // 出力コールバック（Consumer）
 //==============================
-int outputCallback(void* outputBuffer, void*, unsigned int nFrames, double, RtAudioStreamStatus, void*) {
+int outputCallback(void* outputBuffer, void*, unsigned int nFrames, double, RtAudioStreamStatus,
+                   void*) {
     float* out = static_cast<float*>(outputBuffer);
 
     // 読み込める分だけ読み込む
@@ -96,11 +102,11 @@ int outputCallback(void* outputBuffer, void*, unsigned int nFrames, double, RtAu
 // 中継スレッド
 //==============================
 void senderThread() {
-    std::vector<float> tempBuffer(1024); // 一時的な作業用バッファ
-    
+    std::vector<float> tempBuffer(1024);  // 一時的な作業用バッファ
+
     while (g_running) {
         size_t readCount = g_inBuffer.read(tempBuffer.data(), tempBuffer.size());
-        
+
         if (readCount > 0) {
             // ===== ここで音声処理を行う =====
             // 例：そのまま通す
@@ -115,8 +121,7 @@ void senderThread() {
 //==============================
 // main
 //==============================
-int main()
-{
+int main() {
     std::cout << "HELLO!" << std::endl;
 
     RtAudio adc;
@@ -124,7 +129,6 @@ int main()
     std::cout << "getDeviceCount=" << adc.getDeviceCount() << std::endl;
 
     if (adc.getDeviceCount() < 1) {
-
         std::cerr << "No audio devices found\n";
         return 1;
     }
@@ -144,26 +148,14 @@ int main()
 
     try {
         // 入力ストリーム
-        adc.openStream(
-            nullptr,
-            &iParams,
-            RTAUDIO_FLOAT32,
-            sampleRate,
-            &bufferFrames,
-            &inputCallback
-        );
+        adc.openStream(nullptr, &iParams, RTAUDIO_FLOAT32, sampleRate, &bufferFrames,
+                       &inputCallback);
         adc.startStream();
 
         // 出力ストリーム（別）
         RtAudio dac;
-        dac.openStream(
-            &oParams,
-            nullptr,
-            RTAUDIO_FLOAT32,
-            sampleRate,
-            &bufferFrames,
-            &outputCallback
-        );
+        dac.openStream(&oParams, nullptr, RTAUDIO_FLOAT32, sampleRate, &bufferFrames,
+                       &outputCallback);
         dac.startStream();
 
         std::thread th(senderThread);
@@ -179,8 +171,7 @@ int main()
 
         adc.closeStream();
         dac.closeStream();
-    }
-    catch (...) {
+    } catch (...) {
         std::cerr << "RtAudio error\n";
         return 1;
     }

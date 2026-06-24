@@ -4,19 +4,15 @@
 
 #include "PipelineContext.hpp"
 
-#include "FrameSyncProcess.hpp"
-#include "FrameSyncProcessConfig.hpp"
 #include <cmath>
 
-PipelineContext::PipelineContext (
-    )
-    : PipelineContext(FrameSyncProcessConfig{})
-{
+#include "FrameSyncProcess.hpp"
+#include "FrameSyncProcessConfig.hpp"
+
+PipelineContext::PipelineContext() : PipelineContext(FrameSyncProcessConfig{}) {
 }
 
-PipelineContext::PipelineContext (
-    const FrameSyncProcessConfig& config
-    )
+PipelineContext::PipelineContext(const FrameSyncProcessConfig& config)
     : audio_aquire_strategy_(config.audio_aquire_strategy),
       pre_process_strategy_(config.pre_process_strategy),
       overlap_strategy_(config.overlap_strategy),
@@ -25,16 +21,11 @@ PipelineContext::PipelineContext (
       infer_strategy_(config.infer_strategy),
       post_process_strategy_(config.post_process_strategy),
       overlap_add_strategy_(config.overlap_add_strategy),
-      audio_output_strategy_(config.audio_output_strategy)
-{
+      audio_output_strategy_(config.audio_output_strategy) {
     /* do nothing. */
 }
 
-void 
-    PipelineContext::exec (
-        void
-    ) const 
-{
+void PipelineContext::exec(void) const {
     ///
     /// Acquire Audio Data.
     ///
@@ -43,7 +34,7 @@ void
     ///
     /// Pre-Processing.
     ///
-    auto pre_processed = this->pre_process_strategy_(std::move(in)); 
+    auto pre_processed = this->pre_process_strategy_(std::move(in));
 
     ///
     /// オーバーラッピング.
@@ -89,38 +80,22 @@ void
     this->audio_output_strategy_(std::move(syn));
 }
 
-void 
-    PipelineContext::SetConfig(
-        FrameSyncProcess::AquireTag tag, 
-        FrameSyncProcess::AudioAquireStrategy strategy
-    )
-{
+void PipelineContext::SetConfig(FrameSyncProcess::AquireTag tag,
+                                FrameSyncProcess::AudioAquireStrategy strategy) {
     this->audio_aquire_strategy_ = strategy;
 }
 
-void 
-    PipelineContext::SetConfig(
-        FrameSyncProcess::PreProcessTag tag, 
-        FrameSyncProcess::PreProcessStrategy strategy
-    )
-{
+void PipelineContext::SetConfig(FrameSyncProcess::PreProcessTag tag,
+                                FrameSyncProcess::PreProcessStrategy strategy) {
     this->pre_process_strategy_ = strategy;
 }
 
-void 
-    PipelineContext::SetConfig(
-        FrameSyncProcess::InferTag tag, 
-        FrameSyncProcess::InferStrategy strategy
-    )
-{
+void PipelineContext::SetConfig(FrameSyncProcess::InferTag tag,
+                                FrameSyncProcess::InferStrategy strategy) {
     this->infer_strategy_ = strategy;
 }
 
-void 
-    PipelineContext::SetConfig(
-        FrameSyncProcess::OutputTag tag, 
-        FrameSyncProcess::AudioOutputStrategy strategy
-    )
-{
+void PipelineContext::SetConfig(FrameSyncProcess::OutputTag tag,
+                                FrameSyncProcess::AudioOutputStrategy strategy) {
     this->audio_output_strategy_ = strategy;
 }

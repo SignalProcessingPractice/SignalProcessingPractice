@@ -5,13 +5,9 @@
 
 #include "FrameSyncProcess.hpp"
 
-class SineGenerator
-{
+class SineGenerator {
 public:
-    SineGenerator(
-        double frequency = 440.0,
-        double amplitude = 0.5
-    );
+    SineGenerator(double frequency = 440.0, double amplitude = 0.5);
 
     FrameSyncProcess::AudioHop GenerateOneHop();
 

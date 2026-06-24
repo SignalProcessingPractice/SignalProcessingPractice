@@ -5,14 +5,9 @@
 
 #include "FrameSyncProcess.hpp"
 
-class RectangleWindow
-{
+class RectangleWindow {
 public:
     RectangleWindow();
 
-    FrameSyncProcess::AudioFrame
-        Execute(
-            FrameSyncProcess::AudioFrame &&frame
-        );
-
+    FrameSyncProcess::AudioFrame Execute(FrameSyncProcess::AudioFrame &&frame);
 };
