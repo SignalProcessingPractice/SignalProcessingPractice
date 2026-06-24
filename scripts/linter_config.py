@@ -1,7 +1,7 @@
 from pathlib import Path
 import subprocess
 
-BUILD_DIR = "build/app"
+BUILD_DIR = "../build/app"
 
 TARGET_DIR = Path("..")
 
