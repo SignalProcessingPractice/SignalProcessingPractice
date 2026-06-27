@@ -27,13 +27,14 @@
       }
     },
     {
-      "name": "gtest-debug-gcc",
-      "displayName": "GTest GCC (Debug)",
+      "name": "gtest-debug-clang",
+      "displayName": "GTest Clang (Debug)",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/gtest-gcc",
+      "binaryDir": "${sourceDir}/build/gtest-clang",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/gtest-gcc-toolchain.cmake",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/gtest-clang-toolchain.cmake",
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_APP": "OFF"
       }
     }
   ]

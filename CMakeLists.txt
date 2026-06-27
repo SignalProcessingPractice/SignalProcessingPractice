@@ -15,5 +15,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #
 # Add subdirectories
 #
-include(${CMAKE_SOURCE_DIR}/app/app.cmake)
+option(BUILD_APP "Build the application target" ON)
+if(BUILD_APP)
+    include(${CMAKE_SOURCE_DIR}/app/app.cmake)
+endif()
 include(${CMAKE_SOURCE_DIR}/lib/lib.cmake)
