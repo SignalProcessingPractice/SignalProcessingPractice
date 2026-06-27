@@ -18,6 +18,7 @@ clang-tidy が警告を出力した場合、そのコードは不適合とみな
 ### 検査スクリプト
 
 scripts/ 配下に、ユーザコード全域を対象に clang-format または clang-tidy を実行するスクリプトを用意しています。
+このスクリプトの検査対象はユーザコードのみとします。サードパーティのソースコードは検査対象とはしません。
 
 ```bash
 # clang_format 実行
@@ -98,7 +99,7 @@ Strategy の実体を所有する具体的なパイプラインです。`exec()`
 
 ### リアルタイム音声アプリ (`app/main.cpp`)
 
-Windows の WASAPI を使用し、48kHz / 256サンプルバッファで動作します。
+48kHz / 256サンプルバッファで動作します。
 
 入力ストリームと出力ストリームは RtAudio によって独立して管理されており、両者の間は **ロックフリーな SPSC（Single Producer Single Consumer）リングバッファ**（atomic acquire/release による実装）で接続されています。
 
