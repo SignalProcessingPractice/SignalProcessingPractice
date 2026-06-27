@@ -7,9 +7,17 @@
 
 class SineGenerator {
 public:
-    SineGenerator(double frequency = 440.0, double amplitude = 0.5);
+    static constexpr double kDefaultFrequency = 440.0;
+    static constexpr double kDefaultAmplitude = 0.5;
 
-    FrameSyncProcess::AudioHop GenerateOneHop();
+    struct Params {
+        double frequency;
+        double amplitude;
+    };
+
+    explicit SineGenerator(Params params);
+
+    auto GenerateOneHop() -> FrameSyncProcess::AudioHop;
 
     void SetFrequency(double frequency);
 

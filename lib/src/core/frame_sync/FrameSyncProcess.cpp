@@ -3,8 +3,9 @@
 ///
 #include "FrameSyncProcess.hpp"
 
+#include <bit>
 #include <memory>
-#include <utility>
+#include <new>
 
 #include "../pipeline/PipelineContext.hpp"
 #include "FrameSyncProcessConfig.hpp"
@@ -19,16 +20,18 @@
 ///
 struct FrameSyncProcess::Impl {
 public:
-    Impl() : pipeline_(){};
+    Impl() = default;
 
-    Impl(const FrameSyncProcessConfig& config) : pipeline_(config) {
+    explicit Impl(const FrameSyncProcessConfig& config) : pipeline_(config) {
     }
 
     Impl(const Impl&) = default;
-    Impl& operator=(const Impl&) = default;
+    auto operator=(const Impl&) -> Impl& = default;
 
     Impl(Impl&&) = default;
-    Impl& operator=(Impl&&) = default;
+    auto operator=(Impl&&) -> Impl& = default;
+
+    ~Impl() = default;
 
     PipelineContext pipeline_;
 };
@@ -45,12 +48,12 @@ void FrameSyncProcess::CheckImpl() {
 ///
 /// @brief Impl キャスト.
 ///
-FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr() {
-    return reinterpret_cast<Impl*>(&storage_);
+auto FrameSyncProcess::ImplPtr() -> Impl* {
+    return std::launder(std::bit_cast<Impl*>(storage_.data()));
 }
 
-const FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr() const {
-    return reinterpret_cast<const Impl*>(&storage_);
+auto FrameSyncProcess::ImplPtr() const -> const Impl* {
+    return std::launder(std::bit_cast<const Impl*>(storage_.data()));
 }
 ///
 /// @}
@@ -60,11 +63,11 @@ const FrameSyncProcess::Impl* FrameSyncProcess::ImplPtr() const {
 /// @name コンストラクタ / デストラクタ.
 /// @{
 ///
-FrameSyncProcess::FrameSyncProcess() {
+FrameSyncProcess::FrameSyncProcess() : storage_{} {
     std::construct_at(ImplPtr());
 }
 
-FrameSyncProcess::FrameSyncProcess(const FrameSyncProcessConfig& config) {
+FrameSyncProcess::FrameSyncProcess(const FrameSyncProcessConfig& config) : storage_{} {
     std::construct_at(ImplPtr(), config);
 }
 
@@ -72,14 +75,14 @@ FrameSyncProcess::~FrameSyncProcess() {
     std::destroy_at(ImplPtr());
 }
 
-FrameSyncProcess::FrameSyncProcess(FrameSyncProcess&& other) {
-    std::construct_at(ImplPtr(), std::move(*other.ImplPtr()));
+FrameSyncProcess::FrameSyncProcess(FrameSyncProcess&& other) noexcept : storage_{} {
+    std::construct_at(ImplPtr(), *other.ImplPtr());
 }
 
-FrameSyncProcess& FrameSyncProcess::operator=(FrameSyncProcess&& other) {
+auto FrameSyncProcess::operator=(FrameSyncProcess&& other) noexcept -> FrameSyncProcess& {
     if (this != &other) {
         std::destroy_at(ImplPtr());
-        std::construct_at(ImplPtr(), std::move(*other.ImplPtr()));
+        std::construct_at(ImplPtr(), *other.ImplPtr());
     }
     return *this;
 }
@@ -91,40 +94,32 @@ FrameSyncProcess& FrameSyncProcess::operator=(FrameSyncProcess&& other) {
 /// @name 公開 API.
 /// @{
 ///
-void FrameSyncProcess::Attach(void) {
+void FrameSyncProcess::Attach() {
     ///
     /// TODO: 実装.
     ///
 }
 
-void FrameSyncProcess::Detach(void) {
+void FrameSyncProcess::Detach() {
     ///
     /// TODO: 実装.
     ///
 }
 
-///
-/// @brief SetConfig 共通処理.
-///
-template <typename Tag, typename Strategy>
-void SetConfigImpl(FrameSyncProcess::Impl* impl, Tag tag, Strategy strategy) {
-    impl->pipeline_.SetConfig(tag, strategy);
+void FrameSyncProcess::SetConfig([[maybe_unused]] AquireTag tag, AudioAquireStrategy strategy) {
+    ImplPtr()->pipeline_.SetAquireStrategy(strategy);
+}
+void FrameSyncProcess::SetConfig([[maybe_unused]] PreProcessTag tag, PreProcessStrategy strategy) {
+    ImplPtr()->pipeline_.SetPreProcessStrategy(strategy);
+}
+void FrameSyncProcess::SetConfig([[maybe_unused]] InferTag tag, InferStrategy strategy) {
+    ImplPtr()->pipeline_.SetInferStrategy(strategy);
+}
+void FrameSyncProcess::SetConfig([[maybe_unused]] OutputTag tag, AudioOutputStrategy strategy) {
+    ImplPtr()->pipeline_.SetOutputStrategy(strategy);
 }
 
-void FrameSyncProcess::SetConfig(AquireTag tag, AudioAquireStrategy strategy) {
-    SetConfigImpl(ImplPtr(), tag, strategy);
-}
-void FrameSyncProcess::SetConfig(PreProcessTag tag, PreProcessStrategy strategy) {
-    SetConfigImpl(ImplPtr(), tag, strategy);
-}
-void FrameSyncProcess::SetConfig(InferTag tag, InferStrategy strategy) {
-    SetConfigImpl(ImplPtr(), tag, strategy);
-}
-void FrameSyncProcess::SetConfig(OutputTag tag, AudioOutputStrategy strategy) {
-    SetConfigImpl(ImplPtr(), tag, strategy);
-}
-
-void FrameSyncProcess::ProcessFrame(void) {
+void FrameSyncProcess::ProcessFrame() {
     ImplPtr()->pipeline_.exec();
 }
 ///

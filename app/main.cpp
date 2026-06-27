@@ -11,46 +11,53 @@
 #include <chrono>
 #include <cstring>
 #include <iostream>
+#include <span>
 #include <thread>
 #include <vector>
+
+static constexpr size_t kRingBufferSize = 48000U;
+static constexpr unsigned int kSampleRate = 48000U;
+static constexpr unsigned int kBufferFrames = 256U;
+static constexpr size_t kSenderBufferSize = 1024U;
 
 // ロックフリーなSPSCリングバッファ
 class LockFreeRingBuffer {
 private:
-    std::vector<float> buffer_;
-    std::atomic<size_t> write_idx_{0};
-    std::atomic<size_t> read_idx_{0};
-    size_t capacity_;
+    mutable std::vector<float> buffer_;
+    mutable std::atomic<size_t> write_idx_{0};
+    mutable std::atomic<size_t> read_idx_{0};
+    size_t capacity_{0};
 
 public:
-    LockFreeRingBuffer(size_t capacity) : buffer_(capacity + 1), capacity_(capacity + 1) {
+    explicit LockFreeRingBuffer(size_t capacity) : buffer_(capacity + 1), capacity_(capacity + 1) {
     }
 
-    size_t write(const float* data, size_t count) {
-        size_t write_pos = write_idx_.load(std::memory_order_relaxed);
-        size_t read_pos = read_idx_.load(std::memory_order_acquire);
+    auto write(const float* data, size_t count) const -> size_t {
+        const auto write_pos = write_idx_.load(std::memory_order_relaxed);
+        const auto read_pos = read_idx_.load(std::memory_order_acquire);
 
-        size_t available = (read_pos + capacity_ - write_pos - 1) % capacity_;
-        size_t to_write = std::min(count, available);
+        const size_t available = (read_pos + capacity_ - write_pos - 1) % capacity_;
+        const size_t to_write = std::min(count, available);
 
-        // 簡略化のため1サンプルずつコピー（実運用ではラップアラウンドを考慮したmemcpyが高速です）
+        const auto data_span = std::span<const float>(data, count);
         for (size_t i = 0; i < to_write; ++i) {
-            buffer_[(write_pos + i) % capacity_] = data[i];
+            buffer_[(write_pos + i) % capacity_] = data_span[i];
         }
 
         write_idx_.store((write_pos + to_write) % capacity_, std::memory_order_release);
         return to_write;
     }
 
-    size_t read(float* data, size_t count) {
-        size_t read_pos = read_idx_.load(std::memory_order_relaxed);
-        size_t write_pos = write_idx_.load(std::memory_order_acquire);
+    auto read(float* data, size_t count) const -> size_t {
+        const auto read_pos = read_idx_.load(std::memory_order_relaxed);
+        const auto write_pos = write_idx_.load(std::memory_order_acquire);
 
-        size_t available = (write_pos + capacity_ - read_pos) % capacity_;
-        size_t to_read = std::min(count, available);
+        const size_t available = (write_pos + capacity_ - read_pos) % capacity_;
+        const size_t to_read = std::min(count, available);
 
+        const auto data_span = std::span<float>(data, count);
         for (size_t i = 0; i < to_read; ++i) {
-            data[i] = buffer_[(read_pos + i) % capacity_];
+            data_span[i] = buffer_[(read_pos + i) % capacity_];
         }
 
         read_idx_.store((read_pos + to_read) % capacity_, std::memory_order_release);
@@ -58,42 +65,46 @@ public:
     }
 };
 
-// バッファサイズは余裕を持たせて確保（例: 48000サンプル = 1秒分）
-LockFreeRingBuffer g_inBuffer(48000);
-LockFreeRingBuffer g_outBuffer(48000);
-
-std::atomic<bool> g_running{true};
+struct AppContext {
+    LockFreeRingBuffer in_buffer{kRingBufferSize};
+    LockFreeRingBuffer out_buffer{kRingBufferSize};
+    std::atomic<bool> running{true};
+};
 
 //==============================
 // 入力コールバック（Producer）
 //==============================
-int inputCallback(void*, void* inputBuffer, unsigned int nFrames, double,
-                  RtAudioStreamStatus status, void*) {
-    if (status)
+auto inputCallback(void* /*outputBuffer*/, void* inputBuffer, unsigned int nFrames,
+                   double /*streamTime*/, RtAudioStreamStatus status, void* userData) -> int {
+    if (status != 0U) {
         std::cerr << "Stream underflow/overflow\n";
+    }
 
-    float* in = static_cast<float*>(inputBuffer);
-    if (!in)
+    auto* input_ptr = static_cast<float*>(inputBuffer);
+    if (input_ptr == nullptr) {
         return 0;
+    }
 
-    // ロックなし、アロケーションなしで直接書き込む
-    g_inBuffer.write(in, nFrames);
+    auto* ctx = static_cast<AppContext*>(userData);
+    ctx->in_buffer.write(input_ptr, nFrames);
     return 0;
 }
 
 //==============================
 // 出力コールバック（Consumer）
 //==============================
-int outputCallback(void* outputBuffer, void*, unsigned int nFrames, double, RtAudioStreamStatus,
-                   void*) {
-    float* out = static_cast<float*>(outputBuffer);
+auto outputCallback(void* outputBuffer, void* /*inputBuffer*/, unsigned int nFrames,
+                    double /*streamTime*/, RtAudioStreamStatus /*status*/, void* userData) -> int {
+    auto* output_ptr = static_cast<float*>(outputBuffer);
+    auto* ctx = static_cast<AppContext*>(userData);
 
-    // 読み込める分だけ読み込む
-    size_t readCount = g_outBuffer.read(out, nFrames);
+    const auto output_span = std::span<float>(output_ptr, nFrames);
+    const size_t readCount = ctx->out_buffer.read(output_ptr, nFrames);
 
-    // 足りない分は0埋め（無音を出力してノイズを防ぐ）
     if (readCount < nFrames) {
-        std::memset(out + readCount, 0, sizeof(float) * (nFrames - readCount));
+        for (size_t i = readCount; i < nFrames; ++i) {
+            output_span[i] = 0.0F;
+        }
     }
     return 0;
 }
@@ -101,18 +112,15 @@ int outputCallback(void* outputBuffer, void*, unsigned int nFrames, double, RtAu
 //==============================
 // 中継スレッド
 //==============================
-void senderThread() {
-    std::vector<float> tempBuffer(1024);  // 一時的な作業用バッファ
+auto senderThread(AppContext* ctx) -> void {
+    std::vector<float> tempBuffer(kSenderBufferSize);
 
-    while (g_running) {
-        size_t readCount = g_inBuffer.read(tempBuffer.data(), tempBuffer.size());
+    while (ctx->running) {
+        size_t readCount = ctx->in_buffer.read(tempBuffer.data(), tempBuffer.size());
 
         if (readCount > 0) {
-            // ===== ここで音声処理を行う =====
-            // 例：そのまま通す
-            g_outBuffer.write(tempBuffer.data(), readCount);
+            ctx->out_buffer.write(tempBuffer.data(), readCount);
         } else {
-            // CPUを100%専有しないように、データがない時は少しスリープ
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
@@ -121,19 +129,22 @@ void senderThread() {
 //==============================
 // main
 //==============================
-int main() {
-    std::cout << "HELLO!" << std::endl;
+auto main() -> int {
+    std::cout << "HELLO!" << "\n";
 
     RtAudio adc;
 
-    std::cout << "getDeviceCount=" << adc.getDeviceCount() << std::endl;
+    std::cout << "getDeviceCount=" << adc.getDeviceCount() << "\n";
 
     if (adc.getDeviceCount() < 1) {
         std::cerr << "No audio devices found\n";
         return 1;
     }
 
-    RtAudio::StreamParameters iParams, oParams;
+    AppContext ctx;
+
+    RtAudio::StreamParameters iParams;
+    RtAudio::StreamParameters oParams;
 
     iParams.deviceId = adc.getDefaultInputDevice();
     iParams.nChannels = 1;
@@ -143,28 +154,26 @@ int main() {
     oParams.nChannels = 1;
     oParams.firstChannel = 0;
 
-    unsigned int sampleRate = 48000;
-    unsigned int bufferFrames = 256;
+    unsigned int sampleRate = kSampleRate;
+    unsigned int bufferFrames = kBufferFrames;
 
     try {
-        // 入力ストリーム
         adc.openStream(nullptr, &iParams, RTAUDIO_FLOAT32, sampleRate, &bufferFrames,
-                       &inputCallback);
+                       &inputCallback, &ctx);
         adc.startStream();
 
-        // 出力ストリーム（別）
         RtAudio dac;
         dac.openStream(&oParams, nullptr, RTAUDIO_FLOAT32, sampleRate, &bufferFrames,
-                       &outputCallback);
+                       &outputCallback, &ctx);
         dac.startStream();
 
-        std::thread th(senderThread);
+        std::thread sender_thread(senderThread, &ctx);
 
         std::cout << "Running... press Enter to stop\n";
         std::cin.get();
 
-        g_running = false;
-        th.join();
+        ctx.running = false;
+        sender_thread.join();
 
         adc.stopStream();
         dac.stopStream();

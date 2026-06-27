@@ -9,30 +9,39 @@
 #include "Strategies/RectangleOverlapAdder.hpp"
 #include "Strategies/RectangleWindow.hpp"
 
-///
-/// デフォルト Strategy の定義.
-///
+auto get_default_overlapper_delegate() -> const FrameSyncProcess::OverlapStrategy& {
+    static Overlapper instance;
+    static const auto delegate =
+            FrameSyncProcess::OverlapStrategy::create<Overlapper, &Overlapper::Execute>(instance);
+    return delegate;
+}
 
-Overlapper default_overlapper_;
-FrameSyncProcess::OverlapStrategy default_overlapper_delegate_ =
-        FrameSyncProcess::OverlapStrategy ::create<Overlapper, &Overlapper::Execute>(
-                default_overlapper_);
+auto get_default_rectangle_window_delegate() -> const FrameSyncProcess::WindowStrategy& {
+    static RectangleWindow instance;
+    static const auto delegate =
+            FrameSyncProcess::WindowStrategy::create<RectangleWindow, &RectangleWindow::Execute>(
+                    instance);
+    return delegate;
+}
 
-RectangleWindow default_rectangle_window_;
-FrameSyncProcess::WindowStrategy default_rectangle_window_delegate_ =
-        FrameSyncProcess::WindowStrategy ::create<RectangleWindow, &RectangleWindow::Execute>(
-                default_rectangle_window_);
+auto get_default_fft_delegate() -> const FrameSyncProcess::FftStrategy& {
+    static FFT instance;
+    static const auto delegate =
+            FrameSyncProcess::FftStrategy::create<FFT, &FFT::Execute>(instance);
+    return delegate;
+}
 
-FFT default_fft_;
-FrameSyncProcess::FftStrategy default_fft_delegate_ =
-        FrameSyncProcess::FftStrategy ::create<FFT, &FFT::Execute>(default_fft_);
+auto get_default_ifft_postprocess_delegate() -> const FrameSyncProcess::FftStrategy& {
+    static IFFT instance;
+    static const auto delegate =
+            FrameSyncProcess::FftStrategy::create<IFFT, &IFFT::Execute>(instance);
+    return delegate;
+}
 
-IFFT default_postprocess_ifft_;
-FrameSyncProcess::FftStrategy default_ifft_postprocess_delegate_ =
-        FrameSyncProcess::FftStrategy ::create<IFFT, &IFFT::Execute>(default_postprocess_ifft_);
-
-RectangleOverlapAdder default_rectangle_overlap_adder_;
-FrameSyncProcess::OverlapAddStrategy default_rectangle_overlap_adder_delegate_ =
-        FrameSyncProcess::OverlapAddStrategy ::create<RectangleOverlapAdder,
-                                                      &RectangleOverlapAdder::Execute>(
-                default_rectangle_overlap_adder_);
+auto get_default_rectangle_overlap_adder_delegate() -> const FrameSyncProcess::OverlapAddStrategy& {
+    static RectangleOverlapAdder instance;
+    static const auto delegate =
+            FrameSyncProcess::OverlapAddStrategy::create<RectangleOverlapAdder,
+                                                         &RectangleOverlapAdder::Execute>(instance);
+    return delegate;
+}

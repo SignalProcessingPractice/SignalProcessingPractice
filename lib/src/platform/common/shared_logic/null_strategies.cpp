@@ -5,42 +5,45 @@
 
 #include "FrameSyncProcess.hpp"
 
-FrameSyncProcess::AudioHop null_input(void) {
-    // 空のフレームをムーブ (RVO) で返す.
-    FrameSyncProcess::AudioHop frame;
+auto null_input() -> FrameSyncProcess::AudioHop {
+    return FrameSyncProcess::AudioHop{};
+}
+
+auto through_preprocess(const FrameSyncProcess::AudioHop &frame) -> FrameSyncProcess::AudioHop {
     return frame;
 }
 
-FrameSyncProcess::AudioHop through_preprocess(FrameSyncProcess::AudioHop &&frame) {
-    // 何もしないでフレームをそのまま返す.
+auto through_postprocess(const FrameSyncProcess::AudioFrame &frame)
+        -> FrameSyncProcess::AudioFrame {
     return frame;
 }
 
-FrameSyncProcess::AudioFrame through_postprocess(FrameSyncProcess::AudioFrame &&frame) {
-    // 何もしないでフレームをそのまま返す.
+auto null_overlap([[maybe_unused]] const FrameSyncProcess::AudioHop &frame)
+        -> FrameSyncProcess::AudioFrame {
+    return FrameSyncProcess::AudioFrame{};
+}
+
+auto null_window(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame {
     return frame;
 }
 
-FrameSyncProcess::AudioFrame null_window(FrameSyncProcess::AudioFrame &&frame) {
-    // 何もしないでフレームをそのまま返す.
+auto null_fft(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame {
     return frame;
 }
 
-FrameSyncProcess::AudioFrame through_infer(FrameSyncProcess::AudioFrame &&frame) {
-    ///
-    /// 推論を行わず, フレームをそのまま返す.
-    ///
+auto through_infer(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame {
     return frame;
 }
 
-FrameSyncProcess::AudioFrame null_infer(FrameSyncProcess::AudioFrame &&frame) {
-    ///
-    /// 推論を行わず, フレームを無音化して返す.
-    ///
-    std::fill(frame.begin(), frame.end(), 0.0f);
-    return std::move(frame);
+auto null_infer([[maybe_unused]] const FrameSyncProcess::AudioFrame &frame)
+        -> FrameSyncProcess::AudioFrame {
+    return FrameSyncProcess::AudioFrame{};
 }
 
-void null_output(FrameSyncProcess::AudioHop &&frame) {
-    // 何もしないでフレームを破棄する.
+auto null_overlap_add([[maybe_unused]] const FrameSyncProcess::AudioFrame &frame)
+        -> FrameSyncProcess::AudioHop {
+    return FrameSyncProcess::AudioHop{};
+}
+
+auto null_output([[maybe_unused]] const FrameSyncProcess::AudioHop &frame) -> void {
 }

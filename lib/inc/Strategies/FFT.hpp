@@ -10,9 +10,10 @@ class FFT {
 public:
     FFT();
 
-    FrameSyncProcess::AudioFrame Execute(FrameSyncProcess::AudioFrame &&frame);
+    auto Execute(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
 
 private:
+    FrameSyncProcess::AudioFrame input_buffer_;
     FrameSyncProcess::AudioFrame frame_buffer_;
 
     // ARM CMSIS FFT instance and init flag

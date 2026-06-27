@@ -6,15 +6,15 @@
 #include "arm_math.h"
 
 HannWindow::HannWindow() {
-    constexpr auto N = FrameSyncProcess::audio_frame_length;
+    constexpr auto kFrameLength = static_cast<uint32_t>(FrameSyncProcess::audio_frame_length);
 
-    arm_hanning_f32(window_.data(), N);
+    arm_hanning_f32(window_.data(), kFrameLength);
 }
 
-FrameSyncProcess::AudioFrame HannWindow::Execute(FrameSyncProcess::AudioFrame&& frame) {
-    constexpr auto N = FrameSyncProcess::audio_frame_length;
+auto HannWindow::Execute(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame {
+    constexpr auto kFrameLength = static_cast<uint32_t>(FrameSyncProcess::audio_frame_length);
 
-    arm_mult_f32(frame.data(), window_.data(), frame_buffer_.data(), N);
+    arm_mult_f32(frame.data(), window_.data(), frame_buffer_.data(), kFrameLength);
 
     return frame_buffer_;
 }

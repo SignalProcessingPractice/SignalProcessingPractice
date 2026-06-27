@@ -5,29 +5,28 @@
 
 #include <cmath>
 #include <numbers>
+#include <span>
 
-SineGenerator::SineGenerator(double frequency, double amplitude)
-    : frequency_(frequency), amplitude_(amplitude) {
+SineGenerator::SineGenerator(Params params)
+    : frequency_(params.frequency), amplitude_(params.amplitude) {
 }
 
-FrameSyncProcess::AudioHop SineGenerator::GenerateOneHop(void) {
+auto SineGenerator::GenerateOneHop() -> FrameSyncProcess::AudioHop {
     FrameSyncProcess::AudioHop hop_frame;
 
     const double sample_rate = hop_frame.sample_rate();
+    static constexpr double kTwoPi = 2.0 * std::numbers::pi;
+    const double phase_increment = kTwoPi * frequency_ / sample_rate;
 
-    // 1サンプルあたりの位相増分
-    const double phase_increment = 2.0 * std::numbers::pi * frequency_ / sample_rate;
-
-    auto* data = hop_frame.data();
+    const auto hop_span = std::span<float>(hop_frame.data(), hop_frame.size());
 
     for (std::size_t i = 0; i < hop_frame.size(); ++i) {
-        data[i] = amplitude_ * std::sin(phase_);
+        hop_span[i] = static_cast<float>(amplitude_ * std::sin(phase_));
 
         phase_ += phase_increment;
 
-        // 位相を 0〜2π に正規化
-        if (phase_ >= 2.0 * std::numbers::pi) {
-            phase_ -= 2.0 * std::numbers::pi;
+        if (phase_ >= kTwoPi) {
+            phase_ -= kTwoPi;
         }
     }
 

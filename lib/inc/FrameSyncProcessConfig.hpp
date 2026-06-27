@@ -8,27 +8,27 @@
 #include "Strategies/null_strategies.hpp"
 
 ///
-/// デフォルト Strategy の前方宣言.
+/// デフォルト Strategy の取得関数.
 ///
-extern FrameSyncProcess::OverlapStrategy default_overlapper_delegate_;
-extern FrameSyncProcess::WindowStrategy default_rectangle_window_delegate_;
-extern FrameSyncProcess::FftStrategy default_fft_delegate_;
-extern FrameSyncProcess::FftStrategy default_ifft_postprocess_delegate_;
-extern FrameSyncProcess::OverlapAddStrategy default_rectangle_overlap_adder_delegate_;
+auto get_default_overlapper_delegate() -> const FrameSyncProcess::OverlapStrategy &;
+auto get_default_rectangle_window_delegate() -> const FrameSyncProcess::WindowStrategy &;
+auto get_default_fft_delegate() -> const FrameSyncProcess::FftStrategy &;
+auto get_default_ifft_postprocess_delegate() -> const FrameSyncProcess::FftStrategy &;
+auto get_default_rectangle_overlap_adder_delegate() -> const FrameSyncProcess::OverlapAddStrategy &;
 
 struct FrameSyncProcessConfig {
 public:
     FrameSyncProcess::AudioAquireStrategy audio_aquire_strategy = null_input;
     FrameSyncProcess::PreProcessStrategy pre_process_strategy = through_preprocess;
-    FrameSyncProcess::OverlapStrategy overlap_strategy = default_overlapper_delegate_;
+    FrameSyncProcess::OverlapStrategy overlap_strategy = get_default_overlapper_delegate();
 
-    FrameSyncProcess::WindowStrategy window_strategy = default_rectangle_window_delegate_;
-    FrameSyncProcess::FftStrategy fft_strategy = default_fft_delegate_;
+    FrameSyncProcess::WindowStrategy window_strategy = get_default_rectangle_window_delegate();
+    FrameSyncProcess::FftStrategy fft_strategy = get_default_fft_delegate();
     FrameSyncProcess::InferStrategy infer_strategy = through_infer;
 
     FrameSyncProcess::PostProcessStrategy post_process_strategy =
-            default_ifft_postprocess_delegate_;
+            get_default_ifft_postprocess_delegate();
     FrameSyncProcess::OverlapAddStrategy overlap_add_strategy =
-            default_rectangle_overlap_adder_delegate_;
+            get_default_rectangle_overlap_adder_delegate();
     FrameSyncProcess::AudioOutputStrategy audio_output_strategy = null_output;
 };

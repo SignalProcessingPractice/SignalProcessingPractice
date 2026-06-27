@@ -8,34 +8,49 @@
 ///
 /// @brief Null input strategy.
 ///
-FrameSyncProcess::AudioHop null_input(void);
+auto null_input() -> FrameSyncProcess::AudioHop;
 
 ///
 /// @brief Null preprocessing strategy.
 ///
-FrameSyncProcess::AudioHop through_preprocess(FrameSyncProcess::AudioHop &&frame);
+auto through_preprocess(const FrameSyncProcess::AudioHop &frame) -> FrameSyncProcess::AudioHop;
 
 ///
 /// @brief Null postprocessing strategy.
 ///
-FrameSyncProcess::AudioFrame through_postprocess(FrameSyncProcess::AudioFrame &&frame);
+auto through_postprocess(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+
+///
+/// @brief Null overlap strategy.
+///
+auto null_overlap(const FrameSyncProcess::AudioHop &frame) -> FrameSyncProcess::AudioFrame;
 
 ///
 /// @brief Null Window strategy.
 ///
-FrameSyncProcess::AudioFrame null_window(FrameSyncProcess::AudioFrame &&frame);
+auto null_window(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+
+///
+/// @brief Null FFT strategy.
+///
+auto null_fft(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
 
 ///
 /// @brief Through Infer strategy.
 ///
-FrameSyncProcess::AudioFrame through_infer(FrameSyncProcess::AudioFrame &&frame);
+auto through_infer(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
 
 ///
 /// @brief Null Infer strategy.
 ///
-FrameSyncProcess::AudioFrame null_infer(FrameSyncProcess::AudioFrame &&frame);
+auto null_infer(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+
+///
+/// @brief Null overlap-add strategy.
+///
+auto null_overlap_add(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioHop;
 
 ///
 /// @brief Null output strategy.
 ///
-void null_output(FrameSyncProcess::AudioHop &&frame);
+auto null_output(const FrameSyncProcess::AudioHop &frame) -> void;

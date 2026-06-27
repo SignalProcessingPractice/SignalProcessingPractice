@@ -3,6 +3,8 @@
 ///
 #include "Strategies/Overlapper.hpp"
 
+#include <iterator>
+
 #include "FrameSyncProcess.hpp"
 
 ///
@@ -13,12 +15,13 @@
 ///        実装している. ただし, オーバーラッピング処理に他の具象
 ///        ストラテジを実装する状況はまず無いだろう.
 ///
-FrameSyncProcess::AudioFrame Overlapper::Execute(FrameSyncProcess::AudioHop&& hop) {
-    constexpr auto hop_size = FrameSyncProcess::audio_hop_length;
+auto Overlapper::Execute(const FrameSyncProcess::AudioHop &frame) -> FrameSyncProcess::AudioFrame {
+    constexpr auto hop_size = static_cast<std::ptrdiff_t>(FrameSyncProcess::audio_hop_length);
 
-    std::move(frame_buffer_.begin() + hop_size, frame_buffer_.end(), frame_buffer_.begin());
+    std::move(std::next(frame_buffer_.begin(), hop_size), frame_buffer_.end(),
+              frame_buffer_.begin());
 
-    std::copy(hop.begin(), hop.end(), frame_buffer_.end() - hop_size);
+    std::copy(frame.begin(), frame.end(), std::prev(frame_buffer_.end(), hop_size));
 
     return frame_buffer_;
 }

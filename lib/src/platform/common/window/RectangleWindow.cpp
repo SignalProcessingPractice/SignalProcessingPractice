@@ -3,9 +3,9 @@
 ///
 #include "Strategies/RectangleWindow.hpp"
 
-RectangleWindow::RectangleWindow() {
-}
+RectangleWindow::RectangleWindow() = default;
 
-FrameSyncProcess::AudioFrame RectangleWindow::Execute(FrameSyncProcess::AudioFrame&& frame) {
+auto RectangleWindow::Execute(const FrameSyncProcess::AudioFrame &frame)
+        -> FrameSyncProcess::AudioFrame {
     return frame;
 }

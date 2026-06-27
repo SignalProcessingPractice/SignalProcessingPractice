@@ -81,22 +81,22 @@ public:
     ///
     /// オーディオ前処理.
     ///
-    using PreProcessStrategy = etl::delegate<AudioHop(AudioHop &&frame)>;
+    using PreProcessStrategy = etl::delegate<AudioHop(const AudioHop &)>;
 
     ///
     /// オーバーラッピング.
     ///
-    using OverlapStrategy = etl::delegate<AudioFrame(AudioHop &&frame)>;
+    using OverlapStrategy = etl::delegate<AudioFrame(const AudioHop &)>;
 
     ///
     /// 窓関数の積算.
     ///
-    using WindowStrategy = etl::delegate<AudioFrame(AudioFrame &&frame)>;
+    using WindowStrategy = etl::delegate<AudioFrame(const AudioFrame &)>;
 
     ///
     /// FFT.
     ///
-    using FftStrategy = etl::delegate<AudioFrame(AudioFrame &&frame)>;
+    using FftStrategy = etl::delegate<AudioFrame(const AudioFrame &)>;
 
     ///
     /// 推論.
@@ -104,36 +104,36 @@ public:
     /// @note Infer Strategy では, Observer から推論結果を受け取る設計とする.
     ///       返り値は, 何らかの時間軸または周波数軸の推論結果を返すモデルであれば有効なフレームを返し, そうでなければ空フレームを返す.
     ///
-    using InferStrategy = etl::delegate<AudioFrame(AudioFrame &&frame)>;
+    using InferStrategy = etl::delegate<AudioFrame(const AudioFrame &)>;
 
     ///
     /// オーディオ後処理.
     ///
-    using PostProcessStrategy = etl::delegate<AudioFrame(AudioFrame &&frame)>;
+    using PostProcessStrategy = etl::delegate<AudioFrame(const AudioFrame &)>;
 
     ///
     /// Overlap-Add.
     ///
-    using OverlapAddStrategy = etl::delegate<AudioHop(AudioFrame &&frame)>;
+    using OverlapAddStrategy = etl::delegate<AudioHop(const AudioFrame &)>;
 
     ///
     /// オーディオ出力.
     ///
-    using AudioOutputStrategy = etl::delegate<void(AudioHop &&frame)>;
+    using AudioOutputStrategy = etl::delegate<void(const AudioHop &)>;
     /// @}
 
     ///
     /// @name ctor, dtor.
     /// {@
     FrameSyncProcess();
-    FrameSyncProcess(const FrameSyncProcessConfig &config);
+    explicit FrameSyncProcess(const FrameSyncProcessConfig &config);
     ~FrameSyncProcess();
 
-    FrameSyncProcess(FrameSyncProcess &&);
-    FrameSyncProcess &operator=(FrameSyncProcess &&);
+    FrameSyncProcess(FrameSyncProcess &&) noexcept;
+    auto operator=(FrameSyncProcess &&) noexcept -> FrameSyncProcess &;
 
     FrameSyncProcess(const FrameSyncProcess &) = delete;
-    FrameSyncProcess &operator=(const FrameSyncProcess &) = delete;
+    auto operator=(const FrameSyncProcess &) -> FrameSyncProcess & = delete;
     /// @}
 
     ///
@@ -142,12 +142,12 @@ public:
     ///
     /// Obverser 登録.
     ///
-    void Attach(void);
+    void Attach();
 
     ///
     /// Obverser 解除.
     ///
-    void Detach(void);
+    void Detach();
 
     ///
     /// 処理設定.
@@ -165,7 +165,7 @@ public:
     ///
     /// 1 フレーム分の処理を実行.
     ///
-    void ProcessFrame(void);
+    void ProcessFrame();
     /// @}
 
     ///
@@ -180,14 +180,13 @@ private:
     static constexpr std::size_t kImplSize = 16384;  // 16KB
     static constexpr std::size_t kImplAlign = alignof(std::max_align_t);
 
-    alignas(kImplAlign) std::byte storage_[kImplSize];
+    alignas(kImplAlign) std::array<std::byte, kImplSize> storage_;
 
     ///
     /// Impl へのキャスト用.
     ///
-    Impl *ImplPtr();
-    Impl *ImplPtr(const FrameSyncProcessConfig &config);
-    const Impl *ImplPtr() const;
+    [[nodiscard]] auto ImplPtr() -> Impl *;
+    [[nodiscard]] auto ImplPtr() const -> const Impl *;
 
     ///
     /// @brief Impl サイズのコンパイル時検証.
