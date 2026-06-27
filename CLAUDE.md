@@ -24,8 +24,11 @@ scripts/ 配下に、ユーザコード全域を対象に clang-format または
 # clang_format 実行
 python run_clang_format.py
 
-# clang_tidy 実行
+# clang_tidy 実行 (検査のみ)
 python run_clang_tidy.py
+
+# clang_tidy 実行 (自動修正あり)
+python run_clang_tidy.py --fix
 ```
 
 ## ビルドコマンド
@@ -118,6 +121,3 @@ Strategy の実体を所有する具体的なパイプラインです。`exec()`
   - 大容量オブジェクトのスタック確保は避ける
   - メモリ使用量はコンパイル時に把握可能であること
   - 実行時のメモリフットプリントを予測可能にする
-
-- `FrameSyncProcessConfig` はタグディスパッチを使用してパイプラインの動作を構成する
-  - bool フラグではなく型タグによる設定を採用する
