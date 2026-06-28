@@ -72,7 +72,7 @@ ctest --test-dir build/gtest-gcc
 
 #### `FrameSyncProcess` (`lib/inc/FrameSyncProcess.hpp`)
 
-差し替え可能な Strategy を保持する ETL Delegate スロットを持つオーケストレータです。
+差し替え可能な Strategy を保持するオーケストレータです。
 
 1. `AudioAquireStrategy` — 入力取得（512サンプルのホップ）
 2. `PreProcessStrategy`
