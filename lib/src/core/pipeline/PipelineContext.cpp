@@ -8,6 +8,7 @@
 
 #include "FrameSyncProcess.hpp"
 #include "FrameSyncProcessConfig.hpp"
+#include "PipelineResult.hpp"
 
 PipelineContext::PipelineContext(const FrameSyncProcessConfig& config)
     : audio_aquire_strategy_(config.audio_aquire_strategy),
@@ -23,6 +24,10 @@ PipelineContext::PipelineContext(const FrameSyncProcessConfig& config)
 }
 
 auto PipelineContext::exec() -> void {
+    exec(nullptr);
+}
+
+auto PipelineContext::exec(PipelineResult* result) -> void {
     auto input_hop = this->audio_aquire_strategy_();
     auto pre_processed = this->pre_process_strategy_(input_hop);
     auto overlapped = this->overlap_strategy_(pre_processed);
@@ -32,6 +37,17 @@ auto PipelineContext::exec() -> void {
     auto post_processed = this->post_process_strategy_(infered);
     auto synthesized = this->overlap_add_strategy_(post_processed);
     this->audio_output_strategy_(synthesized);
+
+    if (result != nullptr) {
+        result->input_hop = input_hop;
+        result->pre_processed_hop = pre_processed;
+        result->overlapped_frame = overlapped;
+        result->windowed_frame = win_applied;
+        result->fft_frame = fft_result;
+        result->inferred_frame = infered;
+        result->post_processed_frame = post_processed;
+        result->output_hop = synthesized;
+    }
 }
 
 auto PipelineContext::reset() -> void {

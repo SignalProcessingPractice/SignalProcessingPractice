@@ -3,6 +3,8 @@
 ///
 #include "FrameSyncProcess.hpp"
 
+struct PipelineResult;
+
 class PipelineContext {
 public:
     ///
@@ -23,9 +25,16 @@ public:
     /// {@
 
     ///
-    /// パイプライン起動.
+    /// パイプライン起動（結果なし）.
     ///
     auto exec() -> void;
+
+    ///
+    /// パイプライン起動（結果あり）.
+    ///
+    /// result が nullptr でない場合, 各ステージの結果を *result に書き込む.
+    ///
+    auto exec(PipelineResult* result) -> void;
 
     ///
     /// 全 Strategy の内部状態をリセット.

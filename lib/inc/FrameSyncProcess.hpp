@@ -16,6 +16,8 @@
 ///       回避しているが, 将来的には依存関係の解消を検討する.
 ///
 struct FrameSyncProcessConfig;
+struct PipelineResult;
+class IFrameSyncObserver;
 
 class FrameSyncProcess {
 public:
@@ -140,14 +142,22 @@ public:
     /// @name 公開関数.
     /// {@
     ///
-    /// Obverser 登録.
+    /// Observer 登録.
     ///
-    void Attach();
+    void Attach(IFrameSyncObserver* observer);
 
     ///
-    /// Obverser 解除.
+    /// Observer 解除.
     ///
-    void Detach();
+    void Detach(IFrameSyncObserver* observer);
+
+    ///
+    /// 直近の信号処理結果をスナップショットとして取得する.
+    ///
+    /// スレッドセーフ（SeqLock による読み取り保護）. ProcessFrame() と並行呼び出し可能.
+    /// out には呼び出し側で確保した PipelineResult を渡すこと.
+    ///
+    void GetResult(PipelineResult* out) const;
 
     ///
     /// 処理設定.
@@ -177,7 +187,7 @@ private:
     ///
     /// Impl サイズの上限.
     ///
-    static constexpr std::size_t kImplSize = 16384;  // 16KB
+    static constexpr std::size_t kImplSize = 32768;  // 32KB
     static constexpr std::size_t kImplAlign = alignof(std::max_align_t);
 
     alignas(kImplAlign) std::array<std::byte, kImplSize> storage_;
