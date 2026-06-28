@@ -11,7 +11,7 @@ SineGenerator::SineGenerator(Params params)
     : frequency_(params.frequency), amplitude_(params.amplitude) {
 }
 
-auto SineGenerator::GenerateOneHop() -> FrameSyncProcess::AudioHop {
+auto SineGenerator::Exec() -> FrameSyncProcess::AudioHop {
     FrameSyncProcess::AudioHop hop_frame;
 
     const double sample_rate = hop_frame.sample_rate();
@@ -33,10 +33,14 @@ auto SineGenerator::GenerateOneHop() -> FrameSyncProcess::AudioHop {
     return hop_frame;
 }
 
-void SineGenerator::SetFrequency(double frequency) {
+auto SineGenerator::Reset() -> void {
+    phase_ = 0.0;
+}
+
+auto SineGenerator::SetFrequency(double frequency) -> void {
     frequency_ = frequency;
 }
 
-void SineGenerator::SetAmplitude(double amplitude) {
+auto SineGenerator::SetAmplitude(double amplitude) -> void {
     amplitude_ = amplitude;
 }

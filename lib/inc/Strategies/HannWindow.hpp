@@ -9,7 +9,8 @@ class HannWindow {
 public:
     HannWindow();
 
-    auto Execute(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+    auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
+    auto Reset() -> void;
 
 private:
     FrameSyncProcess::AudioFrame window_;

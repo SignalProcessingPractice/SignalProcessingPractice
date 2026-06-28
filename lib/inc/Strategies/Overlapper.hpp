@@ -9,7 +9,8 @@ class Overlapper {
 public:
     Overlapper() = default;
 
-    auto Execute(const FrameSyncProcess::AudioHop &frame) -> FrameSyncProcess::AudioFrame;
+    auto Exec(const FrameSyncProcess::AudioHop& frame) -> FrameSyncProcess::AudioFrame;
+    auto Reset() -> void;
 
 private:
     FrameSyncProcess::AudioFrame frame_buffer_;

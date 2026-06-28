@@ -12,7 +12,7 @@
 /// @todo 加算時の係数は, コンストラクタで設定可能にする.
 ///
 
-auto RectangleOverlapAdder::Execute(const FrameSyncProcess::AudioFrame &frame)
+auto RectangleOverlapAdder::Exec(const FrameSyncProcess::AudioFrame& frame)
         -> FrameSyncProcess::AudioHop {
     constexpr auto kHopLength = static_cast<std::ptrdiff_t>(FrameSyncProcess::audio_hop_length);
 
@@ -27,4 +27,9 @@ auto RectangleOverlapAdder::Execute(const FrameSyncProcess::AudioFrame &frame)
     frame_buffer_ = frame;
 
     return hop_buffer_;
+}
+
+auto RectangleOverlapAdder::Reset() -> void {
+    hop_buffer_ = FrameSyncProcess::AudioHop{};
+    frame_buffer_ = FrameSyncProcess::AudioFrame{};
 }

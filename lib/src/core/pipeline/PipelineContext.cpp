@@ -4,6 +4,8 @@
 
 #include "PipelineContext.hpp"
 
+#include <utility>
+
 #include "FrameSyncProcess.hpp"
 #include "FrameSyncProcessConfig.hpp"
 
@@ -20,7 +22,7 @@ PipelineContext::PipelineContext(const FrameSyncProcessConfig& config)
     /* do nothing. */
 }
 
-void PipelineContext::exec() const {
+auto PipelineContext::exec() -> void {
     auto input_hop = this->audio_aquire_strategy_();
     auto pre_processed = this->pre_process_strategy_(input_hop);
     auto overlapped = this->overlap_strategy_(pre_processed);
@@ -32,38 +34,51 @@ void PipelineContext::exec() const {
     this->audio_output_strategy_(synthesized);
 }
 
-void PipelineContext::SetAquireStrategy(FrameSyncProcess::AudioAquireStrategy strategy) {
-    audio_aquire_strategy_ = strategy;
+auto PipelineContext::reset() -> void {
+    audio_aquire_strategy_.reset();
+    pre_process_strategy_.reset();
+    overlap_strategy_.reset();
+    window_strategy_.reset();
+    fft_strategy_.reset();
+    infer_strategy_.reset();
+    post_process_strategy_.reset();
+    overlap_add_strategy_.reset();
+    audio_output_strategy_.reset();
 }
 
-void PipelineContext::SetPreProcessStrategy(FrameSyncProcess::PreProcessStrategy strategy) {
-    pre_process_strategy_ = strategy;
+auto PipelineContext::SetAquireStrategy(FrameSyncProcess::AudioAquireStrategy strategy) -> void {
+    audio_aquire_strategy_ = std::move(strategy);
 }
 
-void PipelineContext::SetOverlapStrategy(FrameSyncProcess::OverlapStrategy strategy) {
-    overlap_strategy_ = strategy;
+auto PipelineContext::SetPreProcessStrategy(FrameSyncProcess::PreProcessStrategy strategy) -> void {
+    pre_process_strategy_ = std::move(strategy);
 }
 
-void PipelineContext::SetWindowStrategy(FrameSyncProcess::WindowStrategy strategy) {
-    window_strategy_ = strategy;
+auto PipelineContext::SetOverlapStrategy(FrameSyncProcess::OverlapStrategy strategy) -> void {
+    overlap_strategy_ = std::move(strategy);
 }
 
-void PipelineContext::SetFftStrategy(FrameSyncProcess::FftStrategy strategy) {
-    fft_strategy_ = strategy;
+auto PipelineContext::SetWindowStrategy(FrameSyncProcess::WindowStrategy strategy) -> void {
+    window_strategy_ = std::move(strategy);
 }
 
-void PipelineContext::SetInferStrategy(FrameSyncProcess::InferStrategy strategy) {
-    infer_strategy_ = strategy;
+auto PipelineContext::SetFftStrategy(FrameSyncProcess::FftStrategy strategy) -> void {
+    fft_strategy_ = std::move(strategy);
 }
 
-void PipelineContext::SetPostProcessStrategy(FrameSyncProcess::PostProcessStrategy strategy) {
-    post_process_strategy_ = strategy;
+auto PipelineContext::SetInferStrategy(FrameSyncProcess::InferStrategy strategy) -> void {
+    infer_strategy_ = std::move(strategy);
 }
 
-void PipelineContext::SetOverlapAddStrategy(FrameSyncProcess::OverlapAddStrategy strategy) {
-    overlap_add_strategy_ = strategy;
+auto PipelineContext::SetPostProcessStrategy(FrameSyncProcess::PostProcessStrategy strategy)
+        -> void {
+    post_process_strategy_ = std::move(strategy);
 }
 
-void PipelineContext::SetOutputStrategy(FrameSyncProcess::AudioOutputStrategy strategy) {
-    audio_output_strategy_ = strategy;
+auto PipelineContext::SetOverlapAddStrategy(FrameSyncProcess::OverlapAddStrategy strategy) -> void {
+    overlap_add_strategy_ = std::move(strategy);
+}
+
+auto PipelineContext::SetOutputStrategy(FrameSyncProcess::AudioOutputStrategy strategy) -> void {
+    audio_output_strategy_ = std::move(strategy);
 }

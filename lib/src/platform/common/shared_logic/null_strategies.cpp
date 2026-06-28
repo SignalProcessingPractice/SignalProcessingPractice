@@ -5,45 +5,56 @@
 
 #include "FrameSyncProcess.hpp"
 
-auto null_input() -> FrameSyncProcess::AudioHop {
+auto NullInput::Exec() -> FrameSyncProcess::AudioHop {
     return FrameSyncProcess::AudioHop{};
 }
+auto NullInput::Reset() -> void {}
 
-auto through_preprocess(const FrameSyncProcess::AudioHop &frame) -> FrameSyncProcess::AudioHop {
+auto ThroughPreProcess::Exec(const FrameSyncProcess::AudioHop& frame)
+        -> FrameSyncProcess::AudioHop {
     return frame;
 }
+auto ThroughPreProcess::Reset() -> void {}
 
-auto through_postprocess(const FrameSyncProcess::AudioFrame &frame)
+auto ThroughPostProcess::Exec(const FrameSyncProcess::AudioFrame& frame)
         -> FrameSyncProcess::AudioFrame {
     return frame;
 }
+auto ThroughPostProcess::Reset() -> void {}
 
-auto null_overlap([[maybe_unused]] const FrameSyncProcess::AudioHop &frame)
-        -> FrameSyncProcess::AudioFrame {
-    return FrameSyncProcess::AudioFrame{};
-}
-
-auto null_window(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame {
-    return frame;
-}
-
-auto null_fft(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame {
-    return frame;
-}
-
-auto through_infer(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame {
-    return frame;
-}
-
-auto null_infer([[maybe_unused]] const FrameSyncProcess::AudioFrame &frame)
+auto NullOverlap::Exec([[maybe_unused]] const FrameSyncProcess::AudioHop& frame)
         -> FrameSyncProcess::AudioFrame {
     return FrameSyncProcess::AudioFrame{};
 }
+auto NullOverlap::Reset() -> void {}
 
-auto null_overlap_add([[maybe_unused]] const FrameSyncProcess::AudioFrame &frame)
+auto NullWindow::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame {
+    return frame;
+}
+auto NullWindow::Reset() -> void {}
+
+auto NullFft::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame {
+    return frame;
+}
+auto NullFft::Reset() -> void {}
+
+auto ThroughInfer::Exec(const FrameSyncProcess::AudioFrame& frame)
+        -> FrameSyncProcess::AudioFrame {
+    return frame;
+}
+auto ThroughInfer::Reset() -> void {}
+
+auto NullInfer::Exec([[maybe_unused]] const FrameSyncProcess::AudioFrame& frame)
+        -> FrameSyncProcess::AudioFrame {
+    return FrameSyncProcess::AudioFrame{};
+}
+auto NullInfer::Reset() -> void {}
+
+auto NullOverlapAdd::Exec([[maybe_unused]] const FrameSyncProcess::AudioFrame& frame)
         -> FrameSyncProcess::AudioHop {
     return FrameSyncProcess::AudioHop{};
 }
+auto NullOverlapAdd::Reset() -> void {}
 
-auto null_output([[maybe_unused]] const FrameSyncProcess::AudioHop &frame) -> void {
-}
+auto NullOutput::Exec([[maybe_unused]] const FrameSyncProcess::AudioHop& frame) -> void {}
+auto NullOutput::Reset() -> void {}

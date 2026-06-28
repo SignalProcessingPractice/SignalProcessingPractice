@@ -12,7 +12,8 @@ class RectangleOverlapAdder {
 public:
     RectangleOverlapAdder() = default;
 
-    auto Execute(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioHop;
+    auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioHop;
+    auto Reset() -> void;
 
 private:
     FrameSyncProcess::AudioHop hop_buffer_;

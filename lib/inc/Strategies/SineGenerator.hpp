@@ -17,11 +17,11 @@ public:
 
     explicit SineGenerator(Params params);
 
-    auto GenerateOneHop() -> FrameSyncProcess::AudioHop;
+    auto Exec() -> FrameSyncProcess::AudioHop;
+    auto Reset() -> void;
 
-    void SetFrequency(double frequency);
-
-    void SetAmplitude(double amplitude);
+    auto SetFrequency(double frequency) -> void;
+    auto SetAmplitude(double amplitude) -> void;
 
 private:
     double frequency_;

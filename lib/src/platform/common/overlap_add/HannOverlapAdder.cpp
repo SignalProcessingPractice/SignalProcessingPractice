@@ -15,7 +15,7 @@ HannOverlapAdder::HannOverlapAdder() {
     arm_hanning_f32(window_.data(), kFrameLength);
 }
 
-auto HannOverlapAdder::Execute(const FrameSyncProcess::AudioFrame &frame)
+auto HannOverlapAdder::Exec(const FrameSyncProcess::AudioFrame& frame)
         -> FrameSyncProcess::AudioHop {
     constexpr auto kHopLength = static_cast<std::ptrdiff_t>(FrameSyncProcess::audio_hop_length);
     constexpr auto kFrameLength = static_cast<uint32_t>(FrameSyncProcess::audio_frame_length);
@@ -32,4 +32,10 @@ auto HannOverlapAdder::Execute(const FrameSyncProcess::AudioFrame &frame)
     frame_buffer_ = windowed_buffer_;
 
     return hop_buffer_;
+}
+
+auto HannOverlapAdder::Reset() -> void {
+    hop_buffer_ = FrameSyncProcess::AudioHop{};
+    windowed_buffer_ = FrameSyncProcess::AudioFrame{};
+    frame_buffer_ = FrameSyncProcess::AudioFrame{};
 }

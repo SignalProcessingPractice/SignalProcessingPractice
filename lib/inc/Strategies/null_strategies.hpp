@@ -1,56 +1,56 @@
 ///
-/// @file null_strategy.hpp
+/// @file null_strategies.hpp
 ///
 #pragma once
 
 #include "FrameSyncProcess.hpp"
 
-///
-/// @brief Null input strategy.
-///
-auto null_input() -> FrameSyncProcess::AudioHop;
+struct NullInput {
+    static auto Exec() -> FrameSyncProcess::AudioHop;
+    static auto Reset() -> void;
+};
 
-///
-/// @brief Null preprocessing strategy.
-///
-auto through_preprocess(const FrameSyncProcess::AudioHop &frame) -> FrameSyncProcess::AudioHop;
+struct ThroughPreProcess {
+    static auto Exec(const FrameSyncProcess::AudioHop& frame) -> FrameSyncProcess::AudioHop;
+    static auto Reset() -> void;
+};
 
-///
-/// @brief Null postprocessing strategy.
-///
-auto through_postprocess(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+struct ThroughPostProcess {
+    static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
+    static auto Reset() -> void;
+};
 
-///
-/// @brief Null overlap strategy.
-///
-auto null_overlap(const FrameSyncProcess::AudioHop &frame) -> FrameSyncProcess::AudioFrame;
+struct NullOverlap {
+    static auto Exec(const FrameSyncProcess::AudioHop& frame) -> FrameSyncProcess::AudioFrame;
+    static auto Reset() -> void;
+};
 
-///
-/// @brief Null Window strategy.
-///
-auto null_window(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+struct NullWindow {
+    static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
+    static auto Reset() -> void;
+};
 
-///
-/// @brief Null FFT strategy.
-///
-auto null_fft(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+struct NullFft {
+    static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
+    static auto Reset() -> void;
+};
 
-///
-/// @brief Through Infer strategy.
-///
-auto through_infer(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+struct ThroughInfer {
+    static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
+    static auto Reset() -> void;
+};
 
-///
-/// @brief Null Infer strategy.
-///
-auto null_infer(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+struct NullInfer {
+    static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
+    static auto Reset() -> void;
+};
 
-///
-/// @brief Null overlap-add strategy.
-///
-auto null_overlap_add(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioHop;
+struct NullOverlapAdd {
+    static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioHop;
+    static auto Reset() -> void;
+};
 
-///
-/// @brief Null output strategy.
-///
-auto null_output(const FrameSyncProcess::AudioHop &frame) -> void;
+struct NullOutput {
+    static auto Exec(const FrameSyncProcess::AudioHop& frame) -> void;
+    static auto Reset() -> void;
+};

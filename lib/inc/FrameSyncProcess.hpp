@@ -2,11 +2,11 @@
 /// @file FrameSyncProcess.hpp
 ///
 #pragma once
-#include <etl/delegate.h>
 
 #include <cstddef>
 
 #include "AudioFrame.hpp"
+#include "StrategySlot.hpp"
 
 ///
 /// 前方宣言.
@@ -76,27 +76,27 @@ public:
     ///
     /// オーディオフレーム獲得.
     ///
-    using AudioAquireStrategy = etl::delegate<AudioHop(void)>;
+    using AudioAquireStrategy = StrategySlot<AudioHop()>;
 
     ///
     /// オーディオ前処理.
     ///
-    using PreProcessStrategy = etl::delegate<AudioHop(const AudioHop &)>;
+    using PreProcessStrategy = StrategySlot<AudioHop(const AudioHop &)>;
 
     ///
     /// オーバーラッピング.
     ///
-    using OverlapStrategy = etl::delegate<AudioFrame(const AudioHop &)>;
+    using OverlapStrategy = StrategySlot<AudioFrame(const AudioHop &)>;
 
     ///
     /// 窓関数の積算.
     ///
-    using WindowStrategy = etl::delegate<AudioFrame(const AudioFrame &)>;
+    using WindowStrategy = StrategySlot<AudioFrame(const AudioFrame &)>;
 
     ///
     /// FFT.
     ///
-    using FftStrategy = etl::delegate<AudioFrame(const AudioFrame &)>;
+    using FftStrategy = StrategySlot<AudioFrame(const AudioFrame &)>;
 
     ///
     /// 推論.
@@ -104,22 +104,22 @@ public:
     /// @note Infer Strategy では, Observer から推論結果を受け取る設計とする.
     ///       返り値は, 何らかの時間軸または周波数軸の推論結果を返すモデルであれば有効なフレームを返し, そうでなければ空フレームを返す.
     ///
-    using InferStrategy = etl::delegate<AudioFrame(const AudioFrame &)>;
+    using InferStrategy = StrategySlot<AudioFrame(const AudioFrame &)>;
 
     ///
     /// オーディオ後処理.
     ///
-    using PostProcessStrategy = etl::delegate<AudioFrame(const AudioFrame &)>;
+    using PostProcessStrategy = StrategySlot<AudioFrame(const AudioFrame &)>;
 
     ///
     /// Overlap-Add.
     ///
-    using OverlapAddStrategy = etl::delegate<AudioHop(const AudioFrame &)>;
+    using OverlapAddStrategy = StrategySlot<AudioHop(const AudioFrame &)>;
 
     ///
     /// オーディオ出力.
     ///
-    using AudioOutputStrategy = etl::delegate<void(const AudioHop &)>;
+    using AudioOutputStrategy = StrategySlot<void(const AudioHop &)>;
     /// @}
 
     ///

@@ -13,7 +13,7 @@ FFT::FFT() {
     }
 }
 
-auto FFT::Execute(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame {
+auto FFT::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame {
     const auto fftSize = static_cast<uint32_t>(frame.size());
     if (fftSize < 2 || !initialized_) {
         return frame;
@@ -24,4 +24,9 @@ auto FFT::Execute(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess
     arm_rfft_fast_f32(&rfft_instance_, input_buffer_.data(), frame_buffer_.data(), 0);
 
     return frame_buffer_;
+}
+
+auto FFT::Reset() -> void {
+    input_buffer_ = FrameSyncProcess::AudioFrame{};
+    frame_buffer_ = FrameSyncProcess::AudioFrame{};
 }

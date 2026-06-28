@@ -5,7 +5,9 @@
 
 RectangleWindow::RectangleWindow() = default;
 
-auto RectangleWindow::Execute(const FrameSyncProcess::AudioFrame &frame)
+auto RectangleWindow::Exec(const FrameSyncProcess::AudioFrame& frame)
         -> FrameSyncProcess::AudioFrame {
     return frame;
 }
+
+auto RectangleWindow::Reset() -> void {}

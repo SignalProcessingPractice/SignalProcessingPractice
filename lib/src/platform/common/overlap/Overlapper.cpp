@@ -15,7 +15,7 @@
 ///        実装している. ただし, オーバーラッピング処理に他の具象
 ///        ストラテジを実装する状況はまず無いだろう.
 ///
-auto Overlapper::Execute(const FrameSyncProcess::AudioHop &frame) -> FrameSyncProcess::AudioFrame {
+auto Overlapper::Exec(const FrameSyncProcess::AudioHop& frame) -> FrameSyncProcess::AudioFrame {
     constexpr auto hop_size = static_cast<std::ptrdiff_t>(FrameSyncProcess::audio_hop_length);
 
     std::move(std::next(frame_buffer_.begin(), hop_size), frame_buffer_.end(),
@@ -24,4 +24,8 @@ auto Overlapper::Execute(const FrameSyncProcess::AudioHop &frame) -> FrameSyncPr
     std::copy(frame.begin(), frame.end(), std::prev(frame_buffer_.end(), hop_size));
 
     return frame_buffer_;
+}
+
+auto Overlapper::Reset() -> void {
+    frame_buffer_ = FrameSyncProcess::AudioFrame{};
 }

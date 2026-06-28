@@ -3,6 +3,8 @@
 ///
 #include "FrameSyncProcess.hpp"
 
+#include <utility>
+
 #include <bit>
 #include <memory>
 #include <new>
@@ -33,6 +35,9 @@ public:
 
     ~Impl() = default;
 
+    auto pipeline() -> PipelineContext& { return pipeline_; }
+
+private:
     PipelineContext pipeline_;
 };
 
@@ -107,20 +112,20 @@ void FrameSyncProcess::Detach() {
 }
 
 void FrameSyncProcess::SetConfig([[maybe_unused]] AquireTag tag, AudioAquireStrategy strategy) {
-    ImplPtr()->pipeline_.SetAquireStrategy(strategy);
+    ImplPtr()->pipeline().SetAquireStrategy(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] PreProcessTag tag, PreProcessStrategy strategy) {
-    ImplPtr()->pipeline_.SetPreProcessStrategy(strategy);
+    ImplPtr()->pipeline().SetPreProcessStrategy(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] InferTag tag, InferStrategy strategy) {
-    ImplPtr()->pipeline_.SetInferStrategy(strategy);
+    ImplPtr()->pipeline().SetInferStrategy(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] OutputTag tag, AudioOutputStrategy strategy) {
-    ImplPtr()->pipeline_.SetOutputStrategy(strategy);
+    ImplPtr()->pipeline().SetOutputStrategy(std::move(strategy));
 }
 
 void FrameSyncProcess::ProcessFrame() {
-    ImplPtr()->pipeline_.exec();
+    ImplPtr()->pipeline().exec();
 }
 ///
 /// @}

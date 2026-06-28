@@ -9,5 +9,6 @@ class RectangleWindow {
 public:
     RectangleWindow();
 
-    auto Execute(const FrameSyncProcess::AudioFrame &frame) -> FrameSyncProcess::AudioFrame;
+    static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
+    static auto Reset() -> void;
 };
