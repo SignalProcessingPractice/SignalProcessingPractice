@@ -5,8 +5,6 @@
 #include <array>
 #include <cstdint>
 
-#include "AudioFrame.hpp"
-
 // NumSamples: テンプレートによる可変なサンプル数
 // SampleType: オーディオデータの型（デフォルトは float）
 template <std::size_t NumSamples, typename SampleType = float>
@@ -40,32 +38,32 @@ public:
     }
 
     // インデクサで特定のサンプルへアクセス
-    constexpr auto operator[](std::size_t index) noexcept -> SampleType& {
-        return data_[index];
+    constexpr auto operator[](std::size_t index) -> SampleType& {
+        return data_.at(index);
     }
-    constexpr auto operator[](std::size_t index) const noexcept -> const SampleType& {
-        return data_[index];
+    constexpr auto operator[](std::size_t index) const -> const SampleType& {
+        return data_.at(index);
     }
 
     // データへのアクセス
-    constexpr auto data() noexcept -> SampleType* {
+    [[nodiscard]] constexpr auto data() noexcept -> SampleType* {
         return data_.data();
     }
-    constexpr auto data() const noexcept -> const SampleType* {
+    [[nodiscard]] constexpr auto data() const noexcept -> const SampleType* {
         return data_.data();
     }
 
     // イテレータのサポート（標準アルゴリズムとの連携用）
-    constexpr auto begin() noexcept {
+    [[nodiscard]] constexpr auto begin() noexcept {
         return data_.begin();
     }
-    constexpr auto end() noexcept {
+    [[nodiscard]] constexpr auto end() noexcept {
         return data_.end();
     }
-    constexpr auto begin() const noexcept {
+    [[nodiscard]] constexpr auto begin() const noexcept {
         return data_.begin();
     }
-    constexpr auto end() const noexcept {
+    [[nodiscard]] constexpr auto end() const noexcept {
         return data_.end();
     }
 

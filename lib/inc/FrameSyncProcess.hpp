@@ -129,8 +129,8 @@ public:
     explicit FrameSyncProcess(const FrameSyncProcessConfig &config);
     ~FrameSyncProcess();
 
-    FrameSyncProcess(FrameSyncProcess &&) noexcept;
-    auto operator=(FrameSyncProcess &&) noexcept -> FrameSyncProcess &;
+    FrameSyncProcess(FrameSyncProcess &&other) noexcept;
+    auto operator=(FrameSyncProcess &&other) noexcept -> FrameSyncProcess &;
 
     FrameSyncProcess(const FrameSyncProcess &) = delete;
     auto operator=(const FrameSyncProcess &) -> FrameSyncProcess & = delete;
