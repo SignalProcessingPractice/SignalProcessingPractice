@@ -17,6 +17,50 @@
 #include "PipelineResult.hpp"
 
 ///
+/// @brief Strategy のペンディングスロット.
+///
+/// 非 RT スレッドからの書き込みと DSP スレッドでの読み取り・適用を
+/// release/acquire ペアで安全に受け渡すためのラッパ.
+///
+template <typename Strategy>
+struct PendingSlot {
+    PendingSlot() = default;
+
+    PendingSlot(const PendingSlot& other) noexcept
+        : value_(other.value_), flag_(other.flag_.load(std::memory_order_relaxed)) {}
+
+    auto operator=(const PendingSlot& other) noexcept -> PendingSlot& {
+        if (this != &other) {
+            value_ = other.value_;
+            flag_.store(other.flag_.load(std::memory_order_relaxed), std::memory_order_relaxed);
+        }
+        return *this;
+    }
+
+    PendingSlot(PendingSlot&&) = delete;
+    auto operator=(PendingSlot&&) -> PendingSlot& = delete;
+    ~PendingSlot() = default;
+
+    auto set(Strategy strategy) -> void {
+        value_ = std::move(strategy);
+        flag_.store(true, std::memory_order_release);
+    }
+
+    template <typename Fn>
+    [[nodiscard]] auto consume(Fn&& func) -> bool {
+        if (flag_.exchange(false, std::memory_order_acquire)) {
+            std::forward<Fn>(func)(std::move(value_));
+            return true;
+        }
+        return false;
+    }
+
+private:
+    Strategy value_;
+    std::atomic<bool> flag_{false};
+};
+
+///
 /// @name Impl.
 /// @{
 ///
@@ -50,19 +94,7 @@ public:
           pending_infer_(other.pending_infer_),
           pending_post_process_(other.pending_post_process_),
           pending_overlap_add_(other.pending_overlap_add_),
-          pending_output_(other.pending_output_),
-          pending_acquire_flag_(other.pending_acquire_flag_.load(std::memory_order_relaxed)),
-          pending_pre_process_flag_(
-              other.pending_pre_process_flag_.load(std::memory_order_relaxed)),
-          pending_overlap_flag_(other.pending_overlap_flag_.load(std::memory_order_relaxed)),
-          pending_window_flag_(other.pending_window_flag_.load(std::memory_order_relaxed)),
-          pending_fft_flag_(other.pending_fft_flag_.load(std::memory_order_relaxed)),
-          pending_infer_flag_(other.pending_infer_flag_.load(std::memory_order_relaxed)),
-          pending_post_process_flag_(
-              other.pending_post_process_flag_.load(std::memory_order_relaxed)),
-          pending_overlap_add_flag_(
-              other.pending_overlap_add_flag_.load(std::memory_order_relaxed)),
-          pending_output_flag_(other.pending_output_flag_.load(std::memory_order_relaxed)) {}
+          pending_output_(other.pending_output_) {}
 
     auto operator=(const Impl& other) noexcept -> Impl& {
         if (this != &other) {
@@ -85,33 +117,6 @@ public:
             pending_post_process_ = other.pending_post_process_;
             pending_overlap_add_ = other.pending_overlap_add_;
             pending_output_ = other.pending_output_;
-            pending_acquire_flag_.store(
-                other.pending_acquire_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
-            pending_pre_process_flag_.store(
-                other.pending_pre_process_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
-            pending_overlap_flag_.store(
-                other.pending_overlap_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
-            pending_window_flag_.store(
-                other.pending_window_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
-            pending_fft_flag_.store(
-                other.pending_fft_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
-            pending_infer_flag_.store(
-                other.pending_infer_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
-            pending_post_process_flag_.store(
-                other.pending_post_process_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
-            pending_overlap_add_flag_.store(
-                other.pending_overlap_add_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
-            pending_output_flag_.store(
-                other.pending_output_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
         }
         return *this;
     }
@@ -139,41 +144,27 @@ public:
         return pending_observers_flag_;
     }
 
-    [[nodiscard]] auto pending_acquire() -> AudioAquireStrategy& { return pending_acquire_; }
-    [[nodiscard]] auto pending_pre_process() -> PreProcessStrategy& {
+    [[nodiscard]] auto pending_acquire() -> PendingSlot<AudioAquireStrategy>& {
+        return pending_acquire_;
+    }
+    [[nodiscard]] auto pending_pre_process() -> PendingSlot<PreProcessStrategy>& {
         return pending_pre_process_;
     }
-    [[nodiscard]] auto pending_overlap() -> OverlapStrategy& { return pending_overlap_; }
-    [[nodiscard]] auto pending_window() -> WindowStrategy& { return pending_window_; }
-    [[nodiscard]] auto pending_fft() -> FftStrategy& { return pending_fft_; }
-    [[nodiscard]] auto pending_infer() -> InferStrategy& { return pending_infer_; }
-    [[nodiscard]] auto pending_post_process() -> PostProcessStrategy& {
+    [[nodiscard]] auto pending_overlap() -> PendingSlot<OverlapStrategy>& {
+        return pending_overlap_;
+    }
+    [[nodiscard]] auto pending_window() -> PendingSlot<WindowStrategy>& { return pending_window_; }
+    [[nodiscard]] auto pending_fft() -> PendingSlot<FftStrategy>& { return pending_fft_; }
+    [[nodiscard]] auto pending_infer() -> PendingSlot<InferStrategy>& { return pending_infer_; }
+    [[nodiscard]] auto pending_post_process() -> PendingSlot<PostProcessStrategy>& {
         return pending_post_process_;
     }
-    [[nodiscard]] auto pending_overlap_add() -> OverlapAddStrategy& {
+    [[nodiscard]] auto pending_overlap_add() -> PendingSlot<OverlapAddStrategy>& {
         return pending_overlap_add_;
     }
-    [[nodiscard]] auto pending_output() -> AudioOutputStrategy& { return pending_output_; }
-
-    [[nodiscard]] auto pending_acquire_flag() -> std::atomic<bool>& {
-        return pending_acquire_flag_;
+    [[nodiscard]] auto pending_output() -> PendingSlot<AudioOutputStrategy>& {
+        return pending_output_;
     }
-    [[nodiscard]] auto pending_pre_process_flag() -> std::atomic<bool>& {
-        return pending_pre_process_flag_;
-    }
-    [[nodiscard]] auto pending_overlap_flag() -> std::atomic<bool>& {
-        return pending_overlap_flag_;
-    }
-    [[nodiscard]] auto pending_window_flag() -> std::atomic<bool>& { return pending_window_flag_; }
-    [[nodiscard]] auto pending_fft_flag() -> std::atomic<bool>& { return pending_fft_flag_; }
-    [[nodiscard]] auto pending_infer_flag() -> std::atomic<bool>& { return pending_infer_flag_; }
-    [[nodiscard]] auto pending_post_process_flag() -> std::atomic<bool>& {
-        return pending_post_process_flag_;
-    }
-    [[nodiscard]] auto pending_overlap_add_flag() -> std::atomic<bool>& {
-        return pending_overlap_add_flag_;
-    }
-    [[nodiscard]] auto pending_output_flag() -> std::atomic<bool>& { return pending_output_flag_; }
 
 private:
     PipelineContext pipeline_;
@@ -193,35 +184,19 @@ private:
     /// @}
 
     ///
-    /// @name ペンディングスロット.
+    /// @name Strategy ペンディングスロット.
     ///
     /// SetConfig() から書き込まれ, ProcessFrame() の先頭でフレーム境界に適用される.
     /// @{
-    AudioAquireStrategy pending_acquire_;
-    PreProcessStrategy  pending_pre_process_;
-    OverlapStrategy     pending_overlap_;
-    WindowStrategy      pending_window_;
-    FftStrategy         pending_fft_;
-    InferStrategy       pending_infer_;
-    PostProcessStrategy pending_post_process_;
-    OverlapAddStrategy  pending_overlap_add_;
-    AudioOutputStrategy pending_output_;
-    /// @}
-
-    ///
-    /// @name 適用フラグ.
-    ///
-    /// SetConfig() が release で true に設定し, ProcessFrame() が acquire で exchange する.
-    /// @{
-    std::atomic<bool> pending_acquire_flag_{false};
-    std::atomic<bool> pending_pre_process_flag_{false};
-    std::atomic<bool> pending_overlap_flag_{false};
-    std::atomic<bool> pending_window_flag_{false};
-    std::atomic<bool> pending_fft_flag_{false};
-    std::atomic<bool> pending_infer_flag_{false};
-    std::atomic<bool> pending_post_process_flag_{false};
-    std::atomic<bool> pending_overlap_add_flag_{false};
-    std::atomic<bool> pending_output_flag_{false};
+    PendingSlot<AudioAquireStrategy> pending_acquire_;
+    PendingSlot<PreProcessStrategy>  pending_pre_process_;
+    PendingSlot<OverlapStrategy>     pending_overlap_;
+    PendingSlot<WindowStrategy>      pending_window_;
+    PendingSlot<FftStrategy>         pending_fft_;
+    PendingSlot<InferStrategy>       pending_infer_;
+    PendingSlot<PostProcessStrategy> pending_post_process_;
+    PendingSlot<OverlapAddStrategy>  pending_overlap_add_;
+    PendingSlot<AudioOutputStrategy> pending_output_;
     /// @}
 };
 
@@ -324,93 +299,64 @@ void FrameSyncProcess::GetResult(PipelineResult* out) const {
 }
 
 void FrameSyncProcess::SetConfig([[maybe_unused]] AquireTag tag, AudioAquireStrategy strategy) {
-    auto& impl = *ImplPtr();
-    impl.pending_acquire() = std::move(strategy);
-    impl.pending_acquire_flag().store(true, std::memory_order_release);
+    ImplPtr()->pending_acquire().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] PreProcessTag tag,
-                                  PreProcessStrategy strategy) {
-    auto& impl = *ImplPtr();
-    impl.pending_pre_process() = std::move(strategy);
-    impl.pending_pre_process_flag().store(true, std::memory_order_release);
+void FrameSyncProcess::SetConfig([[maybe_unused]] PreProcessTag tag, PreProcessStrategy strategy) {
+    ImplPtr()->pending_pre_process().set(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] OverlapTag tag, OverlapStrategy strategy) {
-    auto& impl = *ImplPtr();
-    impl.pending_overlap() = std::move(strategy);
-    impl.pending_overlap_flag().store(true, std::memory_order_release);
+    ImplPtr()->pending_overlap().set(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] WindowTag tag, WindowStrategy strategy) {
-    auto& impl = *ImplPtr();
-    impl.pending_window() = std::move(strategy);
-    impl.pending_window_flag().store(true, std::memory_order_release);
+    ImplPtr()->pending_window().set(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] FftTag tag, FftStrategy strategy) {
-    auto& impl = *ImplPtr();
-    impl.pending_fft() = std::move(strategy);
-    impl.pending_fft_flag().store(true, std::memory_order_release);
+    ImplPtr()->pending_fft().set(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] InferTag tag, InferStrategy strategy) {
-    auto& impl = *ImplPtr();
-    impl.pending_infer() = std::move(strategy);
-    impl.pending_infer_flag().store(true, std::memory_order_release);
+    ImplPtr()->pending_infer().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] PostProcessTag tag,
-                                  PostProcessStrategy strategy) {
-    auto& impl = *ImplPtr();
-    impl.pending_post_process() = std::move(strategy);
-    impl.pending_post_process_flag().store(true, std::memory_order_release);
+void FrameSyncProcess::SetConfig([[maybe_unused]] PostProcessTag tag, PostProcessStrategy strategy) {
+    ImplPtr()->pending_post_process().set(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] OverlapAddTag tag, OverlapAddStrategy strategy) {
-    auto& impl = *ImplPtr();
-    impl.pending_overlap_add() = std::move(strategy);
-    impl.pending_overlap_add_flag().store(true, std::memory_order_release);
+    ImplPtr()->pending_overlap_add().set(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] OutputTag tag, AudioOutputStrategy strategy) {
-    auto& impl = *ImplPtr();
-    impl.pending_output() = std::move(strategy);
-    impl.pending_output_flag().store(true, std::memory_order_release);
+    ImplPtr()->pending_output().set(std::move(strategy));
 }
 
 void FrameSyncProcess::ProcessFrame() {
     auto& impl = *ImplPtr();
 
     bool any_applied = false;
-    if (impl.pending_acquire_flag().exchange(false, std::memory_order_acquire)) {
-        impl.pipeline().SetAquireStrategy(std::move(impl.pending_acquire()));
-        any_applied = true;
-    }
-    if (impl.pending_pre_process_flag().exchange(false, std::memory_order_acquire)) {
-        impl.pipeline().SetPreProcessStrategy(std::move(impl.pending_pre_process()));
-        any_applied = true;
-    }
-    if (impl.pending_overlap_flag().exchange(false, std::memory_order_acquire)) {
-        impl.pipeline().SetOverlapStrategy(std::move(impl.pending_overlap()));
-        any_applied = true;
-    }
-    if (impl.pending_window_flag().exchange(false, std::memory_order_acquire)) {
-        impl.pipeline().SetWindowStrategy(std::move(impl.pending_window()));
-        any_applied = true;
-    }
-    if (impl.pending_fft_flag().exchange(false, std::memory_order_acquire)) {
-        impl.pipeline().SetFftStrategy(std::move(impl.pending_fft()));
-        any_applied = true;
-    }
-    if (impl.pending_infer_flag().exchange(false, std::memory_order_acquire)) {
-        impl.pipeline().SetInferStrategy(std::move(impl.pending_infer()));
-        any_applied = true;
-    }
-    if (impl.pending_post_process_flag().exchange(false, std::memory_order_acquire)) {
-        impl.pipeline().SetPostProcessStrategy(std::move(impl.pending_post_process()));
-        any_applied = true;
-    }
-    if (impl.pending_overlap_add_flag().exchange(false, std::memory_order_acquire)) {
-        impl.pipeline().SetOverlapAddStrategy(std::move(impl.pending_overlap_add()));
-        any_applied = true;
-    }
-    if (impl.pending_output_flag().exchange(false, std::memory_order_acquire)) {
-        impl.pipeline().SetOutputStrategy(std::move(impl.pending_output()));
-        any_applied = true;
-    }
+    any_applied |= impl.pending_acquire().consume([&impl](AudioAquireStrategy strategy) {
+        impl.pipeline().SetAquireStrategy(std::move(strategy));
+    });
+    any_applied |= impl.pending_pre_process().consume([&impl](PreProcessStrategy strategy) {
+        impl.pipeline().SetPreProcessStrategy(std::move(strategy));
+    });
+    any_applied |= impl.pending_overlap().consume([&impl](OverlapStrategy strategy) {
+        impl.pipeline().SetOverlapStrategy(std::move(strategy));
+    });
+    any_applied |= impl.pending_window().consume([&impl](WindowStrategy strategy) {
+        impl.pipeline().SetWindowStrategy(std::move(strategy));
+    });
+    any_applied |= impl.pending_fft().consume([&impl](FftStrategy strategy) {
+        impl.pipeline().SetFftStrategy(std::move(strategy));
+    });
+    any_applied |= impl.pending_infer().consume([&impl](InferStrategy strategy) {
+        impl.pipeline().SetInferStrategy(std::move(strategy));
+    });
+    any_applied |= impl.pending_post_process().consume([&impl](PostProcessStrategy strategy) {
+        impl.pipeline().SetPostProcessStrategy(std::move(strategy));
+    });
+    any_applied |= impl.pending_overlap_add().consume([&impl](OverlapAddStrategy strategy) {
+        impl.pipeline().SetOverlapAddStrategy(std::move(strategy));
+    });
+    any_applied |= impl.pending_output().consume([&impl](AudioOutputStrategy strategy) {
+        impl.pipeline().SetOutputStrategy(std::move(strategy));
+    });
     if (impl.pending_observers_flag().exchange(false, std::memory_order_acquire)) {
         impl.observers() = impl.pending_observers();
         impl.observer_count() = impl.pending_observer_count();
