@@ -38,6 +38,10 @@ public:
           seq_(other.seq_.load(std::memory_order_relaxed)),
           observers_(other.observers_),
           observer_count_(other.observer_count_),
+          pending_observers_(other.pending_observers_),
+          pending_observer_count_(other.pending_observer_count_),
+          pending_observers_flag_(
+              other.pending_observers_flag_.load(std::memory_order_relaxed)),
           pending_acquire_(other.pending_acquire_),
           pending_pre_process_(other.pending_pre_process_),
           pending_overlap_(other.pending_overlap_),
@@ -67,6 +71,11 @@ public:
             seq_.store(other.seq_.load(std::memory_order_relaxed), std::memory_order_relaxed);
             observers_ = other.observers_;
             observer_count_ = other.observer_count_;
+            pending_observers_ = other.pending_observers_;
+            pending_observer_count_ = other.pending_observer_count_;
+            pending_observers_flag_.store(
+                other.pending_observers_flag_.load(std::memory_order_relaxed),
+                std::memory_order_relaxed);
             pending_acquire_ = other.pending_acquire_;
             pending_pre_process_ = other.pending_pre_process_;
             pending_overlap_ = other.pending_overlap_;
@@ -122,6 +131,14 @@ public:
     [[nodiscard]] auto observer_count() -> std::size_t& { return observer_count_; }
     [[nodiscard]] auto observer_count() const -> std::size_t { return observer_count_; }
 
+    [[nodiscard]] auto pending_observers() -> std::array<ObserverDelegate, kMaxObservers>& {
+        return pending_observers_;
+    }
+    [[nodiscard]] auto pending_observer_count() -> std::size_t& { return pending_observer_count_; }
+    [[nodiscard]] auto pending_observers_flag() -> std::atomic<bool>& {
+        return pending_observers_flag_;
+    }
+
     [[nodiscard]] auto pending_acquire() -> AudioAquireStrategy& { return pending_acquire_; }
     [[nodiscard]] auto pending_pre_process() -> PreProcessStrategy& {
         return pending_pre_process_;
@@ -164,6 +181,16 @@ private:
     std::atomic<uint32_t> seq_{0};
     std::array<ObserverDelegate, kMaxObservers> observers_{};
     std::size_t observer_count_{0};
+
+    ///
+    /// @name Observer ペンディングスロット.
+    ///
+    /// Attach()/Detach() から書き込まれ, ProcessFrame() の先頭でフレーム境界に適用される.
+    /// @{
+    std::array<ObserverDelegate, kMaxObservers> pending_observers_{};
+    std::size_t pending_observer_count_{0};
+    std::atomic<bool> pending_observers_flag_{false};
+    /// @}
 
     ///
     /// @name ペンディングスロット.
@@ -258,22 +285,24 @@ auto FrameSyncProcess::operator=(FrameSyncProcess&& other) noexcept -> FrameSync
 ///
 void FrameSyncProcess::Attach(ObserverDelegate delegate) {
     auto& impl = *ImplPtr();
-    if (impl.observer_count() < kMaxObservers) {
-        impl.observers().at(impl.observer_count()) = delegate;
-        ++impl.observer_count();
+    if (impl.pending_observer_count() < kMaxObservers) {
+        impl.pending_observers().at(impl.pending_observer_count()) = delegate;
+        ++impl.pending_observer_count();
+        impl.pending_observers_flag().store(true, std::memory_order_release);
     }
 }
 
 void FrameSyncProcess::Detach(ObserverDelegate delegate) {
     auto& impl = *ImplPtr();
-    const auto count = impl.observer_count();
+    const auto count = impl.pending_observer_count();
     for (std::size_t i = 0; i < count; ++i) {
-        if (impl.observers().at(i) == delegate) {
+        if (impl.pending_observers().at(i) == delegate) {
             for (std::size_t j = i; j < count - 1U; ++j) {
-                impl.observers().at(j) = impl.observers().at(j + 1U);
+                impl.pending_observers().at(j) = impl.pending_observers().at(j + 1U);
             }
-            impl.observers().at(count - 1U) = ObserverDelegate{};
-            --impl.observer_count();
+            impl.pending_observers().at(count - 1U) = ObserverDelegate{};
+            --impl.pending_observer_count();
+            impl.pending_observers_flag().store(true, std::memory_order_release);
             return;
         }
     }
@@ -380,6 +409,11 @@ void FrameSyncProcess::ProcessFrame() {
     }
     if (impl.pending_output_flag().exchange(false, std::memory_order_acquire)) {
         impl.pipeline().SetOutputStrategy(std::move(impl.pending_output()));
+        any_applied = true;
+    }
+    if (impl.pending_observers_flag().exchange(false, std::memory_order_acquire)) {
+        impl.observers() = impl.pending_observers();
+        impl.observer_count() = impl.pending_observer_count();
         any_applied = true;
     }
     if (any_applied) {
