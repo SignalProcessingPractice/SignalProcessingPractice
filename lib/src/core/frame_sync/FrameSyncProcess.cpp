@@ -14,7 +14,6 @@
 
 #include "../pipeline/PipelineContext.hpp"
 #include "FrameSyncProcessConfig.hpp"
-#include "IFrameSyncObserver.hpp"
 #include "PipelineResult.hpp"
 
 ///
@@ -60,7 +59,7 @@ public:
     [[nodiscard]] auto seq() const -> const std::atomic<uint32_t>& { return seq_; }
     [[nodiscard]] auto result_buffer() -> PipelineResult& { return result_buffer_; }
     [[nodiscard]] auto result_buffer() const -> const PipelineResult& { return result_buffer_; }
-    [[nodiscard]] auto observers() -> std::array<IFrameSyncObserver*, kMaxObservers>& {
+    [[nodiscard]] auto observers() -> std::array<ObserverDelegate, kMaxObservers>& {
         return observers_;
     }
     [[nodiscard]] auto observer_count() -> std::size_t& { return observer_count_; }
@@ -70,7 +69,7 @@ private:
     PipelineContext pipeline_;
     PipelineResult result_buffer_;
     std::atomic<uint32_t> seq_{0};
-    std::array<IFrameSyncObserver*, kMaxObservers> observers_{};
+    std::array<ObserverDelegate, kMaxObservers> observers_{};
     std::size_t observer_count_{0};
 };
 
@@ -132,23 +131,23 @@ auto FrameSyncProcess::operator=(FrameSyncProcess&& other) noexcept -> FrameSync
 /// @name 公開 API.
 /// @{
 ///
-void FrameSyncProcess::Attach(IFrameSyncObserver* observer) {
+void FrameSyncProcess::Attach(ObserverDelegate delegate) {
     auto& impl = *ImplPtr();
     if (impl.observer_count() < kMaxObservers) {
-        impl.observers().at(impl.observer_count()) = observer;
+        impl.observers().at(impl.observer_count()) = delegate;
         ++impl.observer_count();
     }
 }
 
-void FrameSyncProcess::Detach(IFrameSyncObserver* observer) {
+void FrameSyncProcess::Detach(ObserverDelegate delegate) {
     auto& impl = *ImplPtr();
     const auto count = impl.observer_count();
     for (std::size_t i = 0; i < count; ++i) {
-        if (impl.observers().at(i) == observer) {
+        if (impl.observers().at(i) == delegate) {
             for (std::size_t j = i; j < count - 1U; ++j) {
                 impl.observers().at(j) = impl.observers().at(j + 1U);
             }
-            impl.observers().at(count - 1U) = nullptr;
+            impl.observers().at(count - 1U) = ObserverDelegate{};
             --impl.observer_count();
             return;
         }
@@ -205,7 +204,7 @@ void FrameSyncProcess::ProcessFrame() {
     impl.seq().fetch_add(1U, std::memory_order_seq_cst);
     const auto count = impl.observer_count();
     for (std::size_t i = 0; i < count; ++i) {
-        impl.observers().at(i)->OnProcessFrame(impl.result_buffer());
+        impl.observers().at(i)(impl.result_buffer());
     }
 }
 ///

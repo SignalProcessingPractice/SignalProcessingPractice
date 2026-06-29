@@ -5,6 +5,8 @@
 
 #include <cstddef>
 
+#include <etl/delegate.h>
+
 #include "AudioFrame.hpp"
 #include "StrategySlot.hpp"
 
@@ -17,7 +19,6 @@
 ///
 struct FrameSyncProcessConfig;
 struct PipelineResult;
-class IFrameSyncObserver;
 
 class FrameSyncProcess {
 public:
@@ -125,6 +126,15 @@ public:
     /// @}
 
     ///
+    /// @name Observer 型.
+    /// {@
+    ///
+    /// ProcessFrame() 完了時の通知コールバック.
+    ///
+    using ObserverDelegate = etl::delegate<void(const PipelineResult &)>;
+    /// @}
+
+    ///
     /// @name ctor, dtor.
     /// {@
     FrameSyncProcess();
@@ -144,12 +154,12 @@ public:
     ///
     /// Observer 登録.
     ///
-    void Attach(IFrameSyncObserver* observer);
+    void Attach(ObserverDelegate delegate);
 
     ///
     /// Observer 解除.
     ///
-    void Detach(IFrameSyncObserver* observer);
+    void Detach(ObserverDelegate delegate);
 
     ///
     /// 直近の信号処理結果をスナップショットとして取得する.

@@ -2,7 +2,6 @@
 
 #include "FrameSyncProcess.hpp"
 #include "FrameSyncProcessConfig.hpp"
-#include "IFrameSyncObserver.hpp"
 #include "PipelineResult.hpp"
 #include "Strategies/FFT.hpp"
 #include "Strategies/IFFT.hpp"
@@ -12,18 +11,24 @@
 #include "Strategies/SineGenerator.hpp"
 #include "Strategies/null_strategies.hpp"
 
+using ObserverDelegate = FrameSyncProcess::ObserverDelegate;
+
 ///
 /// Observer の呼び出しカウントと最後に受け取った PipelineResult を記録するテスト用 Observer.
 ///
-class ObserverSpy final : public IFrameSyncObserver {
+class ObserverSpy {
 public:
-    auto OnProcessFrame(const PipelineResult& result) -> void override {
+    auto OnProcessFrame(const PipelineResult& result) -> void {
         ++call_count_;
         last_result_ = result;
     }
 
     [[nodiscard]] auto call_count() const -> int { return call_count_; }
     [[nodiscard]] auto last_result() const -> const PipelineResult& { return last_result_; }
+
+    [[nodiscard]] auto as_delegate() -> ObserverDelegate {
+        return ObserverDelegate::create<ObserverSpy, &ObserverSpy::OnProcessFrame>(*this);
+    }
 
 private:
     int call_count_{0};
@@ -51,7 +56,7 @@ private:
 TEST(FrameSyncObserver, ObserverCalledAfterProcessFrame) {
     ObserverSpy spy;
     FrameSyncProcess proc{FrameSyncProcessConfig{}};
-    proc.Attach(&spy);
+    proc.Attach(spy.as_delegate());
 
     EXPECT_EQ(spy.call_count(), 0);
     proc.ProcessFrame();
@@ -80,9 +85,9 @@ TEST(FrameSyncObserver, MultipleObserversAllNotified) {
     ObserverSpy spy2;
     ObserverSpy spy3;
     FrameSyncProcess proc{FrameSyncProcessConfig{}};
-    proc.Attach(&spy1);
-    proc.Attach(&spy2);
-    proc.Attach(&spy3);
+    proc.Attach(spy1.as_delegate());
+    proc.Attach(spy2.as_delegate());
+    proc.Attach(spy3.as_delegate());
 
     proc.ProcessFrame();
 
@@ -97,11 +102,11 @@ TEST(FrameSyncObserver, MultipleObserversAllNotified) {
 TEST(FrameSyncObserver, DetachedObserverNotCalled) {
     ObserverSpy spy;
     FrameSyncProcess proc{FrameSyncProcessConfig{}};
-    proc.Attach(&spy);
+    proc.Attach(spy.as_delegate());
     proc.ProcessFrame();
     EXPECT_EQ(spy.call_count(), 1);
 
-    proc.Detach(&spy);
+    proc.Detach(spy.as_delegate());
     proc.ProcessFrame();
 
     EXPECT_EQ(spy.call_count(), 1);
@@ -135,7 +140,7 @@ TEST(FrameSyncObserver, GetResultMatchesObserverResult) {
 
     ObserverSpy spy;
     FrameSyncProcess proc{config};
-    proc.Attach(&spy);
+    proc.Attach(spy.as_delegate());
     for (int idx = 0; idx < kFramesToProcess; ++idx) {
         proc.ProcessFrame();
     }
@@ -182,7 +187,7 @@ TEST(FrameSyncObserver, ObserverResultOutputHopMatchesPipelineOutput) {
 
     ObserverSpy spy;
     FrameSyncProcess proc{config};
-    proc.Attach(&spy);
+    proc.Attach(spy.as_delegate());
     for (int idx = 0; idx < kFramesToProcess; ++idx) {
         proc.ProcessFrame();
     }
