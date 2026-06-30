@@ -44,7 +44,7 @@ cmake --build build/app
 cmake --preset app-linux
 cmake --build build/app
 
-# ユニットテスト（GCC + Google Test）
+# ユニットテスト（Clang + Google Test）
 cmake --preset gtest-debug-gcc
 cmake --build build/gtest-gcc
 
