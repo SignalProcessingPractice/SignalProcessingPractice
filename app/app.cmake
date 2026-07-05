@@ -18,6 +18,12 @@ file(GLOB SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/*.h
     ${CMAKE_CURRENT_LIST_DIR}/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/model/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/model/*.h
+    ${CMAKE_CURRENT_LIST_DIR}/model/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/presenter/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/presenter/*.h
+    ${CMAKE_CURRENT_LIST_DIR}/presenter/*.hpp
     ${CMAKE_CURRENT_LIST_DIR}/view/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/view/*.h
     ${CMAKE_CURRENT_LIST_DIR}/view/*.hpp
