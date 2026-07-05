@@ -1,70 +1,57 @@
 #
-# カレントディレクトリ配下のファイルを取得
+# Qt6 を検索
+#
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Multimedia)
+
+#
+# Qt の自動コード生成を有効化 (MOC / UIC / RCC)
+#
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+#
+# ソースファイルの収集
 #
 file(GLOB SRC_FILES
     CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_LIST_DIR}/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/*.h
     ${CMAKE_CURRENT_LIST_DIR}/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/*.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/*.h
+    ${CMAKE_CURRENT_LIST_DIR}/view/*.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/view/*.ui
+    ${CMAKE_CURRENT_LIST_DIR}/view/*.qrc
 )
 
-add_executable(APP
+#
+# 実行ファイルのターゲット定義
+#
+qt_add_executable(APP
     ${SRC_FILES}
 )
 
-target_include_directories(APP
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/lib/inc
-)
-
-#
-# RtAudio
-#
-include(FetchContent)
-
-#
-# RtAudio オプション初期化
-#
-set(RTAUDIO_API_WASAPI OFF CACHE BOOL "" FORCE)
-set(RTAUDIO_API_DS OFF CACHE BOOL "" FORCE)
-set(RTAUDIO_API_ALSA OFF CACHE BOOL "" FORCE)
-set(RTAUDIO_API_PULSE OFF CACHE BOOL "" FORCE)
-set(RTAUDIO_API_JACK OFF CACHE BOOL "" FORCE)
-
-if(WIN32)
-
-    message(STATUS "RtAudio backend: WASAPI")
-
-    set(RTAUDIO_API_WASAPI ON CACHE BOOL "" FORCE)
-    set(RTAUDIO_USE_PTHREADS OFF CACHE BOOL "" FORCE)
-
-elseif(UNIX)
-
-    message(STATUS "RtAudio backend: ALSA")
-
-    set(RTAUDIO_API_ALSA ON CACHE BOOL "" FORCE)
-    set(RTAUDIO_USE_PTHREADS ON CACHE BOOL "" FORCE)
-
-endif()
-
-set(RTAUDIO_BUILD_C OFF CACHE BOOL "" FORCE)
-set(RTAUDIO_BUILD_CPP ON CACHE BOOL "" FORCE)
-set(RTAUDIO_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(RTAUDIO_BUILD_TESTING OFF CACHE BOOL "" FORCE)
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-
-FetchContent_Declare(
-    rtaudio
-    GIT_REPOSITORY https://github.com/thestk/rtaudio.git
-    GIT_TAG        6.0.1
-)
-
-FetchContent_MakeAvailable(rtaudio)
-
-find_package(Threads REQUIRED)
-
 target_link_libraries(APP
     PRIVATE
-        rtaudio
-        Threads::Threads
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::Multimedia
+        SIGNAL_PROCESSING_PRACTICE_LIB
 )
+
+#
+# Windows: GUI サブシステムに設定し, windeployqt スクリプトを生成
+#
+if(WIN32)
+    set_target_properties(APP PROPERTIES
+        WIN32_EXECUTABLE TRUE
+    )
+    qt_generate_deploy_app_script(
+        TARGET APP
+        OUTPUT_SCRIPT deploy_script
+        NO_UNSUPPORTED_PLATFORM_ERROR
+    )
+    install(SCRIPT ${deploy_script})
+endif()

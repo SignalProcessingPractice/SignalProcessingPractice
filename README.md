@@ -4,6 +4,8 @@
 ```
 ├ app/
 ├ llb/
-├ third_party/
 └ cmake/
 ```
+
+## Dependencies
+- Qt6
