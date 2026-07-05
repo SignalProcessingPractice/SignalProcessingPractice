@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <memory>
 #include <stop_token>
 #include <thread>
 
@@ -18,6 +19,7 @@
 #include "model/RingBufferAcquire.h"
 
 struct PipelineResult;
+class DeviceInput;
 
 ///
 /// @brief MVP の Model 層.
@@ -78,10 +80,13 @@ private:
 
     ///
     /// @name 入力系 (Producer → リングバッファ → Acquire Strategy).
+    ///
+    /// Producer (InputSource / DeviceInput) は常にどちらか一方のみ動作させる.
     /// {@
     AudioInputBuffer input_buffer_;
     RingBufferAcquire ring_buffer_acquire_{&input_buffer_};
     InputSource input_source_{&input_buffer_};
+    std::unique_ptr<DeviceInput> device_input_;
     /// @}
 
     ///

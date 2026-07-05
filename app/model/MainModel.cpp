@@ -7,9 +7,11 @@
 #include "FrameSyncProcessConfig.hpp"
 #include "PipelineResult.hpp"
 #include "common/AudioConfig.h"
+#include "model/DeviceInput.h"
 
 MainModel::MainModel()
-    : sine_generator_({.frequency = SineGenerator::kDefaultFrequency,
+    : device_input_(std::make_unique<DeviceInput>(&input_buffer_)),
+      sine_generator_({.frequency = SineGenerator::kDefaultFrequency,
                        .amplitude = SineGenerator::kDefaultAmplitude}) {
     process_.SetConfig(FrameSyncProcess::AcquireTag{},
                        FrameSyncProcess::AudioAcquireStrategy{&ring_buffer_acquire_});
@@ -33,6 +35,7 @@ void MainModel::Start() {
 }
 
 void MainModel::Stop() {
+    device_input_->Stop();
     input_source_.Stop();
     if (processing_thread_.joinable()) {
         processing_thread_.request_stop();
@@ -43,15 +46,22 @@ void MainModel::Stop() {
 void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
     switch (stage) {
         case PipelineStage::kAcquire:
-            // 入力は Acquire Strategy を差し替えず, Producer の generator を切り替える.
-            if (index == 1) {
-                input_source_.SetGenerator([this] {
-                    return sine_generator_.Exec();
-                });
+            // 入力は Acquire Strategy を差し替えず, Producer を排他的に切り替える.
+            if (index == 2) {
+                input_source_.Stop();
+                device_input_->Start();
             } else {
-                input_source_.SetGenerator([] {
-                    return FrameSyncProcess::AudioHop{kAppSampleRate};
-                });
+                device_input_->Stop();
+                if (index == 1) {
+                    input_source_.SetGenerator([this] {
+                        return sine_generator_.Exec();
+                    });
+                } else {
+                    input_source_.SetGenerator([] {
+                        return FrameSyncProcess::AudioHop{kAppSampleRate};
+                    });
+                }
+                input_source_.Start();
             }
             break;
         case PipelineStage::kPreProcess:

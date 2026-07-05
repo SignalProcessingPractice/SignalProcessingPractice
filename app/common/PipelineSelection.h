@@ -39,7 +39,7 @@ using PipelineSelectionObserver = std::function<void(PipelineStage stage, int in
 
 namespace pipeline_selection_detail {
 
-inline constexpr std::array<std::string_view, 2> kAcquireNames{"Null", "Sine 440Hz"};
+inline constexpr std::array<std::string_view, 3> kAcquireNames{"Null", "Sine 440Hz", "Device"};
 inline constexpr std::array<std::string_view, 1> kPreProcessNames{"Through"};
 inline constexpr std::array<std::string_view, 1> kOverlapNames{"Overlapper"};
 inline constexpr std::array<std::string_view, 2> kWindowNames{"Rectangle", "Hann"};
