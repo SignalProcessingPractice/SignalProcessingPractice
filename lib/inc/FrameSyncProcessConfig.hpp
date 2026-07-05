@@ -20,7 +20,8 @@ auto get_default_null_output_strategy() -> FrameSyncProcess::AudioOutputStrategy
 
 struct FrameSyncProcessConfig {
 public:
-    FrameSyncProcess::AudioAcquireStrategy audio_acquire_strategy = get_default_null_input_strategy();
+    FrameSyncProcess::AudioAcquireStrategy audio_acquire_strategy =
+            get_default_null_input_strategy();
     FrameSyncProcess::PreProcessStrategy pre_process_strategy =
             get_default_through_preprocess_strategy();
     FrameSyncProcess::OverlapStrategy overlap_strategy = get_default_overlapper_strategy();

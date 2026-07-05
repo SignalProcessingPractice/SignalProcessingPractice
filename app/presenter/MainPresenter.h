@@ -3,6 +3,9 @@
 ///
 #pragma once
 
+#include <memory>
+
+#include "model/MainModel.h"
 #include "presenter/InferResultPresenter.h"
 #include "presenter/PipelinePresenter.h"
 #include "presenter/SpectrumPresenter.h"
@@ -13,9 +16,8 @@ class MainWindow;
 ///
 /// @brief MVP の Presenter 層の統括.
 ///
-/// MainWindow と紐づき, 各表示エリア・パイプライン設定を担当する子 Presenter を保持する.
-///
-/// TODO: MainModel の所有と各子 Presenter への共有を実装する.
+/// MainWindow と紐づき, MainModel を所有し, 各表示エリア・パイプライン設定を
+/// 担当する子 Presenter を保持する.
 ///
 class MainPresenter {
 public:
@@ -26,6 +28,11 @@ private:
     /// 紐づく View.
     ///
     MainWindow* view_;
+
+    ///
+    /// Model (子 Presenter と共有する).
+    ///
+    std::unique_ptr<MainModel> model_;
 
     ///
     /// @name 子 Presenter.

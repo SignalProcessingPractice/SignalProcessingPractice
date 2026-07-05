@@ -3,38 +3,38 @@
 ///
 #pragma once
 
-class QComboBox;
+#include <functional>
 
-///
-/// @brief 音声処理パイプライン各段の Strategy 選択 ComboBox 群.
-///
-/// View 側 (MainWindow) がウィジェットへのポインタを詰めて Presenter へ渡す.
-///
-struct PipelineComboBoxes {
-    QComboBox* acquire{nullptr};
-    QComboBox* pre_process{nullptr};
-    QComboBox* overlap{nullptr};
-    QComboBox* window{nullptr};
-    QComboBox* fft{nullptr};
-    QComboBox* infer{nullptr};
-    QComboBox* post_process{nullptr};
-    QComboBox* overlap_add{nullptr};
-    QComboBox* output{nullptr};
-};
+#include "common/PipelineSelection.h"
+
+class MainModel;
 
 ///
 /// @brief 音声処理パイプライン設定の Presenter 層.
 ///
-/// TODO: MainModel を保持し, ComboBox の選択変更を
-///       FrameSyncProcess::SetConfig() へ仲介する処理を実装する.
+/// 初期化時に View の Observer 機構へ Observer を登録し,
+/// ComboBox の選択変更を MainModel の FrameSyncProcess::SetConfig() へ仲介する.
 ///
 class PipelinePresenter {
 public:
-    explicit PipelinePresenter(const PipelineComboBoxes& combo_boxes);
+    ///
+    /// Observer 登録関数の型.
+    ///
+    /// View (MainWindow) の AttachPipelineObserver() を注入することで,
+    /// Presenter が View の具象型へ依存しない形で Observer を登録する.
+    ///
+    using ObserverRegistrar = std::function<void(PipelineSelectionObserver)>;
+
+    PipelinePresenter(MainModel* model, const ObserverRegistrar& registrar);
 
 private:
     ///
-    /// 各段の Strategy 選択 ComboBox (View).
+    /// ComboBox 選択変更時のイベントハンドラ.
     ///
-    PipelineComboBoxes combo_boxes_;
+    void OnStrategySelected(PipelineStage stage, int index);
+
+    ///
+    /// 紐づく Model.
+    ///
+    MainModel* model_;
 };
