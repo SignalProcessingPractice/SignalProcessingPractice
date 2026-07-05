@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>音声波形（時間軸）</string>
+     <string>音声波形</string>
     </property>
     <widget class="QWidget" name="widgetWaveform" native="true">
      <property name="geometry">
@@ -47,7 +47,7 @@
      </rect>
     </property>
     <property name="title">
-     <string>音声波形（周波数軸）</string>
+     <string>音声スペクトラム</string>
     </property>
     <widget class="QWidget" name="widgetSpectrum" native="true">
      <property name="geometry">
