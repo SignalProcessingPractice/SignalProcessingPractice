@@ -73,8 +73,6 @@ static constexpr std::size_t kMaxObservers = 8;
 ///
 struct FrameSyncProcess::Impl {
 public:
-    Impl() = default;
-
     explicit Impl(const FrameSyncProcessConfig& config) : pipeline_(config) {
     }
 
@@ -252,7 +250,8 @@ auto FrameSyncProcess::ImplPtr() const -> const Impl* {
 /// @{
 ///
 FrameSyncProcess::FrameSyncProcess() : storage_{} {
-    std::construct_at(ImplPtr());
+    // 全 StrategySlot が未バインドの状態を作らないよう, 既定 Config で構築する.
+    std::construct_at(ImplPtr(), FrameSyncProcessConfig{});
 }
 
 FrameSyncProcess::FrameSyncProcess(const FrameSyncProcessConfig& config) : storage_{} {

@@ -137,6 +137,9 @@ public:
     ///
     /// @name ctor, dtor.
     /// {@
+    ///
+    /// 既定 Strategy 構成 (FrameSyncProcessConfig の既定値) で構築する.
+    ///
     FrameSyncProcess();
     explicit FrameSyncProcess(const FrameSyncProcessConfig &config);
     ~FrameSyncProcess();

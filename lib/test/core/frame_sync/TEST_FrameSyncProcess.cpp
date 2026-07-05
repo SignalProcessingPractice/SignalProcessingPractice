@@ -16,6 +16,21 @@
 #include "Strategies/null_strategies.hpp"
 
 ///
+/// デフォルト構築では既定 Strategy 構成がバインドされ, ProcessFrame() が
+/// クラッシュせず実行でき, 結果が無音 (既定入力は NullInput) となることを確認する.
+///
+TEST(FrameSync, DefaultConstructedProcessFrameIsSafe) {
+    FrameSyncProcess proc;
+    proc.ProcessFrame();
+
+    PipelineResult result;
+    proc.GetResult(&result);
+    for (const float sample : result.output_hop) {
+        EXPECT_EQ(sample, 0.0F);
+    }
+}
+
+///
 /// Hann 窓 + RectangleOverlapAdder 構成で, 2 フレーム処理した結果が
 /// サイン波と一致することを確認する.
 ///

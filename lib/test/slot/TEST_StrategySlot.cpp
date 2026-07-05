@@ -33,3 +33,9 @@ TEST(StrategySlotReset, DoesNotCrashWhenUnbound) {
     StrategySlot<int(int)> slot;
     EXPECT_NO_FATAL_FAILURE(slot.reset());
 }
+
+TEST(StrategySlotExec, DispatchesToBoundStrategy) {
+    ResetSpy spy;
+    StrategySlot<int(int)> slot{&spy};
+    EXPECT_EQ(slot(42), 42);
+}

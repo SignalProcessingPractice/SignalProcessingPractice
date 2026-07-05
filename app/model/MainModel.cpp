@@ -9,8 +9,7 @@
 #include "model/AudioConfig.h"
 
 MainModel::MainModel()
-    : process_{FrameSyncProcessConfig{}},  // 既定 Strategy を全スロットへバインドして構築する.
-      sine_generator_({.frequency = SineGenerator::kDefaultFrequency,
+    : sine_generator_({.frequency = SineGenerator::kDefaultFrequency,
                        .amplitude = SineGenerator::kDefaultAmplitude}) {
     process_.SetConfig(FrameSyncProcess::AcquireTag{},
                        FrameSyncProcess::AudioAcquireStrategy{&ring_buffer_acquire_});
