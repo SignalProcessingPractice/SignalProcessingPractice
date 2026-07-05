@@ -22,18 +22,18 @@ scripts/ 配下に、ユーザコード全域を対象に clang-format または
 
 ```bash
 # clang_format 実行
-python run_clang_format.py
+python3 run_clang_format.py
 
 # clang_tidy 実行 (検査のみ)
-python run_clang_tidy.py
+python3 run_clang_tidy.py
 
 # clang_tidy 実行 (自動修正あり)
-python run_clang_tidy.py --fix
+python3 run_clang_tidy.py --fix
 ```
 
 ## ビルドコマンド
 
-`CMakePresets.json` には、2つの CMake Preset が定義されています。
+`CMakePresets.json` には、以下の CMake Preset が定義されています。
 
 ```bash
 # Windows アプリケーション（Clang、WASAPI オーディオ）
@@ -45,14 +45,14 @@ cmake --preset app-linux
 cmake --build build/app
 
 # ユニットテスト（Clang + Google Test）
-cmake --preset gtest-debug-gcc
-cmake --build build/gtest-gcc
+cmake --preset gtest-debug-clang
+cmake --build build/gtest-clang
 
 # 全テストの実行
-ctest --test-dir build/gtest-gcc
+ctest --test-dir build/gtest-clang
 
 # テストバイナリを直接実行
-./build/gtest-gcc/TEST_FrameSyncProcess
+./build/gtest-clang/TEST_FrameSyncProcess
 ```
 
 ## アーキテクチャ
@@ -74,7 +74,7 @@ ctest --test-dir build/gtest-gcc
 
 差し替え可能な Strategy を保持するオーケストレータです。
 
-1. `AudioAquireStrategy` — 入力取得（512サンプルのホップ）
+1. `AudioAcquireStrategy` — 入力取得（512サンプルのホップ）
 2. `PreProcessStrategy`
 3. `OverlapStrategy` — `Overlapper` による 512→1024 サンプル変換
 4. `WindowStrategy` — 窓関数の適用
@@ -100,13 +100,15 @@ Strategy の実体を所有する具体的なパイプラインです。`exec()`
 | `overlap_add/` | `HannOverlapAdder`, `RectangleOverlapAdder` |
 | `shared_logic/` | テスト用の Null Strategy およびパススルー Strategy |
 
-### リアルタイム音声アプリ (`app/main.cpp`)
+### GUI アプリ (`app/`)
 
-48kHz / 256サンプルバッファで動作します。
+Qt6 (Widgets) を使用した GUI アプリケーションを、**MVP（Model-View-Presenter）アーキテクチャ** に準拠する形式で開発中です。
 
-入力ストリームと出力ストリームは RtAudio によって独立して管理されており、両者の間は **ロックフリーな SPSC（Single Producer Single Consumer）リングバッファ**（atomic acquire/release による実装）で接続されています。
+- `app/view/` — View 層（Qt 依存はこの層に閉じ込める）
+- `app/presenter/` — Presenter 層（View 抽象と Model の仲介）
+- `app/model/` — Model 層（`FrameSyncProcess` のラップ、処理スレッド管理）
 
-専用の処理スレッドが入力バッファからデータを取得し、DSP パイプラインを実行した後に出力バッファへ書き込みます。
+旧実装（RtAudio による CLI アプリ）は `app/_old/_main.cpp` に退避されています。旧実装は 48kHz / 256 サンプルバッファで動作し、入出力ストリーム間を **ロックフリーな SPSC リングバッファ**（atomic acquire/release による実装）で接続していました。この設計は Model 層実装時の参考とします。
 
 ### 依存ライブラリ（CMake FetchContent により取得）
 
