@@ -3,7 +3,7 @@
 #include <QMainWindow>
 #include <memory>
 
-#include "view/mainwindow.h"
+#include "view/MainWindow.h"
 
 // #include "dummypresenter.h"
 // #include "dummyview.h"

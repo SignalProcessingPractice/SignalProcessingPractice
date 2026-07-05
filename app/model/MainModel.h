@@ -1,5 +1,5 @@
 ///
-/// @file mainmodel.h
+/// @file MainModel.h
 ///
 #pragma once
 

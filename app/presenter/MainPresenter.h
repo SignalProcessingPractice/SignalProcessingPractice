@@ -1,5 +1,5 @@
 ///
-/// @file mainpresenter.h
+/// @file MainPresenter.h
 ///
 #pragma once
 
