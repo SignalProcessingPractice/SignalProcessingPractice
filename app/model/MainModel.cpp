@@ -5,18 +5,55 @@
 #include "model/MainModel.h"
 
 #include "FrameSyncProcessConfig.hpp"
+#include "PipelineResult.hpp"
+#include "model/AudioConfig.h"
 
 MainModel::MainModel()
-    : sine_generator_({.frequency = SineGenerator::kDefaultFrequency,
+    : process_{FrameSyncProcessConfig{}},  // 既定 Strategy を全スロットへバインドして構築する.
+      sine_generator_({.frequency = SineGenerator::kDefaultFrequency,
                        .amplitude = SineGenerator::kDefaultAmplitude}) {
+    process_.SetConfig(FrameSyncProcess::AcquireTag{},
+                       FrameSyncProcess::AudioAcquireStrategy{&ring_buffer_acquire_});
+    process_.Attach(
+            FrameSyncProcess::ObserverDelegate::create<MainModel, &MainModel::OnFrameProcessed>(
+                    *this));
+}
+
+MainModel::~MainModel() {
+    Stop();
+}
+
+void MainModel::Start() {
+    if (processing_thread_.joinable()) {
+        return;
+    }
+    input_source_.Start();
+    processing_thread_ = std::jthread{[this](const std::stop_token& stop_token) {
+        RunProcessing(stop_token);
+    }};
+}
+
+void MainModel::Stop() {
+    input_source_.Stop();
+    if (processing_thread_.joinable()) {
+        processing_thread_.request_stop();
+        processing_thread_.join();
+    }
 }
 
 void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
     switch (stage) {
         case PipelineStage::kAcquire:
-            process_.SetConfig(FrameSyncProcess::AcquireTag{},
-                               index == 1 ? FrameSyncProcess::AudioAcquireStrategy{&sine_generator_}
-                                          : get_default_null_input_strategy());
+            // 入力は Acquire Strategy を差し替えず, Producer の generator を切り替える.
+            if (index == 1) {
+                input_source_.SetGenerator([this] {
+                    return sine_generator_.Exec();
+                });
+            } else {
+                input_source_.SetGenerator([] {
+                    return FrameSyncProcess::AudioHop{kAppSampleRate};
+                });
+            }
             break;
         case PipelineStage::kPreProcess:
             process_.SetConfig(FrameSyncProcess::PreProcessTag{},
@@ -54,4 +91,18 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
 
 auto MainModel::Process() -> FrameSyncProcess& {
     return process_;
+}
+
+auto MainModel::GetProcessedFrameCount() const -> std::uint64_t {
+    return processed_frame_count_.load(std::memory_order_relaxed);
+}
+
+void MainModel::RunProcessing(const std::stop_token& stop_token) {
+    while (input_buffer_.WaitForHop(stop_token)) {
+        process_.ProcessFrame();
+    }
+}
+
+void MainModel::OnFrameProcessed([[maybe_unused]] const PipelineResult& result) {
+    processed_frame_count_.fetch_add(1, std::memory_order_relaxed);
 }

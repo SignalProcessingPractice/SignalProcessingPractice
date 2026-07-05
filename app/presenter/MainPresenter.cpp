@@ -17,4 +17,6 @@ MainPresenter::MainPresenter(MainWindow* view)
       pipeline_presenter_(model_.get(), [view](PipelineSelectionObserver observer) {
           view->AttachPipelineObserver(std::move(observer));
       }) {
+    // NOTE: 開始/停止 UI の実装までは, Presenter 構築と同時に処理を開始する.
+    model_->Start();
 }
