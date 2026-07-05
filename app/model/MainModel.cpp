@@ -6,7 +6,7 @@
 
 #include "FrameSyncProcessConfig.hpp"
 #include "PipelineResult.hpp"
-#include "model/AudioConfig.h"
+#include "common/AudioConfig.h"
 
 MainModel::MainModel()
     : sine_generator_({.frequency = SineGenerator::kDefaultFrequency,

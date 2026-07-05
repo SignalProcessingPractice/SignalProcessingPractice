@@ -4,7 +4,7 @@
 
 #include "model/RingBufferAcquire.h"
 
-#include "model/AudioConfig.h"
+#include "common/AudioConfig.h"
 #include "model/AudioInputBuffer.h"
 
 RingBufferAcquire::RingBufferAcquire(AudioInputBuffer* buffer) : buffer_(buffer) {

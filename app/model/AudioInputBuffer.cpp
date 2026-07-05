@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "model/AudioConfig.h"
+#include "common/AudioConfig.h"
 
 auto AudioInputBuffer::Push(std::span<const float> samples) -> bool {
     if (queue_.available() < samples.size()) {

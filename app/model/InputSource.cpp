@@ -8,7 +8,7 @@
 #include <span>
 #include <utility>
 
-#include "model/AudioConfig.h"
+#include "common/AudioConfig.h"
 #include "model/AudioInputBuffer.h"
 
 InputSource::InputSource(AudioInputBuffer* buffer)

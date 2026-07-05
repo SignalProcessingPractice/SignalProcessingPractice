@@ -4,6 +4,7 @@
 
 #include "presenter/MainPresenter.h"
 
+#include <functional>
 #include <utility>
 
 #include "view/MainWindow.h"
@@ -11,8 +12,22 @@
 MainPresenter::MainPresenter(MainWindow* view)
     : view_(view),
       model_(std::make_unique<MainModel>()),
-      waveform_presenter_(view->GetWaveformWidget()),
-      spectrum_presenter_(view->GetSpectrumWidget()),
+      waveform_presenter_(
+              model_.get(),
+              [view](std::function<void()> observer) {
+                  view->AttachFrameTickObserver(std::move(observer));
+              },
+              [view](std::span<const float> samples) {
+                  view->UpdateWaveform(samples);
+              }),
+      spectrum_presenter_(
+              model_.get(),
+              [view](std::function<void()> observer) {
+                  view->AttachFrameTickObserver(std::move(observer));
+              },
+              [view](std::span<const float> values) {
+                  view->UpdateSpectrum(values);
+              }),
       infer_result_presenter_(view->GetInferResultWidget()),
       pipeline_presenter_(model_.get(), [view](PipelineSelectionObserver observer) {
           view->AttachPipelineObserver(std::move(observer));
