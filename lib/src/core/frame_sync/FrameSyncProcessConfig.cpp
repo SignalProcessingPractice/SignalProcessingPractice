@@ -10,9 +10,9 @@
 #include "Strategies/RectangleWindow.hpp"
 #include "Strategies/null_strategies.hpp"
 
-auto get_default_null_input_strategy() -> FrameSyncProcess::AudioAquireStrategy {
+auto get_default_null_input_strategy() -> FrameSyncProcess::AudioAcquireStrategy {
     static NullInput instance;
-    static FrameSyncProcess::AudioAquireStrategy slot{&instance};
+    static FrameSyncProcess::AudioAcquireStrategy slot{&instance};
     return slot;
 }
 

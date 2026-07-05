@@ -44,7 +44,7 @@ public:
     ///
     /// 各 Strategy 設定.
     ///
-    auto SetAquireStrategy(FrameSyncProcess::AudioAquireStrategy strategy) -> void;
+    auto SetAcquireStrategy(FrameSyncProcess::AudioAcquireStrategy strategy) -> void;
     auto SetPreProcessStrategy(FrameSyncProcess::PreProcessStrategy strategy) -> void;
     auto SetOverlapStrategy(FrameSyncProcess::OverlapStrategy strategy) -> void;
     auto SetWindowStrategy(FrameSyncProcess::WindowStrategy strategy) -> void;
@@ -56,7 +56,7 @@ public:
     /// @}
 
 private:
-    FrameSyncProcess::AudioAquireStrategy audio_aquire_strategy_;
+    FrameSyncProcess::AudioAcquireStrategy audio_acquire_strategy_;
     FrameSyncProcess::PreProcessStrategy pre_process_strategy_;
     FrameSyncProcess::OverlapStrategy overlap_strategy_;
     FrameSyncProcess::WindowStrategy window_strategy_;

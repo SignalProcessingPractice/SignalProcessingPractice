@@ -4,9 +4,15 @@
 
 class ResetSpy {
 public:
-    static auto Exec(int val) -> int { return val; }
-    auto Reset() -> void { ++reset_count_; }
-    [[nodiscard]] auto reset_count() const -> int { return reset_count_; }
+    static auto Exec(int val) -> int {
+        return val;
+    }
+    auto Reset() -> void {
+        ++reset_count_;
+    }
+    [[nodiscard]] auto reset_count() const -> int {
+        return reset_count_;
+    }
 
 private:
     int reset_count_{0};

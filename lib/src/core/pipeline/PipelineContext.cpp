@@ -11,7 +11,7 @@
 #include "PipelineResult.hpp"
 
 PipelineContext::PipelineContext(const FrameSyncProcessConfig& config)
-    : audio_aquire_strategy_(config.audio_aquire_strategy),
+    : audio_acquire_strategy_(config.audio_acquire_strategy),
       pre_process_strategy_(config.pre_process_strategy),
       overlap_strategy_(config.overlap_strategy),
       window_strategy_(config.window_strategy),
@@ -28,7 +28,7 @@ auto PipelineContext::exec() -> void {
 }
 
 auto PipelineContext::exec(PipelineResult* result) -> void {
-    auto input_hop = this->audio_aquire_strategy_();
+    auto input_hop = this->audio_acquire_strategy_();
     auto pre_processed = this->pre_process_strategy_(input_hop);
     auto overlapped = this->overlap_strategy_(pre_processed);
     auto win_applied = this->window_strategy_(overlapped);
@@ -51,7 +51,7 @@ auto PipelineContext::exec(PipelineResult* result) -> void {
 }
 
 auto PipelineContext::reset() -> void {
-    audio_aquire_strategy_.reset();
+    audio_acquire_strategy_.reset();
     pre_process_strategy_.reset();
     overlap_strategy_.reset();
     window_strategy_.reset();
@@ -62,8 +62,8 @@ auto PipelineContext::reset() -> void {
     audio_output_strategy_.reset();
 }
 
-auto PipelineContext::SetAquireStrategy(FrameSyncProcess::AudioAquireStrategy strategy) -> void {
-    audio_aquire_strategy_ = std::move(strategy);
+auto PipelineContext::SetAcquireStrategy(FrameSyncProcess::AudioAcquireStrategy strategy) -> void {
+    audio_acquire_strategy_ = std::move(strategy);
 }
 
 auto PipelineContext::SetPreProcessStrategy(FrameSyncProcess::PreProcessStrategy strategy) -> void {

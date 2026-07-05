@@ -10,4 +10,5 @@ auto RectangleWindow::Exec(const FrameSyncProcess::AudioFrame& frame)
     return frame;
 }
 
-auto RectangleWindow::Reset() -> void {}
+auto RectangleWindow::Reset() -> void {
+}

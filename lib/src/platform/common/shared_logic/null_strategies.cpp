@@ -8,53 +8,63 @@
 auto NullInput::Exec() -> FrameSyncProcess::AudioHop {
     return FrameSyncProcess::AudioHop{};
 }
-auto NullInput::Reset() -> void {}
+auto NullInput::Reset() -> void {
+}
 
 auto ThroughPreProcess::Exec(const FrameSyncProcess::AudioHop& frame)
         -> FrameSyncProcess::AudioHop {
     return frame;
 }
-auto ThroughPreProcess::Reset() -> void {}
+auto ThroughPreProcess::Reset() -> void {
+}
 
 auto ThroughPostProcess::Exec(const FrameSyncProcess::AudioFrame& frame)
         -> FrameSyncProcess::AudioFrame {
     return frame;
 }
-auto ThroughPostProcess::Reset() -> void {}
+auto ThroughPostProcess::Reset() -> void {
+}
 
 auto NullOverlap::Exec([[maybe_unused]] const FrameSyncProcess::AudioHop& frame)
         -> FrameSyncProcess::AudioFrame {
     return FrameSyncProcess::AudioFrame{};
 }
-auto NullOverlap::Reset() -> void {}
+auto NullOverlap::Reset() -> void {
+}
 
 auto NullWindow::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame {
     return frame;
 }
-auto NullWindow::Reset() -> void {}
+auto NullWindow::Reset() -> void {
+}
 
 auto NullFft::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame {
     return frame;
 }
-auto NullFft::Reset() -> void {}
+auto NullFft::Reset() -> void {
+}
 
-auto ThroughInfer::Exec(const FrameSyncProcess::AudioFrame& frame)
-        -> FrameSyncProcess::AudioFrame {
+auto ThroughInfer::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame {
     return frame;
 }
-auto ThroughInfer::Reset() -> void {}
+auto ThroughInfer::Reset() -> void {
+}
 
 auto NullInfer::Exec([[maybe_unused]] const FrameSyncProcess::AudioFrame& frame)
         -> FrameSyncProcess::AudioFrame {
     return FrameSyncProcess::AudioFrame{};
 }
-auto NullInfer::Reset() -> void {}
+auto NullInfer::Reset() -> void {
+}
 
 auto NullOverlapAdd::Exec([[maybe_unused]] const FrameSyncProcess::AudioFrame& frame)
         -> FrameSyncProcess::AudioHop {
     return FrameSyncProcess::AudioHop{};
 }
-auto NullOverlapAdd::Reset() -> void {}
+auto NullOverlapAdd::Reset() -> void {
+}
 
-auto NullOutput::Exec([[maybe_unused]] const FrameSyncProcess::AudioHop& frame) -> void {}
-auto NullOutput::Reset() -> void {}
+auto NullOutput::Exec([[maybe_unused]] const FrameSyncProcess::AudioHop& frame) -> void {
+}
+auto NullOutput::Reset() -> void {
+}

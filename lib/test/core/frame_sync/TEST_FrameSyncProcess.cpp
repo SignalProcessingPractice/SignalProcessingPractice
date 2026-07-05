@@ -33,7 +33,8 @@ TEST(FrameSync, InputEqualOutput) {
     class OutputValidator {
     public:
         OutputValidator(SineGenerator* validator, std::size_t* counter)
-            : validator_(validator), counter_(counter) {}
+            : validator_(validator), counter_(counter) {
+        }
 
         auto Exec(const FrameSyncProcess::AudioHop& hop) -> void {
             if (first_call_) {
@@ -47,11 +48,9 @@ TEST(FrameSync, InputEqualOutput) {
                 EXPECT_NEAR(hop[idx], validator_hop[idx], kTolerance);
             }
 
-            std::cout << "\n[Frame " << *counter_ << "] First " << kDisplaySamples
-                      << " samples:\n";
+            std::cout << "\n[Frame " << *counter_ << "] First " << kDisplaySamples << " samples:\n";
             for (std::size_t idx = 0;
-                 idx < std::min(kDisplaySamples, hop.size()) && idx < validator_hop.size();
-                 ++idx) {
+                 idx < std::min(kDisplaySamples, hop.size()) && idx < validator_hop.size(); ++idx) {
                 std::cout << "  [" << idx << "] output=" << std::fixed
                           << std::setprecision(kPrecision) << hop[idx]
                           << ", validator=" << std::fixed << std::setprecision(kPrecision)
@@ -61,7 +60,9 @@ TEST(FrameSync, InputEqualOutput) {
             ++(*counter_);
         }
 
-        auto Reset() -> void { first_call_ = true; }
+        auto Reset() -> void {
+            first_call_ = true;
+        }
 
     private:
         SineGenerator* validator_;
@@ -74,7 +75,7 @@ TEST(FrameSync, InputEqualOutput) {
     OutputValidator output_validator{&sine_gen_validator, &frame_counter};
 
     FrameSyncProcessConfig config;
-    config.audio_aquire_strategy.bind(&sine_gen_inputer);
+    config.audio_acquire_strategy.bind(&sine_gen_inputer);
     config.window_strategy.bind(&hann_window);
     config.overlap_add_strategy.bind(&rectangle_overlap_adder);
     config.audio_output_strategy.bind(&output_validator);
@@ -107,13 +108,13 @@ TEST(FrameSync, DefaultConfigProcessFrameDoesNotCrash) {
 TEST(FrameSync, MoveCtorTransfersWorkingState) {
     constexpr int kFramesToProcess = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
-    SineGenerator gen{
-        SineGenerator::Params{SineGenerator::kDefaultFrequency, SineGenerator::kDefaultAmplitude}};
+    SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,
+                                            SineGenerator::kDefaultAmplitude}};
     Overlapper overlapper;
     RectangleOverlapAdder adder;
 
     FrameSyncProcessConfig config;
-    config.audio_aquire_strategy.bind(&gen);
+    config.audio_acquire_strategy.bind(&gen);
     config.overlap_strategy.bind(&overlapper);
     config.overlap_add_strategy.bind(&adder);
 
@@ -144,13 +145,13 @@ TEST(FrameSync, MoveCtorTransfersWorkingState) {
 TEST(FrameSync, MoveAssignmentTransfersWorkingState) {
     constexpr int kFramesToProcess = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
-    SineGenerator gen{
-        SineGenerator::Params{SineGenerator::kDefaultFrequency, SineGenerator::kDefaultAmplitude}};
+    SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,
+                                            SineGenerator::kDefaultAmplitude}};
     Overlapper overlapper;
     RectangleOverlapAdder adder;
 
     FrameSyncProcessConfig config;
-    config.audio_aquire_strategy.bind(&gen);
+    config.audio_acquire_strategy.bind(&gen);
     config.overlap_strategy.bind(&overlapper);
     config.overlap_add_strategy.bind(&adder);
 
@@ -182,13 +183,13 @@ TEST(FrameSync, MoveAssignmentTransfersWorkingState) {
 TEST(FrameSync, GetResultReturnsCurrentFrameData) {
     constexpr int kFramesToProcess = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
-    SineGenerator gen{
-        SineGenerator::Params{SineGenerator::kDefaultFrequency, SineGenerator::kDefaultAmplitude}};
+    SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,
+                                            SineGenerator::kDefaultAmplitude}};
     Overlapper overlapper;
     RectangleOverlapAdder adder;
 
     FrameSyncProcessConfig config;
-    config.audio_aquire_strategy.bind(&gen);
+    config.audio_acquire_strategy.bind(&gen);
     config.overlap_strategy.bind(&overlapper);
     config.overlap_add_strategy.bind(&adder);
 
@@ -219,13 +220,13 @@ TEST(FrameSync, GetResultReturnsCurrentFrameData) {
 TEST(FrameSync, SetConfigAcquireStrategyAppliesAtFrameBoundary) {
     constexpr int kWarmUpFrames = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
-    SineGenerator gen{
-        SineGenerator::Params{SineGenerator::kDefaultFrequency, SineGenerator::kDefaultAmplitude}};
+    SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,
+                                            SineGenerator::kDefaultAmplitude}};
     Overlapper overlapper;
     RectangleOverlapAdder adder;
 
     FrameSyncProcessConfig config;
-    config.audio_aquire_strategy.bind(&gen);
+    config.audio_acquire_strategy.bind(&gen);
     config.overlap_strategy.bind(&overlapper);
     config.overlap_add_strategy.bind(&adder);
 
@@ -246,9 +247,9 @@ TEST(FrameSync, SetConfigAcquireStrategyAppliesAtFrameBoundary) {
     EXPECT_TRUE(had_signal);
 
     NullInput null_input;
-    FrameSyncProcess::AudioAquireStrategy null_slot;
+    FrameSyncProcess::AudioAcquireStrategy null_slot;
     null_slot.bind(&null_input);
-    proc.SetConfig(FrameSyncProcess::AquireTag{}, null_slot);
+    proc.SetConfig(FrameSyncProcess::AcquireTag{}, null_slot);
     proc.ProcessFrame();
 
     PipelineResult after;
@@ -273,13 +274,13 @@ TEST(FrameSync, SetConfigAcquireStrategyAppliesAtFrameBoundary) {
 TEST(FrameSync, SetConfigTriggersPipelineReset) {
     constexpr int kWarmUpFrames = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
-    SineGenerator gen{
-        SineGenerator::Params{SineGenerator::kDefaultFrequency, SineGenerator::kDefaultAmplitude}};
+    SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,
+                                            SineGenerator::kDefaultAmplitude}};
     Overlapper overlapper;
     RectangleOverlapAdder adder;
 
     FrameSyncProcessConfig config;
-    config.audio_aquire_strategy.bind(&gen);
+    config.audio_acquire_strategy.bind(&gen);
     config.overlap_strategy.bind(&overlapper);
     config.overlap_add_strategy.bind(&adder);
 
@@ -300,9 +301,9 @@ TEST(FrameSync, SetConfigTriggersPipelineReset) {
     EXPECT_TRUE(had_signal);
 
     NullInput null_input;
-    FrameSyncProcess::AudioAquireStrategy null_slot;
+    FrameSyncProcess::AudioAcquireStrategy null_slot;
     null_slot.bind(&null_input);
-    proc.SetConfig(FrameSyncProcess::AquireTag{}, null_slot);
+    proc.SetConfig(FrameSyncProcess::AcquireTag{}, null_slot);
     proc.ProcessFrame();
 
     PipelineResult after;

@@ -3,9 +3,9 @@
 ///
 #pragma once
 
-#include <cstddef>
-
 #include <etl/delegate.h>
+
+#include <cstddef>
 
 #include "AudioFrame.hpp"
 #include "StrategySlot.hpp"
@@ -52,7 +52,7 @@ public:
         explicit tag_t() = default;
     };
 
-    struct Aquire {};
+    struct Acquire {};
     struct PreProcess {};
     struct Overlap {};
     struct Window {};
@@ -62,7 +62,7 @@ public:
     struct OverlapAdd {};
     struct Output {};
 
-    using AquireTag = tag_t<Aquire>;
+    using AcquireTag = tag_t<Acquire>;
     using PreProcessTag = tag_t<PreProcess>;
     using OverlapTag = tag_t<Overlap>;
     using WindowTag = tag_t<Window>;
@@ -79,7 +79,7 @@ public:
     ///
     /// オーディオフレーム獲得.
     ///
-    using AudioAquireStrategy = StrategySlot<AudioHop()>;
+    using AudioAcquireStrategy = StrategySlot<AudioHop()>;
 
     ///
     /// オーディオ前処理.
@@ -167,12 +167,12 @@ public:
     /// スレッドセーフ（SeqLock による読み取り保護）. ProcessFrame() と並行呼び出し可能.
     /// out には呼び出し側で確保した PipelineResult を渡すこと.
     ///
-    void GetResult(PipelineResult* out) const;
+    void GetResult(PipelineResult *out) const;
 
     ///
     /// 処理設定.
     ///
-    void SetConfig(AquireTag tag, AudioAquireStrategy strategy);
+    void SetConfig(AcquireTag tag, AudioAcquireStrategy strategy);
     void SetConfig(PreProcessTag tag, PreProcessStrategy strategy);
     void SetConfig(OverlapTag tag, OverlapStrategy strategy);
     void SetConfig(WindowTag tag, WindowStrategy strategy);

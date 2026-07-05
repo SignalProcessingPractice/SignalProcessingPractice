@@ -23,8 +23,12 @@ public:
         last_result_ = result;
     }
 
-    [[nodiscard]] auto call_count() const -> int { return call_count_; }
-    [[nodiscard]] auto last_result() const -> const PipelineResult& { return last_result_; }
+    [[nodiscard]] auto call_count() const -> int {
+        return call_count_;
+    }
+    [[nodiscard]] auto last_result() const -> const PipelineResult& {
+        return last_result_;
+    }
 
     [[nodiscard]] auto as_delegate() -> ObserverDelegate {
         return ObserverDelegate::create<ObserverSpy, &ObserverSpy::OnProcessFrame>(*this);
@@ -41,10 +45,15 @@ private:
 ///
 class OutputCapture {
 public:
-    explicit OutputCapture(FrameSyncProcess::AudioHop* dest) : dest_(dest) {}
+    explicit OutputCapture(FrameSyncProcess::AudioHop* dest) : dest_(dest) {
+    }
 
-    auto Exec(const FrameSyncProcess::AudioHop& hop) -> void { *dest_ = hop; }
-    auto Reset() -> void { *dest_ = FrameSyncProcess::AudioHop{}; }
+    auto Exec(const FrameSyncProcess::AudioHop& hop) -> void {
+        *dest_ = hop;
+    }
+    auto Reset() -> void {
+        *dest_ = FrameSyncProcess::AudioHop{};
+    }
 
 private:
     FrameSyncProcess::AudioHop* dest_;
@@ -130,7 +139,7 @@ TEST(FrameSyncObserver, GetResultMatchesObserverResult) {
     RectangleOverlapAdder adder;
 
     FrameSyncProcessConfig config;
-    config.audio_aquire_strategy.bind(&gen);
+    config.audio_acquire_strategy.bind(&gen);
     config.overlap_strategy.bind(&overlapper);
     config.window_strategy.bind(&window);
     config.fft_strategy.bind(&fft);
@@ -176,7 +185,7 @@ TEST(FrameSyncObserver, ObserverResultOutputHopMatchesPipelineOutput) {
     OutputCapture capture{&captured_hop};
 
     FrameSyncProcessConfig config;
-    config.audio_aquire_strategy.bind(&gen);
+    config.audio_acquire_strategy.bind(&gen);
     config.overlap_strategy.bind(&overlapper);
     config.window_strategy.bind(&window);
     config.fft_strategy.bind(&fft);

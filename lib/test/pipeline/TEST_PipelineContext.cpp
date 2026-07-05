@@ -12,10 +12,15 @@
 
 class OutputCollector {
 public:
-    explicit OutputCollector(FrameSyncProcess::AudioHop* dest) : dest_(dest) {}
+    explicit OutputCollector(FrameSyncProcess::AudioHop* dest) : dest_(dest) {
+    }
 
-    auto Exec(const FrameSyncProcess::AudioHop& hop) -> void { *dest_ = hop; }
-    auto Reset() -> void { *dest_ = FrameSyncProcess::AudioHop{}; }
+    auto Exec(const FrameSyncProcess::AudioHop& hop) -> void {
+        *dest_ = hop;
+    }
+    auto Reset() -> void {
+        *dest_ = FrameSyncProcess::AudioHop{};
+    }
 
 private:
     FrameSyncProcess::AudioHop* dest_;
@@ -39,7 +44,7 @@ TEST(PipelineContextReset, OutputMatchesFreshPipelineAfterReset) {
     OutputCollector collector_a{&result_a};
 
     FrameSyncProcessConfig config_a;
-    config_a.audio_aquire_strategy.bind(&gen_a);
+    config_a.audio_acquire_strategy.bind(&gen_a);
     config_a.overlap_strategy.bind(&overlapper_a);
     config_a.window_strategy.bind(&window_a);
     config_a.fft_strategy.bind(&fft_a);
@@ -61,7 +66,7 @@ TEST(PipelineContextReset, OutputMatchesFreshPipelineAfterReset) {
     OutputCollector collector_b{&result_b};
 
     FrameSyncProcessConfig config_b;
-    config_b.audio_aquire_strategy.bind(&gen_b);
+    config_b.audio_acquire_strategy.bind(&gen_b);
     config_b.overlap_strategy.bind(&overlapper_b);
     config_b.window_strategy.bind(&window_b);
     config_b.fft_strategy.bind(&fft_b);

@@ -27,7 +27,8 @@ struct PendingSlot {
     PendingSlot() = default;
 
     PendingSlot(const PendingSlot& other) noexcept
-        : value_(other.value_), flag_(other.flag_.load(std::memory_order_relaxed)) {}
+        : value_(other.value_), flag_(other.flag_.load(std::memory_order_relaxed)) {
+    }
 
     auto operator=(const PendingSlot& other) noexcept -> PendingSlot& {
         if (this != &other) {
@@ -74,7 +75,8 @@ struct FrameSyncProcess::Impl {
 public:
     Impl() = default;
 
-    explicit Impl(const FrameSyncProcessConfig& config) : pipeline_(config) {}
+    explicit Impl(const FrameSyncProcessConfig& config) : pipeline_(config) {
+    }
 
     Impl(const Impl& other) noexcept
         : pipeline_(other.pipeline_),
@@ -84,8 +86,7 @@ public:
           observer_count_(other.observer_count_),
           pending_observers_(other.pending_observers_),
           pending_observer_count_(other.pending_observer_count_),
-          pending_observers_flag_(
-              other.pending_observers_flag_.load(std::memory_order_relaxed)),
+          pending_observers_flag_(other.pending_observers_flag_.load(std::memory_order_relaxed)),
           pending_acquire_(other.pending_acquire_),
           pending_pre_process_(other.pending_pre_process_),
           pending_overlap_(other.pending_overlap_),
@@ -94,7 +95,8 @@ public:
           pending_infer_(other.pending_infer_),
           pending_post_process_(other.pending_post_process_),
           pending_overlap_add_(other.pending_overlap_add_),
-          pending_output_(other.pending_output_) {}
+          pending_output_(other.pending_output_) {
+    }
 
     auto operator=(const Impl& other) noexcept -> Impl& {
         if (this != &other) {
@@ -106,8 +108,8 @@ public:
             pending_observers_ = other.pending_observers_;
             pending_observer_count_ = other.pending_observer_count_;
             pending_observers_flag_.store(
-                other.pending_observers_flag_.load(std::memory_order_relaxed),
-                std::memory_order_relaxed);
+                    other.pending_observers_flag_.load(std::memory_order_relaxed),
+                    std::memory_order_relaxed);
             pending_acquire_ = other.pending_acquire_;
             pending_pre_process_ = other.pending_pre_process_;
             pending_overlap_ = other.pending_overlap_;
@@ -125,26 +127,42 @@ public:
     auto operator=(Impl&&) -> Impl& = delete;
     ~Impl() = default;
 
-    [[nodiscard]] auto pipeline() -> PipelineContext& { return pipeline_; }
-    [[nodiscard]] auto seq() -> std::atomic<uint32_t>& { return seq_; }
-    [[nodiscard]] auto seq() const -> const std::atomic<uint32_t>& { return seq_; }
-    [[nodiscard]] auto result_buffer() -> PipelineResult& { return result_buffer_; }
-    [[nodiscard]] auto result_buffer() const -> const PipelineResult& { return result_buffer_; }
+    [[nodiscard]] auto pipeline() -> PipelineContext& {
+        return pipeline_;
+    }
+    [[nodiscard]] auto seq() -> std::atomic<uint32_t>& {
+        return seq_;
+    }
+    [[nodiscard]] auto seq() const -> const std::atomic<uint32_t>& {
+        return seq_;
+    }
+    [[nodiscard]] auto result_buffer() -> PipelineResult& {
+        return result_buffer_;
+    }
+    [[nodiscard]] auto result_buffer() const -> const PipelineResult& {
+        return result_buffer_;
+    }
     [[nodiscard]] auto observers() -> std::array<ObserverDelegate, kMaxObservers>& {
         return observers_;
     }
-    [[nodiscard]] auto observer_count() -> std::size_t& { return observer_count_; }
-    [[nodiscard]] auto observer_count() const -> std::size_t { return observer_count_; }
+    [[nodiscard]] auto observer_count() -> std::size_t& {
+        return observer_count_;
+    }
+    [[nodiscard]] auto observer_count() const -> std::size_t {
+        return observer_count_;
+    }
 
     [[nodiscard]] auto pending_observers() -> std::array<ObserverDelegate, kMaxObservers>& {
         return pending_observers_;
     }
-    [[nodiscard]] auto pending_observer_count() -> std::size_t& { return pending_observer_count_; }
+    [[nodiscard]] auto pending_observer_count() -> std::size_t& {
+        return pending_observer_count_;
+    }
     [[nodiscard]] auto pending_observers_flag() -> std::atomic<bool>& {
         return pending_observers_flag_;
     }
 
-    [[nodiscard]] auto pending_acquire() -> PendingSlot<AudioAquireStrategy>& {
+    [[nodiscard]] auto pending_acquire() -> PendingSlot<AudioAcquireStrategy>& {
         return pending_acquire_;
     }
     [[nodiscard]] auto pending_pre_process() -> PendingSlot<PreProcessStrategy>& {
@@ -153,9 +171,15 @@ public:
     [[nodiscard]] auto pending_overlap() -> PendingSlot<OverlapStrategy>& {
         return pending_overlap_;
     }
-    [[nodiscard]] auto pending_window() -> PendingSlot<WindowStrategy>& { return pending_window_; }
-    [[nodiscard]] auto pending_fft() -> PendingSlot<FftStrategy>& { return pending_fft_; }
-    [[nodiscard]] auto pending_infer() -> PendingSlot<InferStrategy>& { return pending_infer_; }
+    [[nodiscard]] auto pending_window() -> PendingSlot<WindowStrategy>& {
+        return pending_window_;
+    }
+    [[nodiscard]] auto pending_fft() -> PendingSlot<FftStrategy>& {
+        return pending_fft_;
+    }
+    [[nodiscard]] auto pending_infer() -> PendingSlot<InferStrategy>& {
+        return pending_infer_;
+    }
     [[nodiscard]] auto pending_post_process() -> PendingSlot<PostProcessStrategy>& {
         return pending_post_process_;
     }
@@ -188,14 +212,14 @@ private:
     ///
     /// SetConfig() から書き込まれ, ProcessFrame() の先頭でフレーム境界に適用される.
     /// @{
-    PendingSlot<AudioAquireStrategy> pending_acquire_;
-    PendingSlot<PreProcessStrategy>  pending_pre_process_;
-    PendingSlot<OverlapStrategy>     pending_overlap_;
-    PendingSlot<WindowStrategy>      pending_window_;
-    PendingSlot<FftStrategy>         pending_fft_;
-    PendingSlot<InferStrategy>       pending_infer_;
+    PendingSlot<AudioAcquireStrategy> pending_acquire_;
+    PendingSlot<PreProcessStrategy> pending_pre_process_;
+    PendingSlot<OverlapStrategy> pending_overlap_;
+    PendingSlot<WindowStrategy> pending_window_;
+    PendingSlot<FftStrategy> pending_fft_;
+    PendingSlot<InferStrategy> pending_infer_;
     PendingSlot<PostProcessStrategy> pending_post_process_;
-    PendingSlot<OverlapAddStrategy>  pending_overlap_add_;
+    PendingSlot<OverlapAddStrategy> pending_overlap_add_;
     PendingSlot<AudioOutputStrategy> pending_output_;
     /// @}
 };
@@ -298,7 +322,7 @@ void FrameSyncProcess::GetResult(PipelineResult* out) const {
     }
 }
 
-void FrameSyncProcess::SetConfig([[maybe_unused]] AquireTag tag, AudioAquireStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] AcquireTag tag, AudioAcquireStrategy strategy) {
     ImplPtr()->pending_acquire().set(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] PreProcessTag tag, PreProcessStrategy strategy) {
@@ -316,7 +340,8 @@ void FrameSyncProcess::SetConfig([[maybe_unused]] FftTag tag, FftStrategy strate
 void FrameSyncProcess::SetConfig([[maybe_unused]] InferTag tag, InferStrategy strategy) {
     ImplPtr()->pending_infer().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] PostProcessTag tag, PostProcessStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] PostProcessTag tag,
+                                 PostProcessStrategy strategy) {
     ImplPtr()->pending_post_process().set(std::move(strategy));
 }
 void FrameSyncProcess::SetConfig([[maybe_unused]] OverlapAddTag tag, OverlapAddStrategy strategy) {
@@ -330,8 +355,8 @@ void FrameSyncProcess::ProcessFrame() {
     auto& impl = *ImplPtr();
 
     bool any_applied = false;
-    any_applied |= impl.pending_acquire().consume([&impl](AudioAquireStrategy strategy) {
-        impl.pipeline().SetAquireStrategy(std::move(strategy));
+    any_applied |= impl.pending_acquire().consume([&impl](AudioAcquireStrategy strategy) {
+        impl.pipeline().SetAcquireStrategy(std::move(strategy));
     });
     any_applied |= impl.pending_pre_process().consume([&impl](PreProcessStrategy strategy) {
         impl.pipeline().SetPreProcessStrategy(std::move(strategy));
