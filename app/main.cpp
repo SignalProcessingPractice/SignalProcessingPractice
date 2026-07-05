@@ -1,8 +1,7 @@
-#include <memory>
-
 #include <QApplication>
 #include <QGridLayout>
 #include <QMainWindow>
+#include <memory>
 
 #include "view/mainwindow.h"
 
@@ -24,8 +23,7 @@
 //     return std::make_pair(std::move(presenter), viewPtr);
 // } // namespace
 
-auto main(int argc, char *argv[]) -> int
-{
+auto main(int argc, char *argv[]) -> int {
     QApplication app(argc, argv);
 
     // auto window_ = createDummyWindow();

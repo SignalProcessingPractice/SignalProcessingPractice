@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1165</width>
+    <width>1304</width>
     <height>1007</height>
    </rect>
   </property>
@@ -14,88 +14,88 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QGroupBox" name="groupBoxWaveForm">
+   <widget class="QGroupBox" name="groupBoxWaveform">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>1121</width>
+      <width>1261</width>
       <height>231</height>
      </rect>
     </property>
     <property name="title">
      <string>音声波形（時間軸）</string>
     </property>
-    <widget class="QWidget" name="widgetWaveForm" native="true">
+    <widget class="QWidget" name="widgetWaveform" native="true">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>1101</width>
+       <width>1241</width>
        <height>191</height>
       </rect>
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_2">
+   <widget class="QGroupBox" name="groupBoxSpectrum">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>250</y>
-      <width>1121</width>
+      <width>1261</width>
       <height>231</height>
      </rect>
     </property>
     <property name="title">
      <string>音声波形（周波数軸）</string>
     </property>
-    <widget class="QWidget" name="waveFormWidget_3" native="true">
+    <widget class="QWidget" name="widgetSpectrum" native="true">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>1101</width>
+       <width>1241</width>
        <height>191</height>
       </rect>
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_3">
+   <widget class="QGroupBox" name="groupBoxInferResult">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>490</y>
-      <width>1121</width>
+      <width>1261</width>
       <height>231</height>
      </rect>
     </property>
     <property name="title">
      <string>推論結果（作成中）</string>
     </property>
-    <widget class="QWidget" name="waveFormWidget_4" native="true">
+    <widget class="QWidget" name="widgetInferResult" native="true">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>1101</width>
+       <width>1241</width>
        <height>191</height>
       </rect>
      </property>
     </widget>
    </widget>
-   <widget class="QGroupBox" name="groupBox_4">
+   <widget class="QGroupBox" name="groupBoxPipeline">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>730</y>
-      <width>1121</width>
+      <width>1261</width>
       <height>231</height>
      </rect>
     </property>
     <property name="title">
      <string>音声処理パイプライン</string>
     </property>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupBoxAcquire">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -107,7 +107,7 @@
      <property name="title">
       <string>入力</string>
      </property>
-     <widget class="QComboBox" name="comboBox">
+     <widget class="QComboBox" name="comboBoxAcquire">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -118,7 +118,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_5">
+    <widget class="QGroupBox" name="groupBoxPreProcess">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -130,7 +130,7 @@
      <property name="title">
       <string>前処理</string>
      </property>
-     <widget class="QComboBox" name="comboBox_2">
+     <widget class="QComboBox" name="comboBoxPreProcess">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -141,7 +141,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_6">
+    <widget class="QGroupBox" name="groupBoxOverlap">
      <property name="geometry">
       <rect>
        <x>290</x>
@@ -153,7 +153,7 @@
      <property name="title">
       <string>オーバーラップ</string>
      </property>
-     <widget class="QComboBox" name="comboBox_3">
+     <widget class="QComboBox" name="comboBoxOverlap">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -164,30 +164,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_7">
-     <property name="geometry">
-      <rect>
-       <x>430</x>
-       <y>30</y>
-       <width>121</width>
-       <height>181</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>FFT</string>
-     </property>
-     <widget class="QComboBox" name="comboBox_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>101</width>
-        <height>24</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QGroupBox" name="groupBox_8">
+    <widget class="QGroupBox" name="groupBoxFft">
      <property name="geometry">
       <rect>
        <x>570</x>
@@ -197,9 +174,9 @@
       </rect>
      </property>
      <property name="title">
-      <string>推論</string>
+      <string>FFT</string>
      </property>
-     <widget class="QComboBox" name="comboBox_6">
+     <widget class="QComboBox" name="comboBoxFft">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -210,7 +187,30 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_9">
+    <widget class="QGroupBox" name="groupBoxInfer">
+     <property name="geometry">
+      <rect>
+       <x>710</x>
+       <y>30</y>
+       <width>121</width>
+       <height>181</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>推論</string>
+     </property>
+     <widget class="QComboBox" name="comboBoxInfer">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>101</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBoxPostProcess">
      <property name="geometry">
       <rect>
        <x>850</x>
@@ -222,7 +222,7 @@
      <property name="title">
       <string>後処理</string>
      </property>
-     <widget class="QComboBox" name="comboBox_7">
+     <widget class="QComboBox" name="comboBoxPostProcess">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -233,30 +233,7 @@
       </property>
      </widget>
     </widget>
-    <widget class="QGroupBox" name="groupBox_10">
-     <property name="geometry">
-      <rect>
-       <x>710</x>
-       <y>30</y>
-       <width>121</width>
-       <height>181</height>
-      </rect>
-     </property>
-     <property name="title">
-      <string>Overlap-Add</string>
-     </property>
-     <widget class="QComboBox" name="comboBox_8">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>101</width>
-        <height>24</height>
-       </rect>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QGroupBox" name="groupBox_11">
+    <widget class="QGroupBox" name="groupBoxOverlapAdd">
      <property name="geometry">
       <rect>
        <x>990</x>
@@ -266,9 +243,55 @@
       </rect>
      </property>
      <property name="title">
+      <string>Overlap-Add</string>
+     </property>
+     <widget class="QComboBox" name="comboBoxOverlapAdd">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>101</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBoxOutput">
+     <property name="geometry">
+      <rect>
+       <x>1130</x>
+       <y>30</y>
+       <width>121</width>
+       <height>181</height>
+      </rect>
+     </property>
+     <property name="title">
       <string>出力</string>
      </property>
-     <widget class="QComboBox" name="comboBox_9">
+     <widget class="QComboBox" name="comboBoxOutput">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>101</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QGroupBox" name="groupBoxWindow">
+     <property name="geometry">
+      <rect>
+       <x>430</x>
+       <y>30</y>
+       <width>121</width>
+       <height>181</height>
+      </rect>
+     </property>
+     <property name="title">
+      <string>窓関数</string>
+     </property>
+     <widget class="QComboBox" name="comboBoxWindow">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -287,16 +310,16 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1165</width>
+     <width>1304</width>
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuSignalProcessingPractice">
+   <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
    </widget>
-   <addaction name="menuSignalProcessingPractice"/>
+   <addaction name="menuHelp"/>
   </widget>
  </widget>
  <resources/>
