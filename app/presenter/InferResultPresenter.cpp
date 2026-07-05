@@ -2,6 +2,7 @@
 /// @file InferResultPresenter.cpp
 ///
 
-#include "InferResultPresenter.h"
+#include "presenter/InferResultPresenter.h"
 
-InferResultPresenter::InferResultPresenter() = default;
+InferResultPresenter::InferResultPresenter(QWidget* widget) : widget_(widget) {
+}

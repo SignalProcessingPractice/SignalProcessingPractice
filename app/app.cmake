@@ -38,6 +38,11 @@ qt_add_executable(APP
     ${SRC_FILES}
 )
 
+target_include_directories(APP
+    PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}
+)
+
 target_link_libraries(APP
     PRIVATE
         Qt6::Core

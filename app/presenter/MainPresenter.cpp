@@ -2,6 +2,14 @@
 /// @file MainPresenter.cpp
 ///
 
-#include "MainPresenter.h"
+#include "presenter/MainPresenter.h"
 
-MainPresenter::MainPresenter() = default;
+#include "view/MainWindow.h"
+
+MainPresenter::MainPresenter(MainWindow* view)
+    : view_(view),
+      waveform_presenter_(view->GetWaveformWidget()),
+      spectrum_presenter_(view->GetSpectrumWidget()),
+      infer_result_presenter_(view->GetInferResultWidget()),
+      pipeline_presenter_(view->GetPipelineComboBoxes()) {
+}

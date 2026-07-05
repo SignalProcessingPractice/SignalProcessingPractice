@@ -2,6 +2,7 @@
 /// @file SpectrumPresenter.cpp
 ///
 
-#include "SpectrumPresenter.h"
+#include "presenter/SpectrumPresenter.h"
 
-SpectrumPresenter::SpectrumPresenter() = default;
+SpectrumPresenter::SpectrumPresenter(QWidget* widget) : widget_(widget) {
+}

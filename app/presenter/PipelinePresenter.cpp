@@ -2,6 +2,8 @@
 /// @file PipelinePresenter.cpp
 ///
 
-#include "PipelinePresenter.h"
+#include "presenter/PipelinePresenter.h"
 
-PipelinePresenter::PipelinePresenter() = default;
+PipelinePresenter::PipelinePresenter(const PipelineComboBoxes& combo_boxes)
+    : combo_boxes_(combo_boxes) {
+}

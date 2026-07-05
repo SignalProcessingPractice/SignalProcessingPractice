@@ -2,6 +2,7 @@
 /// @file WaveformPresenter.cpp
 ///
 
-#include "WaveformPresenter.h"
+#include "presenter/WaveformPresenter.h"
 
-WaveformPresenter::WaveformPresenter() = default;
+WaveformPresenter::WaveformPresenter(QWidget* widget) : widget_(widget) {
+}
