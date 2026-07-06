@@ -69,7 +69,7 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
             break;
         case PipelineStage::kPreProcess:
             process_.SetConfig(FrameSyncProcess::PreProcessTag{},
-                               get_default_through_preprocess_strategy());
+                               get_default_bypass_preprocess_strategy());
             break;
         case PipelineStage::kOverlap:
             process_.SetConfig(FrameSyncProcess::OverlapTag{}, get_default_overlapper_strategy());
@@ -83,7 +83,7 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
             process_.SetConfig(FrameSyncProcess::FftTag{}, get_default_fft_strategy());
             break;
         case PipelineStage::kInfer:
-            process_.SetConfig(FrameSyncProcess::InferTag{}, get_default_through_infer_strategy());
+            process_.SetConfig(FrameSyncProcess::InferTag{}, get_default_bypass_infer_strategy());
             break;
         case PipelineStage::kPostProcess:
             process_.SetConfig(FrameSyncProcess::PostProcessTag{},

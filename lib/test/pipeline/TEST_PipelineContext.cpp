@@ -38,7 +38,7 @@ TEST(PipelineContextReset, OutputMatchesFreshPipelineAfterReset) {
     Overlapper overlapper_a;
     RectangleWindow window_a;
     FFT fft_a;
-    ThroughInfer infer_a;
+    BypassInfer infer_a;
     IFFT ifft_a;
     RectangleOverlapAdder adder_a;
     OutputCollector collector_a{&result_a};
@@ -60,7 +60,7 @@ TEST(PipelineContextReset, OutputMatchesFreshPipelineAfterReset) {
     Overlapper overlapper_b;
     RectangleWindow window_b;
     FFT fft_b;
-    ThroughInfer infer_b;
+    BypassInfer infer_b;
     IFFT ifft_b;
     RectangleOverlapAdder adder_b;
     OutputCollector collector_b{&result_b};

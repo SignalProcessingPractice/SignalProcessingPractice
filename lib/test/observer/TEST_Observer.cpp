@@ -134,7 +134,7 @@ TEST(FrameSyncObserver, GetResultMatchesObserverResult) {
     Overlapper overlapper;
     RectangleWindow window;
     FFT fft;
-    ThroughInfer infer;
+    BypassInfer infer;
     IFFT ifft;
     RectangleOverlapAdder adder;
 
@@ -177,7 +177,7 @@ TEST(FrameSyncObserver, ObserverResultOutputHopMatchesPipelineOutput) {
     Overlapper overlapper;
     RectangleWindow window;
     FFT fft;
-    ThroughInfer infer;
+    BypassInfer infer;
     IFFT ifft;
     RectangleOverlapAdder adder;
 

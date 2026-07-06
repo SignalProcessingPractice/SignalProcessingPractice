@@ -11,18 +11,17 @@ auto NullInput::Exec() -> FrameSyncProcess::AudioHop {
 auto NullInput::Reset() -> void {
 }
 
-auto ThroughPreProcess::Exec(const FrameSyncProcess::AudioHop& frame)
-        -> FrameSyncProcess::AudioHop {
+auto BypassPreProcess::Exec(const FrameSyncProcess::AudioHop& frame) -> FrameSyncProcess::AudioHop {
     return frame;
 }
-auto ThroughPreProcess::Reset() -> void {
+auto BypassPreProcess::Reset() -> void {
 }
 
-auto ThroughPostProcess::Exec(const FrameSyncProcess::AudioFrame& frame)
+auto BypassPostProcess::Exec(const FrameSyncProcess::AudioFrame& frame)
         -> FrameSyncProcess::AudioFrame {
     return frame;
 }
-auto ThroughPostProcess::Reset() -> void {
+auto BypassPostProcess::Reset() -> void {
 }
 
 auto NullOverlap::Exec([[maybe_unused]] const FrameSyncProcess::AudioHop& frame)
@@ -44,10 +43,10 @@ auto NullFft::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProces
 auto NullFft::Reset() -> void {
 }
 
-auto ThroughInfer::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame {
+auto BypassInfer::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame {
     return frame;
 }
-auto ThroughInfer::Reset() -> void {
+auto BypassInfer::Reset() -> void {
 }
 
 auto NullInfer::Exec([[maybe_unused]] const FrameSyncProcess::AudioFrame& frame)

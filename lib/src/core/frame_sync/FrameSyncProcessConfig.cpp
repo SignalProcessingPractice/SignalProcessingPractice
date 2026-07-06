@@ -16,8 +16,8 @@ auto get_default_null_input_strategy() -> FrameSyncProcess::AudioAcquireStrategy
     return slot;
 }
 
-auto get_default_through_preprocess_strategy() -> FrameSyncProcess::PreProcessStrategy {
-    static ThroughPreProcess instance;
+auto get_default_bypass_preprocess_strategy() -> FrameSyncProcess::PreProcessStrategy {
+    static BypassPreProcess instance;
     static FrameSyncProcess::PreProcessStrategy slot{&instance};
     return slot;
 }
@@ -40,8 +40,8 @@ auto get_default_fft_strategy() -> FrameSyncProcess::FftStrategy {
     return slot;
 }
 
-auto get_default_through_infer_strategy() -> FrameSyncProcess::InferStrategy {
-    static ThroughInfer instance;
+auto get_default_bypass_infer_strategy() -> FrameSyncProcess::InferStrategy {
+    static BypassInfer instance;
     static FrameSyncProcess::InferStrategy slot{&instance};
     return slot;
 }

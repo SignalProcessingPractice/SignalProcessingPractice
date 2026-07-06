@@ -10,12 +10,12 @@ struct NullInput {
     static auto Reset() -> void;
 };
 
-struct ThroughPreProcess {
+struct BypassPreProcess {
     static auto Exec(const FrameSyncProcess::AudioHop& frame) -> FrameSyncProcess::AudioHop;
     static auto Reset() -> void;
 };
 
-struct ThroughPostProcess {
+struct BypassPostProcess {
     static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
     static auto Reset() -> void;
 };
@@ -35,7 +35,7 @@ struct NullFft {
     static auto Reset() -> void;
 };
 
-struct ThroughInfer {
+struct BypassInfer {
     static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
     static auto Reset() -> void;
 };

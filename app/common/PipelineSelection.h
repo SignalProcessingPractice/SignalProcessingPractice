@@ -64,11 +64,11 @@ using SineFrequencyObserver = std::function<void(int frequency_hz)>;
 namespace pipeline_selection_detail {
 
 inline constexpr std::array<std::string_view, 3> kAcquireNames{"Null", "Sine", "Device"};
-inline constexpr std::array<std::string_view, 1> kPreProcessNames{"Through"};
+inline constexpr std::array<std::string_view, 1> kPreProcessNames{"Bypass"};
 inline constexpr std::array<std::string_view, 1> kOverlapNames{"Overlapper"};
 inline constexpr std::array<std::string_view, 2> kWindowNames{"Rectangle", "Hann"};
 inline constexpr std::array<std::string_view, 1> kFftNames{"FFT"};
-inline constexpr std::array<std::string_view, 1> kInferNames{"Through"};
+inline constexpr std::array<std::string_view, 1> kInferNames{"Bypass"};
 inline constexpr std::array<std::string_view, 1> kPostProcessNames{"IFFT"};
 inline constexpr std::array<std::string_view, 2> kOverlapAddNames{"Rectangle", "Hann"};
 inline constexpr std::array<std::string_view, 1> kOutputNames{"Null"};
