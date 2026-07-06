@@ -7,6 +7,7 @@
 #include <QAudioSource>
 #include <QIODevice>
 #include <memory>
+#include <string>
 #include <vector>
 
 class AudioInputBuffer;
@@ -60,12 +61,21 @@ public:
     auto operator=(DeviceInput&&) -> DeviceInput& = delete;
 
     ///
-    /// デフォルト入力デバイスでキャプチャを開始する.
+    /// 利用可能な入力デバイス名の一覧を取得する.
     ///
+    /// 一覧の並びは Start() の device_index に対応する.
+    ///
+    [[nodiscard]] static auto GetDeviceNames() -> std::vector<std::string>;
+
+    ///
+    /// 指定 index の入力デバイスでキャプチャを開始する.
+    ///
+    /// @param device_index GetDeviceNames() の並びに対応する index.
+    ///                     範囲外の場合はデフォルト入力デバイスを使用する.
     /// @return 開始できれば true. デバイスなし・フォーマット非対応・開始失敗時は
     ///         警告を stderr へ出力して false.
     ///
-    auto Start() -> bool;
+    auto Start(int device_index) -> bool;
 
     ///
     /// キャプチャを停止する.

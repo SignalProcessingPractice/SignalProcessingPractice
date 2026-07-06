@@ -57,14 +57,27 @@ DeviceInput::~DeviceInput() {
     Stop();
 }
 
-auto DeviceInput::Start() -> bool {
+auto DeviceInput::GetDeviceNames() -> std::vector<std::string> {
+    const auto devices = QMediaDevices::audioInputs();
+    std::vector<std::string> names;
+    names.reserve(static_cast<std::size_t>(devices.size()));
+    for (const auto& device : devices) {
+        names.push_back(device.description().toStdString());
+    }
+    return names;
+}
+
+auto DeviceInput::Start(int device_index) -> bool {
     if (audio_source_ != nullptr) {
         return true;
     }
 
-    const QAudioDevice device = QMediaDevices::defaultAudioInput();
+    const auto devices = QMediaDevices::audioInputs();
+    const QAudioDevice device = (device_index >= 0 && device_index < devices.size())
+                                        ? devices.at(device_index)
+                                        : QMediaDevices::defaultAudioInput();
     if (device.isNull()) {
-        std::cerr << "DeviceInput: no default audio input device found\n";
+        std::cerr << "DeviceInput: no audio input device found\n";
         return false;
     }
 

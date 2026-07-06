@@ -4,28 +4,50 @@
 #pragma once
 
 #include <functional>
+#include <string>
+#include <vector>
 
 #include "common/PipelineSelection.h"
 
 class MainModel;
 
 ///
+/// @brief View (MainWindow) から注入されるフック群.
+///
+/// Presenter が View の具象型へ依存しないための Type Erasure 境界.
+///
+struct PipelineViewHooks {
+    ///
+    /// Strategy 選択変更の Observer 登録関数 (AttachPipelineObserver() を注入する).
+    ///
+    std::function<void(PipelineSelectionObserver)> attach_selection;
+
+    ///
+    /// 入力デバイス選択変更の Observer 登録関数 (AttachAcquireDeviceObserver() を注入する).
+    ///
+    std::function<void(AcquireDeviceObserver)> attach_device;
+
+    ///
+    /// デバイス選択 ComboBox の表示・選択肢投入 (ShowAcquireDeviceSelector() を注入する).
+    ///
+    std::function<void(const std::vector<std::string>&)> show_device_selector;
+
+    ///
+    /// デバイス選択 ComboBox の非表示化 (HideAcquireDeviceSelector() を注入する).
+    ///
+    std::function<void()> hide_device_selector;
+};
+
+///
 /// @brief 音声処理パイプライン設定の Presenter 層.
 ///
 /// 初期化時に View の Observer 機構へ Observer を登録し,
 /// ComboBox の選択変更を MainModel の FrameSyncProcess::SetConfig() へ仲介する.
+/// 入力 "Device" 選択時はデバイス一覧を View へ渡し, デバイス選択を Model へ仲介する.
 ///
 class PipelinePresenter {
 public:
-    ///
-    /// Observer 登録関数の型.
-    ///
-    /// View (MainWindow) の AttachPipelineObserver() を注入することで,
-    /// Presenter が View の具象型へ依存しない形で Observer を登録する.
-    ///
-    using ObserverRegistrar = std::function<void(PipelineSelectionObserver)>;
-
-    PipelinePresenter(MainModel* model, const ObserverRegistrar& registrar);
+    PipelinePresenter(MainModel* model, PipelineViewHooks hooks);
 
 private:
     ///
@@ -34,7 +56,17 @@ private:
     void OnStrategySelected(PipelineStage stage, int index);
 
     ///
+    /// 入力デバイス選択変更時のイベントハンドラ.
+    ///
+    void OnDeviceSelected(int device_index);
+
+    ///
     /// 紐づく Model.
     ///
     MainModel* model_;
+
+    ///
+    /// View から注入されたフック群.
+    ///
+    PipelineViewHooks hooks_;
 };

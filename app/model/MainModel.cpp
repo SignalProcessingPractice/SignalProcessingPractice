@@ -47,10 +47,13 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
     switch (stage) {
         case PipelineStage::kAcquire:
             // 入力は Acquire Strategy を差し替えず, Producer を排他的に切り替える.
-            if (index == 2) {
+            if (index == kAcquireDeviceItemIndex) {
                 input_source_.Stop();
-                device_input_->Start();
+                device_input_->Stop();
+                // キャプチャの開始はデバイス選択 (ApplyDeviceSelection) を待つ.
+                device_mode_ = true;
             } else {
+                device_mode_ = false;
                 device_input_->Stop();
                 if (index == 1) {
                     input_source_.SetGenerator([this] {
@@ -96,6 +99,18 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
             process_.SetConfig(FrameSyncProcess::OutputTag{}, get_default_null_output_strategy());
             break;
     }
+}
+
+auto MainModel::GetAudioInputDeviceNames() -> std::vector<std::string> {
+    return DeviceInput::GetDeviceNames();
+}
+
+void MainModel::ApplyDeviceSelection(int device_index) {
+    if (!device_mode_) {
+        return;
+    }
+    device_input_->Stop();
+    device_input_->Start(device_index);
 }
 
 auto MainModel::Process() -> FrameSyncProcess& {

@@ -69,6 +69,32 @@ void MainWindow::AttachPipelineObserver(PipelineSelectionObserver observer) {
     pipeline_observers_.push_back(std::move(observer));
 }
 
+void MainWindow::AttachAcquireDeviceObserver(AcquireDeviceObserver observer) {
+    acquire_device_observers_.push_back(std::move(observer));
+}
+
+void MainWindow::ShowAcquireDeviceSelector(const std::vector<std::string>& device_names) {
+    QComboBox* combo_box = ui->comboBoxAcquireDevice;
+
+    // 選択肢の入れ替え中に不定な index で通知しないようシグナルを止め,
+    // 投入完了後に現在の選択を明示的に通知する.
+    combo_box->blockSignals(true);
+    combo_box->clear();
+    for (const auto& name : device_names) {
+        combo_box->addItem(QString::fromStdString(name));
+    }
+    combo_box->blockSignals(false);
+    combo_box->show();
+
+    if (combo_box->currentIndex() >= 0) {
+        NotifyAcquireDeviceSelection(combo_box->currentIndex());
+    }
+}
+
+void MainWindow::HideAcquireDeviceSelector() {
+    ui->comboBoxAcquireDevice->hide();
+}
+
 void MainWindow::AttachFrameTickObserver(FrameTickObserver observer) {
     frame_tick_observers_.push_back(std::move(observer));
 }
@@ -102,6 +128,14 @@ void MainWindow::SetupPipelineComboBoxes() {
             NotifyPipelineSelection(stage, index);
         });
     }
+
+    // 入力デバイス選択 ComboBox は "Device" 選択時のみ表示する.
+    ui->comboBoxAcquireDevice->hide();
+    connect(ui->comboBoxAcquireDevice, &QComboBox::currentIndexChanged, this, [this](int index) {
+        if (index >= 0) {
+            NotifyAcquireDeviceSelection(index);
+        }
+    });
 }
 
 namespace {
@@ -151,6 +185,12 @@ void MainWindow::SetupFrameTick() {
 void MainWindow::NotifyPipelineSelection(PipelineStage stage, int index) {
     for (const auto& observer : pipeline_observers_) {
         observer(stage, index);
+    }
+}
+
+void MainWindow::NotifyAcquireDeviceSelection(int device_index) {
+    for (const auto& observer : acquire_device_observers_) {
+        observer(device_index);
     }
 }
 

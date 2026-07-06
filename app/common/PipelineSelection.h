@@ -37,6 +37,18 @@ inline constexpr std::size_t kPipelineStageCount = 9;
 ///
 using PipelineSelectionObserver = std::function<void(PipelineStage stage, int index)>;
 
+///
+/// 入力段の "Device" 項目の index.
+///
+inline constexpr int kAcquireDeviceItemIndex = 2;
+
+///
+/// @brief 入力デバイス選択変更の Observer 型.
+///
+/// View のデバイス選択 ComboBox 変更時に選択 index が通知される.
+///
+using AcquireDeviceObserver = std::function<void(int device_index)>;
+
 namespace pipeline_selection_detail {
 
 inline constexpr std::array<std::string_view, 3> kAcquireNames{"Null", "Sine 440Hz", "Device"};

@@ -7,7 +7,9 @@
 #include <cstdint>
 #include <memory>
 #include <stop_token>
+#include <string>
 #include <thread>
+#include <vector>
 
 #include "FrameSyncProcess.hpp"
 #include "Strategies/HannOverlapAdder.hpp"
@@ -51,9 +53,22 @@ public:
     /// ComboBox の選択 (stage, index) に対応する Strategy を FrameSyncProcess へ設定する.
     ///
     /// index は GetStrategyNames(stage) の並びに対応する.
-    /// kAcquire は Acquire Strategy ではなく InputSource の generator を切り替える.
+    /// kAcquire は Acquire Strategy ではなく Producer (InputSource / DeviceInput) を切り替える.
+    /// "Device" 選択時はキャプチャを開始せず, ApplyDeviceSelection() を待つ.
     ///
     void ApplyStrategySelection(PipelineStage stage, int index);
+
+    ///
+    /// 利用可能な入力デバイス名の一覧を取得する.
+    ///
+    [[nodiscard]] static auto GetAudioInputDeviceNames() -> std::vector<std::string>;
+
+    ///
+    /// 指定 index の入力デバイスでキャプチャを開始する (入力が "Device" のときのみ有効).
+    ///
+    /// device_index は GetAudioInputDeviceNames() の並びに対応する.
+    ///
+    void ApplyDeviceSelection(int device_index);
 
     ///
     /// FrameSyncProcess への参照を取得する.
@@ -103,4 +118,9 @@ private:
     std::jthread processing_thread_;
 
     std::atomic<std::uint64_t> processed_frame_count_{0};
+
+    ///
+    /// 入力が "Device" 選択中かどうか (ApplyDeviceSelection() の有効判定に使用).
+    ///
+    bool device_mode_{false};
 };

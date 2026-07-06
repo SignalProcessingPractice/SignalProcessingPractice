@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <functional>
 #include <span>
+#include <string>
 #include <vector>
 
 #include "common/PipelineSelection.h"
@@ -49,6 +50,25 @@ public:
     void AttachPipelineObserver(PipelineSelectionObserver observer);
 
     ///
+    /// @brief 入力デバイス選択変更の Observer を登録する.
+    ///
+    void AttachAcquireDeviceObserver(AcquireDeviceObserver observer);
+
+    ///
+    /// @name 入力デバイス選択 ComboBox の表示制御.
+    /// {@
+    ///
+    /// デバイス名一覧を投入して表示し, 現在の選択を Observer へ通知する.
+    ///
+    void ShowAcquireDeviceSelector(const std::vector<std::string>& device_names);
+
+    ///
+    /// 非表示にする.
+    ///
+    void HideAcquireDeviceSelector();
+    /// @}
+
+    ///
     /// @brief 表示更新周期の Tick Observer を登録する.
     ///
     /// 登録した Observer は QTimer により約 30 fps で呼び出される.
@@ -89,6 +109,7 @@ private:
     /// 登録済み Observer への通知.
     ///
     void NotifyPipelineSelection(PipelineStage stage, int index);
+    void NotifyAcquireDeviceSelection(int device_index);
     void NotifyFrameTick();
 
     Ui::MainWindow* ui;
@@ -101,6 +122,7 @@ private:
     /// @name Observer リスト.
     /// {@
     std::vector<PipelineSelectionObserver> pipeline_observers_;
+    std::vector<AcquireDeviceObserver> acquire_device_observers_;
     std::vector<FrameTickObserver> frame_tick_observers_;
     /// @}
 };
