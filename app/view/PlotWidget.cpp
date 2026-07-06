@@ -4,12 +4,13 @@
 
 #include "view/PlotWidget.h"
 
+#include <algorithm>
+#include <cstddef>
+
 #include <QFontMetrics>
 #include <QPainter>
 #include <QPen>
 #include <QPolygonF>
-#include <algorithm>
-#include <cstddef>
 
 namespace {
 

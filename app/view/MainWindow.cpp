@@ -4,13 +4,14 @@
 
 #include "MainWindow.h"
 
+#include <array>
+#include <memory>
+#include <utility>
+
 #include <QComboBox>
 #include <QSpinBox>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <array>
-#include <memory>
-#include <utility>
 
 #include "common/AudioConfig.h"
 #include "ui_MainWindow.h"

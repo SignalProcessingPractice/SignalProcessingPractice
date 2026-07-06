@@ -4,14 +4,15 @@
 
 #include "model/DeviceInput.h"
 
-#include <QAudioDevice>
-#include <QMediaDevices>
 #include <bit>
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
 #include <limits>
 #include <span>
+
+#include <QAudioDevice>
+#include <QMediaDevices>
 
 #include "common/AudioConfig.h"
 #include "model/AudioInputBuffer.h"

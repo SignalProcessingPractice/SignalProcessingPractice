@@ -3,12 +3,12 @@
 ///
 #pragma once
 
-#include <etl/queue_spsc_atomic.h>
-
 #include <condition_variable>
 #include <mutex>
 #include <span>
 #include <stop_token>
+
+#include <etl/queue_spsc_atomic.h>
 
 #include "FrameSyncProcess.hpp"
 

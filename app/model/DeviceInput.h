@@ -3,12 +3,13 @@
 ///
 #pragma once
 
-#include <QAudioFormat>
-#include <QAudioSource>
-#include <QIODevice>
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <QAudioFormat>
+#include <QAudioSource>
+#include <QIODevice>
 
 class AudioInputBuffer;
 

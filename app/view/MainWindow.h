@@ -3,11 +3,12 @@
 ///
 #pragma once
 
-#include <QMainWindow>
 #include <functional>
 #include <span>
 #include <string>
 #include <vector>
+
+#include <QMainWindow>
 
 #include "common/PipelineSelection.h"
 

@@ -3,10 +3,11 @@
 ///
 #pragma once
 
-#include <QString>
-#include <QWidget>
 #include <span>
 #include <vector>
+
+#include <QString>
+#include <QWidget>
 
 ///
 /// 目盛り本数の既定値.

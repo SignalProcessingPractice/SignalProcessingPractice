@@ -3,9 +3,9 @@
 ///
 #pragma once
 
-#include <etl/delegate.h>
-
 #include <cstddef>
+
+#include <etl/delegate.h>
 
 #include "AudioFrame.hpp"
 #include "StrategySlot.hpp"

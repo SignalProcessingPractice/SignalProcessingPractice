@@ -1,10 +1,10 @@
 ///
 /// @file TEST_FrameSyncProcess.cpp
 ///
-#include <gtest/gtest.h>
-
 #include <iomanip>
 #include <iostream>
+
+#include <gtest/gtest.h>
 
 #include "FrameSyncProcess.hpp"
 #include "FrameSyncProcessConfig.hpp"

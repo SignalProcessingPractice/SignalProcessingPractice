@@ -24,6 +24,27 @@ Cpp11BracedListStyle: true
 # include を整理
 SortIncludes: true
 
+# Google Style のグループ順に include を再グループ化する
+#   1. 対応ヘッダ (Priority 0, 自動判定)
+#   2. C システムヘッダ
+#   3. C++ 標準ライブラリ
+#   4. 他ライブラリ (Qt, ETL, CMSIS-DSP, gtest)
+#   5. 自プロジェクト
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^<Q[A-Z]'
+    Priority: 4
+  - Regex: '^<(etl|gtest|gmock)/'
+    Priority: 4
+  - Regex: '^<arm_.*\.h>'
+    Priority: 4
+  - Regex: '^<.*\.h>'
+    Priority: 2
+  - Regex: '^<.*'
+    Priority: 3
+  - Regex: '.*'
+    Priority: 5
+
 # コメント位置の調整
 ReflowComments: true
 
