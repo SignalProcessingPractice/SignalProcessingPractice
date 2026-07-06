@@ -38,6 +38,11 @@ inline constexpr std::size_t kPipelineStageCount = 9;
 using PipelineSelectionObserver = std::function<void(PipelineStage stage, int index)>;
 
 ///
+/// 入力段の "Sine" 項目の index.
+///
+inline constexpr int kAcquireSineItemIndex = 1;
+
+///
 /// 入力段の "Device" 項目の index.
 ///
 inline constexpr int kAcquireDeviceItemIndex = 2;
@@ -49,9 +54,16 @@ inline constexpr int kAcquireDeviceItemIndex = 2;
 ///
 using AcquireDeviceObserver = std::function<void(int device_index)>;
 
+///
+/// @brief サイン波周波数変更の Observer 型.
+///
+/// View の周波数 SpinBox 変更時に周波数 (Hz) が通知される.
+///
+using SineFrequencyObserver = std::function<void(int frequency_hz)>;
+
 namespace pipeline_selection_detail {
 
-inline constexpr std::array<std::string_view, 3> kAcquireNames{"Null", "Sine 440Hz", "Device"};
+inline constexpr std::array<std::string_view, 3> kAcquireNames{"Null", "Sine", "Device"};
 inline constexpr std::array<std::string_view, 1> kPreProcessNames{"Through"};
 inline constexpr std::array<std::string_view, 1> kOverlapNames{"Overlapper"};
 inline constexpr std::array<std::string_view, 2> kWindowNames{"Rectangle", "Hann"};

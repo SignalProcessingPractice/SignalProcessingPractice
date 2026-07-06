@@ -22,6 +22,11 @@ void InputSource::SetGenerator(HopGenerator generator) {
     generator_ = std::move(generator);
 }
 
+void InputSource::RunWithGeneratorLock(const std::function<void()>& func) {
+    const std::lock_guard<std::mutex> guard{generator_mutex_};
+    func();
+}
+
 void InputSource::Start() {
     if (thread_.joinable()) {
         return;

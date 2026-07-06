@@ -127,6 +127,16 @@
        </rect>
       </property>
      </widget>
+     <widget class="QSpinBox" name="spinBoxSineFrequency">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>60</y>
+        <width>101</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
     <widget class="QGroupBox" name="groupBoxPreProcess">
      <property name="geometry">

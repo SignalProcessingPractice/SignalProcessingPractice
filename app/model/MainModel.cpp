@@ -55,7 +55,7 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
             } else {
                 device_mode_ = false;
                 device_input_->Stop();
-                if (index == 1) {
+                if (index == kAcquireSineItemIndex) {
                     input_source_.SetGenerator([this] {
                         return sine_generator_.Exec();
                     });
@@ -111,6 +111,13 @@ void MainModel::ApplyDeviceSelection(int device_index) {
     }
     device_input_->Stop();
     device_input_->Start(device_index);
+}
+
+void MainModel::ApplySineFrequency(int frequency_hz) {
+    // Producer スレッドの Exec() と排他して周波数を更新する.
+    input_source_.RunWithGeneratorLock([this, frequency_hz] {
+        sine_generator_.SetFrequency(static_cast<double>(frequency_hz));
+    });
 }
 
 auto MainModel::Process() -> FrameSyncProcess& {

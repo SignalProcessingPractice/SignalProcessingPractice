@@ -5,6 +5,7 @@
 #include "MainWindow.h"
 
 #include <QComboBox>
+#include <QSpinBox>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <array>
@@ -48,6 +49,13 @@ constexpr float kSpectrumMaxDb = 0.0F;
 constexpr float kHzPerKHz = 1000.0F;
 constexpr float kNyquistKHz = static_cast<float>(kAppSampleRate) / 2.0F / kHzPerKHz;
 
+///
+/// サイン波周波数 SpinBox の設定 (可聴域, 初期値 440 Hz).
+///
+constexpr int kSineFrequencyMin = 20;
+constexpr int kSineFrequencyMax = 20000;
+constexpr int kSineFrequencyDefault = 440;
+
 }  // namespace
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -73,6 +81,10 @@ void MainWindow::AttachAcquireDeviceObserver(AcquireDeviceObserver observer) {
     acquire_device_observers_.push_back(std::move(observer));
 }
 
+void MainWindow::AttachSineFrequencyObserver(SineFrequencyObserver observer) {
+    sine_frequency_observers_.push_back(std::move(observer));
+}
+
 void MainWindow::ShowAcquireDeviceSelector(const std::vector<std::string>& device_names) {
     QComboBox* combo_box = ui->comboBoxAcquireDevice;
 
@@ -93,6 +105,15 @@ void MainWindow::ShowAcquireDeviceSelector(const std::vector<std::string>& devic
 
 void MainWindow::HideAcquireDeviceSelector() {
     ui->comboBoxAcquireDevice->hide();
+}
+
+void MainWindow::ShowSineFrequencySelector() {
+    ui->spinBoxSineFrequency->show();
+    NotifySineFrequency(ui->spinBoxSineFrequency->value());
+}
+
+void MainWindow::HideSineFrequencySelector() {
+    ui->spinBoxSineFrequency->hide();
 }
 
 void MainWindow::AttachFrameTickObserver(FrameTickObserver observer) {
@@ -135,6 +156,15 @@ void MainWindow::SetupPipelineComboBoxes() {
         if (index >= 0) {
             NotifyAcquireDeviceSelection(index);
         }
+    });
+
+    // サイン波周波数 SpinBox は "Sine" 選択時のみ表示する.
+    ui->spinBoxSineFrequency->setRange(kSineFrequencyMin, kSineFrequencyMax);
+    ui->spinBoxSineFrequency->setValue(kSineFrequencyDefault);
+    ui->spinBoxSineFrequency->setSuffix(QStringLiteral(" Hz"));
+    ui->spinBoxSineFrequency->hide();
+    connect(ui->spinBoxSineFrequency, &QSpinBox::valueChanged, this, [this](int value) {
+        NotifySineFrequency(value);
     });
 }
 
@@ -191,6 +221,12 @@ void MainWindow::NotifyPipelineSelection(PipelineStage stage, int index) {
 void MainWindow::NotifyAcquireDeviceSelection(int device_index) {
     for (const auto& observer : acquire_device_observers_) {
         observer(device_index);
+    }
+}
+
+void MainWindow::NotifySineFrequency(int frequency_hz) {
+    for (const auto& observer : sine_frequency_observers_) {
+        observer(frequency_hz);
     }
 }
 

@@ -48,6 +48,18 @@ MainPresenter::MainPresenter(MainWindow* view)
                               [view] {
                                   view->HideAcquireDeviceSelector();
                               },
+                      .attach_sine_frequency =
+                              [view](SineFrequencyObserver observer) {
+                                  view->AttachSineFrequencyObserver(std::move(observer));
+                              },
+                      .show_sine_frequency_selector =
+                              [view] {
+                                  view->ShowSineFrequencySelector();
+                              },
+                      .hide_sine_frequency_selector =
+                              [view] {
+                                  view->HideSineFrequencySelector();
+                              },
               }) {
     // NOTE: 開始/停止 UI の実装までは, Presenter 構築と同時に処理を開始する.
     model_->Start();

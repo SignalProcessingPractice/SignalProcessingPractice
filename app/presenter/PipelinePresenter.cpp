@@ -16,6 +16,9 @@ PipelinePresenter::PipelinePresenter(MainModel* model, PipelineViewHooks hooks)
     hooks_.attach_device([this](int device_index) {
         OnDeviceSelected(device_index);
     });
+    hooks_.attach_sine_frequency([this](int frequency_hz) {
+        OnSineFrequencyChanged(frequency_hz);
+    });
 }
 
 void PipelinePresenter::OnStrategySelected(PipelineStage stage, int index) {
@@ -23,13 +26,22 @@ void PipelinePresenter::OnStrategySelected(PipelineStage stage, int index) {
 
     if (stage == PipelineStage::kAcquire) {
         if (index == kAcquireDeviceItemIndex) {
+            hooks_.hide_sine_frequency_selector();
             hooks_.show_device_selector(MainModel::GetAudioInputDeviceNames());
+        } else if (index == kAcquireSineItemIndex) {
+            hooks_.hide_device_selector();
+            hooks_.show_sine_frequency_selector();
         } else {
             hooks_.hide_device_selector();
+            hooks_.hide_sine_frequency_selector();
         }
     }
 }
 
 void PipelinePresenter::OnDeviceSelected(int device_index) {
     model_->ApplyDeviceSelection(device_index);
+}
+
+void PipelinePresenter::OnSineFrequencyChanged(int frequency_hz) {
+    model_->ApplySineFrequency(frequency_hz);
 }

@@ -36,6 +36,21 @@ struct PipelineViewHooks {
     /// デバイス選択 ComboBox の非表示化 (HideAcquireDeviceSelector() を注入する).
     ///
     std::function<void()> hide_device_selector;
+
+    ///
+    /// サイン波周波数変更の Observer 登録関数 (AttachSineFrequencyObserver() を注入する).
+    ///
+    std::function<void(SineFrequencyObserver)> attach_sine_frequency;
+
+    ///
+    /// 周波数 SpinBox の表示 (ShowSineFrequencySelector() を注入する).
+    ///
+    std::function<void()> show_sine_frequency_selector;
+
+    ///
+    /// 周波数 SpinBox の非表示化 (HideSineFrequencySelector() を注入する).
+    ///
+    std::function<void()> hide_sine_frequency_selector;
 };
 
 ///
@@ -59,6 +74,11 @@ private:
     /// 入力デバイス選択変更時のイベントハンドラ.
     ///
     void OnDeviceSelected(int device_index);
+
+    ///
+    /// サイン波周波数変更時のイベントハンドラ.
+    ///
+    void OnSineFrequencyChanged(int frequency_hz);
 
     ///
     /// 紐づく Model.

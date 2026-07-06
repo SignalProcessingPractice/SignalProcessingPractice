@@ -71,6 +71,13 @@ public:
     void ApplyDeviceSelection(int device_index);
 
     ///
+    /// サイン波生成の周波数を設定する.
+    ///
+    /// Producer スレッドと排他して SineGenerator を更新する (スレッドセーフ).
+    ///
+    void ApplySineFrequency(int frequency_hz);
+
+    ///
     /// FrameSyncProcess への参照を取得する.
     ///
     [[nodiscard]] auto Process() -> FrameSyncProcess&;

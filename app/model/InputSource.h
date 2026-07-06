@@ -30,6 +30,14 @@ public:
     ///
     void SetGenerator(HopGenerator generator);
 
+    ///
+    /// generator 用 mutex を保持した状態で処理を実行する.
+    ///
+    /// generator が参照するオブジェクト (SineGenerator 等) の状態変更を
+    /// Producer スレッドの GenerateHop() と排他するために使用する.
+    ///
+    void RunWithGeneratorLock(const std::function<void()>& func);
+
     void Start();
     void Stop();
 
