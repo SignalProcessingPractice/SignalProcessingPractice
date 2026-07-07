@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <functional>
 #include <span>
+#include <string>
 #include <string_view>
 
 ///
@@ -61,9 +62,21 @@ using AcquireDeviceObserver = std::function<void(int device_index)>;
 ///
 using SineFrequencyObserver = std::function<void(int frequency_hz)>;
 
+///
+/// 入力段の "File" 項目の index.
+///
+inline constexpr int kAcquireFileItemIndex = 3;
+
+///
+/// @brief 音声ファイル選択の Observer 型.
+///
+/// View のファイル選択ダイアログ確定時にファイルパスが通知される.
+///
+using FileSelectionObserver = std::function<void(const std::string& path)>;
+
 namespace pipeline_selection_detail {
 
-inline constexpr std::array<std::string_view, 3> kAcquireNames{"Null", "Sine", "Device"};
+inline constexpr std::array<std::string_view, 4> kAcquireNames{"Null", "Sine", "Device", "File"};
 inline constexpr std::array<std::string_view, 1> kPreProcessNames{"Bypass"};
 inline constexpr std::array<std::string_view, 1> kOverlapNames{"Overlapper"};
 inline constexpr std::array<std::string_view, 2> kWindowNames{"Rectangle", "Hann"};

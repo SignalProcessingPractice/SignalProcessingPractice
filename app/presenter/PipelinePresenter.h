@@ -51,6 +51,21 @@ struct PipelineViewHooks {
     /// 周波数 SpinBox の非表示化 (HideSineFrequencySelector() を注入する).
     ///
     std::function<void()> hide_sine_frequency_selector;
+
+    ///
+    /// 音声ファイル選択の Observer 登録関数 (AttachFileSelectionObserver() を注入する).
+    ///
+    std::function<void(FileSelectionObserver)> attach_file_selection;
+
+    ///
+    /// ファイル選択ボタンの表示 (ShowFileSelector() を注入する).
+    ///
+    std::function<void()> show_file_selector;
+
+    ///
+    /// ファイル選択ボタンの非表示化 (HideFileSelector() を注入する).
+    ///
+    std::function<void()> hide_file_selector;
 };
 
 ///
@@ -79,6 +94,11 @@ private:
     /// サイン波周波数変更時のイベントハンドラ.
     ///
     void OnSineFrequencyChanged(int frequency_hz);
+
+    ///
+    /// 音声ファイル選択時のイベントハンドラ.
+    ///
+    void OnFileSelected(const std::string& path);
 
     ///
     /// 紐づく Model.

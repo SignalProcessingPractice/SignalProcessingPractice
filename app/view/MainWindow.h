@@ -61,6 +61,11 @@ public:
     void AttachSineFrequencyObserver(SineFrequencyObserver observer);
 
     ///
+    /// @brief 音声ファイル選択の Observer を登録する.
+    ///
+    void AttachFileSelectionObserver(FileSelectionObserver observer);
+
+    ///
     /// @name 入力デバイス選択 ComboBox の表示制御.
     /// {@
     ///
@@ -86,6 +91,13 @@ public:
     /// 非表示にする.
     ///
     void HideSineFrequencySelector();
+    /// @}
+
+    ///
+    /// @name 音声ファイル選択ボタンの表示制御.
+    /// {@
+    void ShowFileSelector();
+    void HideFileSelector();
     /// @}
 
     ///
@@ -131,6 +143,7 @@ private:
     void NotifyPipelineSelection(PipelineStage stage, int index);
     void NotifyAcquireDeviceSelection(int device_index);
     void NotifySineFrequency(int frequency_hz);
+    void NotifyFileSelection(const std::string& path);
     void NotifyFrameTick();
 
     Ui::MainWindow* ui;
@@ -145,6 +158,7 @@ private:
     std::vector<PipelineSelectionObserver> pipeline_observers_;
     std::vector<AcquireDeviceObserver> acquire_device_observers_;
     std::vector<SineFrequencyObserver> sine_frequency_observers_;
+    std::vector<FileSelectionObserver> file_selection_observers_;
     std::vector<FrameTickObserver> frame_tick_observers_;
     /// @}
 };

@@ -17,6 +17,7 @@
 #include "Strategies/SineGenerator.hpp"
 #include "common/PipelineSelection.h"
 #include "model/AudioInputBuffer.h"
+#include "model/FilePlayer.h"
 #include "model/InputSource.h"
 #include "model/RingBufferAcquire.h"
 
@@ -78,6 +79,14 @@ public:
     void ApplySineFrequency(int frequency_hz);
 
     ///
+    /// 音声ファイル (WAV) を読み込む.
+    ///
+    /// Producer スレッドと排他して FilePlayer を更新する (スレッドセーフ).
+    /// 読み込み失敗時は既存データ (未ロードなら無音) を維持する.
+    ///
+    void ApplyFileSelection(const std::string& path);
+
+    ///
     /// FrameSyncProcess への参照を取得する.
     ///
     [[nodiscard]] auto Process() -> FrameSyncProcess&;
@@ -121,6 +130,11 @@ private:
     HannWindow hann_window_;
     HannOverlapAdder hann_overlap_adder_;
     /// @}
+
+    ///
+    /// 音声ファイル入力のデータソース.
+    ///
+    FilePlayer file_player_;
 
     std::jthread processing_thread_;
 

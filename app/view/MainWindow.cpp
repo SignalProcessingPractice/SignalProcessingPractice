@@ -9,6 +9,9 @@
 #include <utility>
 
 #include <QComboBox>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QPushButton>
 #include <QSpinBox>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -86,6 +89,10 @@ void MainWindow::AttachSineFrequencyObserver(SineFrequencyObserver observer) {
     sine_frequency_observers_.push_back(std::move(observer));
 }
 
+void MainWindow::AttachFileSelectionObserver(FileSelectionObserver observer) {
+    file_selection_observers_.push_back(std::move(observer));
+}
+
 void MainWindow::ShowAcquireDeviceSelector(const std::vector<std::string>& device_names) {
     QComboBox* combo_box = ui->comboBoxAcquireDevice;
 
@@ -115,6 +122,14 @@ void MainWindow::ShowSineFrequencySelector() {
 
 void MainWindow::HideSineFrequencySelector() {
     ui->spinBoxSineFrequency->hide();
+}
+
+void MainWindow::ShowFileSelector() {
+    ui->pushButtonAcquireFile->show();
+}
+
+void MainWindow::HideFileSelector() {
+    ui->pushButtonAcquireFile->hide();
 }
 
 void MainWindow::AttachFrameTickObserver(FrameTickObserver observer) {
@@ -166,6 +181,20 @@ void MainWindow::SetupPipelineComboBoxes() {
     ui->spinBoxSineFrequency->hide();
     connect(ui->spinBoxSineFrequency, &QSpinBox::valueChanged, this, [this](int value) {
         NotifySineFrequency(value);
+    });
+
+    // 音声ファイル選択ボタンは "File" 選択時のみ表示する.
+    ui->pushButtonAcquireFile->setText(QStringLiteral("選択..."));
+    ui->pushButtonAcquireFile->hide();
+    connect(ui->pushButtonAcquireFile, &QPushButton::clicked, this, [this] {
+        const QString path =
+                QFileDialog::getOpenFileName(this, QStringLiteral("音声ファイルを選択"), QString{},
+                                             QStringLiteral("WAV (*.wav)"));
+        if (path.isEmpty()) {
+            return;
+        }
+        ui->pushButtonAcquireFile->setText(QFileInfo{path}.fileName());
+        NotifyFileSelection(path.toStdString());
     });
 }
 
@@ -228,6 +257,12 @@ void MainWindow::NotifyAcquireDeviceSelection(int device_index) {
 void MainWindow::NotifySineFrequency(int frequency_hz) {
     for (const auto& observer : sine_frequency_observers_) {
         observer(frequency_hz);
+    }
+}
+
+void MainWindow::NotifyFileSelection(const std::string& path) {
+    for (const auto& observer : file_selection_observers_) {
+        observer(path);
     }
 }
 

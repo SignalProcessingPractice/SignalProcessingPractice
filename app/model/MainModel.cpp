@@ -59,6 +59,11 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
                     input_source_.SetGenerator([this] {
                         return sine_generator_.Exec();
                     });
+                } else if (index == kAcquireFileItemIndex) {
+                    // 未ロード時は FilePlayer が無音を返す. ファイル選択は ApplyFileSelection().
+                    input_source_.SetGenerator([this] {
+                        return file_player_.NextHop();
+                    });
                 } else {
                     input_source_.SetGenerator([] {
                         return FrameSyncProcess::AudioHop{kAppSampleRate};
@@ -117,6 +122,13 @@ void MainModel::ApplySineFrequency(int frequency_hz) {
     // Producer スレッドの Exec() と排他して周波数を更新する.
     input_source_.RunWithGeneratorLock([this, frequency_hz] {
         sine_generator_.SetFrequency(static_cast<double>(frequency_hz));
+    });
+}
+
+void MainModel::ApplyFileSelection(const std::string& path) {
+    // Producer スレッドの NextHop() と排他してロードする.
+    input_source_.RunWithGeneratorLock([this, &path] {
+        file_player_.Load(path);
     });
 }
 
