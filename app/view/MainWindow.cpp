@@ -93,6 +93,10 @@ void MainWindow::AttachFileSelectionObserver(FileSelectionObserver observer) {
     file_selection_observers_.push_back(std::move(observer));
 }
 
+void MainWindow::AttachOutputDeviceObserver(OutputDeviceObserver observer) {
+    output_device_observers_.push_back(std::move(observer));
+}
+
 void MainWindow::ShowAcquireDeviceSelector(const std::vector<std::string>& device_names) {
     QComboBox* combo_box = ui->comboBoxAcquireDevice;
 
@@ -130,6 +134,28 @@ void MainWindow::ShowFileSelector() {
 
 void MainWindow::HideFileSelector() {
     ui->pushButtonAcquireFile->hide();
+}
+
+void MainWindow::ShowOutputDeviceSelector(const std::vector<std::string>& device_names) {
+    QComboBox* combo_box = ui->comboBoxOutputDevice;
+
+    // 選択肢の入れ替え中に不定な index で通知しないようシグナルを止め,
+    // 投入完了後に現在の選択を明示的に通知する.
+    combo_box->blockSignals(true);
+    combo_box->clear();
+    for (const auto& name : device_names) {
+        combo_box->addItem(QString::fromStdString(name));
+    }
+    combo_box->blockSignals(false);
+    combo_box->show();
+
+    if (combo_box->currentIndex() >= 0) {
+        NotifyOutputDeviceSelection(combo_box->currentIndex());
+    }
+}
+
+void MainWindow::HideOutputDeviceSelector() {
+    ui->comboBoxOutputDevice->hide();
 }
 
 void MainWindow::AttachFrameTickObserver(FrameTickObserver observer) {
@@ -181,6 +207,14 @@ void MainWindow::SetupPipelineComboBoxes() {
     ui->spinBoxSineFrequency->hide();
     connect(ui->spinBoxSineFrequency, &QSpinBox::valueChanged, this, [this](int value) {
         NotifySineFrequency(value);
+    });
+
+    // 出力デバイス選択 ComboBox は出力 "Device" 選択時のみ表示する.
+    ui->comboBoxOutputDevice->hide();
+    connect(ui->comboBoxOutputDevice, &QComboBox::currentIndexChanged, this, [this](int index) {
+        if (index >= 0) {
+            NotifyOutputDeviceSelection(index);
+        }
     });
 
     // 音声ファイル選択ボタンは "File" 選択時のみ表示する.
@@ -263,6 +297,12 @@ void MainWindow::NotifySineFrequency(int frequency_hz) {
 void MainWindow::NotifyFileSelection(const std::string& path) {
     for (const auto& observer : file_selection_observers_) {
         observer(path);
+    }
+}
+
+void MainWindow::NotifyOutputDeviceSelection(int device_index) {
+    for (const auto& observer : output_device_observers_) {
+        observer(device_index);
     }
 }
 

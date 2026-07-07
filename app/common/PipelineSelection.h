@@ -74,6 +74,18 @@ inline constexpr int kAcquireFileItemIndex = 3;
 ///
 using FileSelectionObserver = std::function<void(const std::string& path)>;
 
+///
+/// 出力段の "Device" 項目の index.
+///
+inline constexpr int kOutputDeviceItemIndex = 1;
+
+///
+/// @brief 出力デバイス選択変更の Observer 型.
+///
+/// View の出力デバイス選択 ComboBox 変更時に選択 index が通知される.
+///
+using OutputDeviceObserver = std::function<void(int device_index)>;
+
 namespace pipeline_selection_detail {
 
 inline constexpr std::array<std::string_view, 4> kAcquireNames{"Null", "Sine", "Device", "File"};
@@ -84,7 +96,7 @@ inline constexpr std::array<std::string_view, 1> kFftNames{"FFT"};
 inline constexpr std::array<std::string_view, 1> kInferNames{"Bypass"};
 inline constexpr std::array<std::string_view, 1> kPostProcessNames{"IFFT"};
 inline constexpr std::array<std::string_view, 2> kOverlapAddNames{"Rectangle", "Hann"};
-inline constexpr std::array<std::string_view, 1> kOutputNames{"Null"};
+inline constexpr std::array<std::string_view, 2> kOutputNames{"Null", "Device"};
 
 }  // namespace pipeline_selection_detail
 

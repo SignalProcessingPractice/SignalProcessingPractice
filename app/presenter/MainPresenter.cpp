@@ -72,6 +72,18 @@ MainPresenter::MainPresenter(MainWindow* view)
                               [view] {
                                   view->HideFileSelector();
                               },
+                      .attach_output_device =
+                              [view](OutputDeviceObserver observer) {
+                                  view->AttachOutputDeviceObserver(std::move(observer));
+                              },
+                      .show_output_device_selector =
+                              [view](const std::vector<std::string>& device_names) {
+                                  view->ShowOutputDeviceSelector(device_names);
+                              },
+                      .hide_output_device_selector =
+                              [view] {
+                                  view->HideOutputDeviceSelector();
+                              },
               }) {
     // NOTE: 開始/停止 UI の実装までは, Presenter 構築と同時に処理を開始する.
     model_->Start();

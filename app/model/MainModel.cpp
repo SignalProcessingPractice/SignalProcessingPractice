@@ -8,11 +8,13 @@
 #include "PipelineResult.hpp"
 #include "common/AudioConfig.h"
 #include "model/DeviceInput.h"
+#include "model/DeviceOutput.h"
 
 MainModel::MainModel()
     : device_input_(std::make_unique<DeviceInput>(&input_buffer_)),
       sine_generator_({.frequency = SineGenerator::kDefaultFrequency,
-                       .amplitude = SineGenerator::kDefaultAmplitude}) {
+                       .amplitude = SineGenerator::kDefaultAmplitude}),
+      device_output_(std::make_unique<DeviceOutput>(&output_buffer_)) {
     process_.SetConfig(FrameSyncProcess::AcquireTag{},
                        FrameSyncProcess::AudioAcquireStrategy{&ring_buffer_acquire_});
     process_.Attach(
@@ -35,6 +37,7 @@ void MainModel::Start() {
 }
 
 void MainModel::Stop() {
+    device_output_->Stop();
     device_input_->Stop();
     input_source_.Stop();
     if (processing_thread_.joinable()) {
@@ -101,7 +104,17 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
                                        : get_default_rectangle_overlap_adder_strategy());
             break;
         case PipelineStage::kOutput:
-            process_.SetConfig(FrameSyncProcess::OutputTag{}, get_default_null_output_strategy());
+            if (index == kOutputDeviceItemIndex) {
+                process_.SetConfig(FrameSyncProcess::OutputTag{},
+                                   FrameSyncProcess::AudioOutputStrategy{&ring_buffer_output_});
+                // 再生の開始はデバイス選択 (ApplyOutputDeviceSelection) を待つ.
+                output_device_mode_ = true;
+            } else {
+                output_device_mode_ = false;
+                device_output_->Stop();
+                process_.SetConfig(FrameSyncProcess::OutputTag{},
+                                   get_default_null_output_strategy());
+            }
             break;
     }
 }
@@ -130,6 +143,18 @@ void MainModel::ApplyFileSelection(const std::string& path) {
     input_source_.RunWithGeneratorLock([this, &path] {
         file_player_.Load(path);
     });
+}
+
+auto MainModel::GetAudioOutputDeviceNames() -> std::vector<std::string> {
+    return DeviceOutput::GetDeviceNames();
+}
+
+void MainModel::ApplyOutputDeviceSelection(int device_index) {
+    if (!output_device_mode_) {
+        return;
+    }
+    device_output_->Stop();
+    device_output_->Start(device_index);
 }
 
 auto MainModel::Process() -> FrameSyncProcess& {

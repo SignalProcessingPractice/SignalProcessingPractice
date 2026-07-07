@@ -66,6 +66,11 @@ public:
     void AttachFileSelectionObserver(FileSelectionObserver observer);
 
     ///
+    /// @brief 出力デバイス選択変更の Observer を登録する.
+    ///
+    void AttachOutputDeviceObserver(OutputDeviceObserver observer);
+
+    ///
     /// @name 入力デバイス選択 ComboBox の表示制御.
     /// {@
     ///
@@ -98,6 +103,20 @@ public:
     /// {@
     void ShowFileSelector();
     void HideFileSelector();
+    /// @}
+
+    ///
+    /// @name 出力デバイス選択 ComboBox の表示制御.
+    /// {@
+    ///
+    /// デバイス名一覧を投入して表示し, 現在の選択を Observer へ通知する.
+    ///
+    void ShowOutputDeviceSelector(const std::vector<std::string>& device_names);
+
+    ///
+    /// 非表示にする.
+    ///
+    void HideOutputDeviceSelector();
     /// @}
 
     ///
@@ -144,6 +163,7 @@ private:
     void NotifyAcquireDeviceSelection(int device_index);
     void NotifySineFrequency(int frequency_hz);
     void NotifyFileSelection(const std::string& path);
+    void NotifyOutputDeviceSelection(int device_index);
     void NotifyFrameTick();
 
     Ui::MainWindow* ui;
@@ -159,6 +179,7 @@ private:
     std::vector<AcquireDeviceObserver> acquire_device_observers_;
     std::vector<SineFrequencyObserver> sine_frequency_observers_;
     std::vector<FileSelectionObserver> file_selection_observers_;
+    std::vector<OutputDeviceObserver> output_device_observers_;
     std::vector<FrameTickObserver> frame_tick_observers_;
     /// @}
 };

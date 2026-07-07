@@ -66,6 +66,21 @@ struct PipelineViewHooks {
     /// ファイル選択ボタンの非表示化 (HideFileSelector() を注入する).
     ///
     std::function<void()> hide_file_selector;
+
+    ///
+    /// 出力デバイス選択変更の Observer 登録関数 (AttachOutputDeviceObserver() を注入する).
+    ///
+    std::function<void(OutputDeviceObserver)> attach_output_device;
+
+    ///
+    /// 出力デバイス選択 ComboBox の表示・選択肢投入 (ShowOutputDeviceSelector() を注入する).
+    ///
+    std::function<void(const std::vector<std::string>&)> show_output_device_selector;
+
+    ///
+    /// 出力デバイス選択 ComboBox の非表示化 (HideOutputDeviceSelector() を注入する).
+    ///
+    std::function<void()> hide_output_device_selector;
 };
 
 ///
@@ -99,6 +114,11 @@ private:
     /// 音声ファイル選択時のイベントハンドラ.
     ///
     void OnFileSelected(const std::string& path);
+
+    ///
+    /// 出力デバイス選択変更時のイベントハンドラ.
+    ///
+    void OnOutputDeviceSelected(int device_index);
 
     ///
     /// 紐づく Model.

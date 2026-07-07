@@ -22,10 +22,21 @@ PipelinePresenter::PipelinePresenter(MainModel* model, PipelineViewHooks hooks)
     hooks_.attach_file_selection([this](const std::string& path) {
         OnFileSelected(path);
     });
+    hooks_.attach_output_device([this](int device_index) {
+        OnOutputDeviceSelected(device_index);
+    });
 }
 
 void PipelinePresenter::OnStrategySelected(PipelineStage stage, int index) {
     model_->ApplyStrategySelection(stage, index);
+
+    if (stage == PipelineStage::kOutput) {
+        if (index == kOutputDeviceItemIndex) {
+            hooks_.show_output_device_selector(MainModel::GetAudioOutputDeviceNames());
+        } else {
+            hooks_.hide_output_device_selector();
+        }
+    }
 
     if (stage == PipelineStage::kAcquire) {
         if (index == kAcquireDeviceItemIndex) {
@@ -58,4 +69,8 @@ void PipelinePresenter::OnSineFrequencyChanged(int frequency_hz) {
 
 void PipelinePresenter::OnFileSelected(const std::string& path) {
     model_->ApplyFileSelection(path);
+}
+
+void PipelinePresenter::OnOutputDeviceSelected(int device_index) {
+    model_->ApplyOutputDeviceSelection(device_index);
 }

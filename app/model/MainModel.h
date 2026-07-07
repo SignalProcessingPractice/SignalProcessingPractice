@@ -17,12 +17,15 @@
 #include "Strategies/SineGenerator.hpp"
 #include "common/PipelineSelection.h"
 #include "model/AudioInputBuffer.h"
+#include "model/AudioOutputBuffer.h"
 #include "model/FilePlayer.h"
 #include "model/InputSource.h"
 #include "model/RingBufferAcquire.h"
+#include "model/RingBufferOutput.h"
 
 struct PipelineResult;
 class DeviceInput;
+class DeviceOutput;
 
 ///
 /// @brief MVP の Model 層.
@@ -87,6 +90,18 @@ public:
     void ApplyFileSelection(const std::string& path);
 
     ///
+    /// 利用可能な出力デバイス名の一覧を取得する.
+    ///
+    [[nodiscard]] static auto GetAudioOutputDeviceNames() -> std::vector<std::string>;
+
+    ///
+    /// 指定 index の出力デバイスで再生を開始する (出力が "Device" のときのみ有効).
+    ///
+    /// device_index は GetAudioOutputDeviceNames() の並びに対応する.
+    ///
+    void ApplyOutputDeviceSelection(int device_index);
+
+    ///
     /// FrameSyncProcess への参照を取得する.
     ///
     [[nodiscard]] auto Process() -> FrameSyncProcess&;
@@ -136,6 +151,14 @@ private:
     ///
     FilePlayer file_player_;
 
+    ///
+    /// @name 出力系 (Output Strategy → リングバッファ → 出力デバイス).
+    /// {@
+    AudioOutputBuffer output_buffer_;
+    RingBufferOutput ring_buffer_output_{&output_buffer_};
+    std::unique_ptr<DeviceOutput> device_output_;
+    /// @}
+
     std::jthread processing_thread_;
 
     std::atomic<std::uint64_t> processed_frame_count_{0};
@@ -144,4 +167,9 @@ private:
     /// 入力が "Device" 選択中かどうか (ApplyDeviceSelection() の有効判定に使用).
     ///
     bool device_mode_{false};
+
+    ///
+    /// 出力が "Device" 選択中かどうか (ApplyOutputDeviceSelection() の有効判定に使用).
+    ///
+    bool output_device_mode_{false};
 };
