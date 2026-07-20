@@ -33,6 +33,7 @@ public:
 protected:
     auto readData(char* data, qint64 max_size) -> qint64 override;
     auto writeData(const char* data, qint64 size) -> qint64 override;
+    [[nodiscard]] auto bytesAvailable() const -> qint64 override;
 
 private:
     AudioOutputBuffer* buffer_;

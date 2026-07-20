@@ -56,6 +56,14 @@ auto AudioPullDevice::writeData([[maybe_unused]] const char* data,
     return -1;
 }
 
+auto AudioPullDevice::bytesAvailable() const -> qint64 {
+    // 不足分は無音で埋めて常に読み出し可能とするため, 固定の見かけ上のバイト数を返す.
+    // (既定の QIODevice::bytesAvailable() は 0 を返し, atEnd() が true になる結果
+    //  QAudioSink が readData() を呼び出さなくなり, 無音のまま再生されない.)
+    constexpr qint64 kApparentAvailableBytes = 1 << 20;
+    return kApparentAvailableBytes + QIODevice::bytesAvailable();
+}
+
 DeviceOutput::DeviceOutput(AudioOutputBuffer* buffer) : pull_device_(buffer) {
 }
 
