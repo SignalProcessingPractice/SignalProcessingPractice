@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
-project(CPP_PRACTICE CXX)
+project(CPP_PRACTICE 
+    VERSION 0.1.0
+    LANGUAGES CXX)
 
 #
 # Set the C++ standard

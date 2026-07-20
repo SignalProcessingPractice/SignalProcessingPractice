@@ -3,12 +3,14 @@
 #
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Multimedia)
 
+message(STATUS "QT_HOST_PATH = ${QT_HOST_PATH}")
+message(STATUS "QT_HOST_PATH_CMAKE_DIR = ${QT_HOST_PATH_CMAKE_DIR}")
+message(STATUS "QT6_DIR = ${Qt6_DIR}")
+
 #
-# Qt の自動コード生成を有効化 (MOC / UIC / RCC)
+# Qt プロジェクトのセットアップ
 #
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
+qt_standard_project_setup()
 
 #
 # ソースファイルの収集
@@ -55,17 +57,23 @@ target_link_libraries(APP
         SIGNAL_PROCESSING_PRACTICE_LIB
 )
 
-#
-# Windows: GUI サブシステムに設定し, windeployqt スクリプトを生成
-#
+install(TARGETS APP
+    BUNDLE  DESTINATION .
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
 if(WIN32)
     set_target_properties(APP PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
+endif()
+
+if(WIN32)
     qt_generate_deploy_app_script(
         TARGET APP
         OUTPUT_SCRIPT deploy_script
         NO_UNSUPPORTED_PLATFORM_ERROR
     )
+
     install(SCRIPT ${deploy_script})
 endif()
