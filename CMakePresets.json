@@ -11,10 +11,8 @@
       "displayName": "Win App (Debug)",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/app-win",
-      "environment": {
-        "CMAKE_PREFIX_PATH": "$env{QT_ROOT}"
-      },
       "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "$env{QT_ROOT_DIR}/",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x64-windows-qt-toolchain.cmake",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/install"
       }
@@ -25,6 +23,8 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/app-linux",
       "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "$env{QT_ROOT_DIR}/",
+        "Qt6_DIR": "$env{QT_ROOT_DIR}/",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x64-linux-clang-toolchain.cmake"
       }
     },
@@ -34,6 +34,7 @@
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build/gtest-clang",
       "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "$env{QT_ROOT_DIR}",
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/gtest-clang-toolchain.cmake",
         "BUILD_APP": "OFF"
       }

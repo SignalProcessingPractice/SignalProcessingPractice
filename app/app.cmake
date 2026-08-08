@@ -3,10 +3,6 @@
 #
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Multimedia)
 
-message(STATUS "QT_HOST_PATH = ${QT_HOST_PATH}")
-message(STATUS "QT_HOST_PATH_CMAKE_DIR = ${QT_HOST_PATH_CMAKE_DIR}")
-message(STATUS "QT6_DIR = ${Qt6_DIR}")
-
 #
 # Qt プロジェクトのセットアップ
 #

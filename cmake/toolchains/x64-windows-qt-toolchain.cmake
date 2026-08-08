@@ -6,14 +6,14 @@ set(CMAKE_SYSTEM_PROCESSOR x86_64)
 #
 # Qt のインストール先を確認
 #
-if(NOT DEFINED ENV{QT_ROOT})
-    message(FATAL_ERROR "Environment variable QT_ROOT is not set.")
+if(NOT DEFINED ENV{QT_ROOT_DIR})
+    message(FATAL_ERROR "Environment variable QT_ROOT_DIR is not set.")
 endif()
 if(NOT DEFINED ENV{QT_TOOLCHAIN_ROOT})
     message(FATAL_ERROR "Environment variable QT_TOOLCHAIN_ROOT is not set.")
 endif()
 
-set(QT_ROOT "$ENV{QT_ROOT}")
+set(QT_ROOT_DIR "$ENV{QT_ROOT_DIR}")
 
 set(CMAKE_C_COMPILER
     "$ENV{QT_TOOLCHAIN_ROOT}/bin/gcc.exe"
