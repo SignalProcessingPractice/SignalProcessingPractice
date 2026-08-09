@@ -37,16 +37,6 @@ jobs:
       shell: bash
       run: echo "QT_TOOLCHAIN_ROOT=$IQTA_TOOLS/mingw1310_64" >> "$GITHUB_ENV"
 
-    - name: Check Qt installation
-      shell: bash
-      run: |
-        echo "QT_ROOT_DIR=$QT_ROOT_DIR"
-        echo "QT_TOOLCHAIN_ROOT=$QT_TOOLCHAIN_ROOT"
-        echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH"
-
-        find "$QT_ROOT_DIR" -name "Qt6Config.cmake" -print
-        ls "$QT_TOOLCHAIN_ROOT/bin" | grep -i gcc || true
-
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type

@@ -31,17 +31,6 @@ jobs:
         modules: qtmultimedia
         tools: 'tools_qtcreator,qt.tools.qtcreator'
 
-    - name: Check Qt installation
-      run: |
-        echo "QT_ROOT_DIR=$QT_ROOT_DIR"
-        echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH"
-
-        find "$QT_ROOT_DIR" -name "Qt6Config.cmake" -print
-
-        ls -la "$QT_ROOT_DIR"
-        ls -la "$QT_ROOT_DIR/lib/cmake" || true
-        ls -la "$QT_ROOT_DIR/lib/cmake/Qt6" || true
-
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
