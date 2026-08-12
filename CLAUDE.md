@@ -38,11 +38,11 @@ python3 run_clang_tidy.py --fix
 ```bash
 # Windows アプリケーション（Clang、WASAPI オーディオ）
 cmake --preset app-win
-cmake --build build/app
+cmake --build build/app-win
 
 # Linux アプリケーション（Clang、ALSA オーディオ）
 cmake --preset app-linux
-cmake --build build/app
+cmake --build build/app-linux
 
 # ユニットテスト（Clang + Google Test）
 cmake --preset gtest-debug-clang

@@ -4,7 +4,9 @@ name: Build, Test and Lint for the desktop application on Linux.
 
 on:
   push:
+    branches: [ develop ]
   pull_request:
+    branches: [ develop ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
