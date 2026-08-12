@@ -10,6 +10,7 @@ include(FetchContent)
 FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
+    EXCLUDE_FROM_ALL
 )
 
 #
