@@ -7,6 +7,16 @@
   },
   "configurePresets": [
     {
+      "name": "gtest-debug-clang",
+      "displayName": "GTest Clang (Debug)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/gtest-clang",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/gtest-clang-toolchain.cmake",
+        "BUILD_APP": "OFF"
+      }
+    },
+    {
       "name": "app-win",
       "displayName": "Win App (Debug)",
       "generator": "Ninja",
@@ -24,16 +34,6 @@
       "binaryDir": "${sourceDir}/build/app-linux",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x64-linux-clang-toolchain.cmake"
-      }
-    },
-    {
-      "name": "gtest-debug-clang",
-      "displayName": "GTest Clang (Debug)",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/gtest-clang",
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/gtest-clang-toolchain.cmake",
-        "BUILD_APP": "OFF"
       }
     }
   ]

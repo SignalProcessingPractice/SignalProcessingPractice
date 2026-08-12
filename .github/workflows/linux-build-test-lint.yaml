@@ -1,0 +1,87 @@
+# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
+# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
+name: Build, Test and Lint for the desktop application on Linux.
+
+on:
+  push:
+  pull_request:
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  ci-qt-linux:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: "[preprocess] Checkout"
+      uses: actions/checkout@v4
+
+    - name: "[preprocess] Install Qt"
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.*'
+        host: linux
+        target: desktop
+        dir: '${{ github.workspace }}/qt/'
+        install-deps: true
+        modules: qtmultimedia
+        tools: 'tools_qtcreator,qt.tools.qtcreator'
+
+    - name: "[preprocess] Use matching clang toolchain"
+      # ubuntu-latest には複数バージョンの clang が入っているため,
+      # ビルドで使う clang (18.x) と揃えた run-clang-tidy を確実に使う.
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-tools-18
+        echo "/usr/lib/llvm-18/bin" >> "$GITHUB_PATH"
+
+    - name: "[build] Configure CMake"
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run:  |
+        cmake --preset app-linux \
+         -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: "[build] Build"
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build/app-linux --config ${{env.BUILD_TYPE}}
+
+    - name: "[lint] Determine diff base"
+      # pull_request イベントには base.ref があるのでそれを使う.
+      # push イベントには pull_request コンテキストが無いため, プッシュ前の
+      # コミット (github.event.before) を使う. 新規ブランチの初回プッシュ等で
+      # before が解決できない場合は, 差分検査をあきらめて全件検査にフォールバックする
+      # (スクリプト側は --diff-base に空文字を渡すと全件検査になる).
+      id: diff_base
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          base="origin/${{ github.event.pull_request.base.ref }}"
+        else
+          base="${{ github.event.before }}"
+        fi
+
+        if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "${base}^{commit}" 2>/dev/null; then
+          echo "diff base '$base' is not resolvable; falling back to full scan"
+          base=""
+        fi
+
+        echo "base=$base" >> "$GITHUB_OUTPUT"
+
+    - name: "[lint] clang-format (diff only)"
+      working-directory: scripts
+      run: python3 run_clang_format.py --check --diff-base "${{ steps.diff_base.outputs.base }}"
+
+    - name: "[lint] clang-tidy (diff only)"
+      working-directory: scripts
+      run: python3 run_clang_tidy.py --build-dir ${{github.workspace}}/build/app-linux --diff-base "${{ steps.diff_base.outputs.base }}"
+
+    - name: "[test] Test"
+      working-directory: ${{github.workspace}}/build/app-linux
+      # Execute tests defined by the CMake configuration.
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}

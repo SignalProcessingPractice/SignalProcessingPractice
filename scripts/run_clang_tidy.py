@@ -23,6 +23,11 @@ parser.add_argument(
     "--diff-base",
     help="指定した git ref との差分に含まれる lib/ 配下の .cpp ファイルのみを対象にする (例: origin/develop)",
 )
+parser.add_argument(
+    "--build-dir",
+    default=BUILD_DIR,
+    help=f"compile_commands.json が存在するビルドディレクトリ (デフォルト: {BUILD_DIR})",
+)
 args = parser.parse_args()
 
 CPP_EXTENSIONS = {".cpp", ".cc", ".c", ".cxx"}
@@ -45,7 +50,7 @@ else:
 cmd = [
     "run-clang-tidy",
     f"-j{os.cpu_count() or 1}",
-    "-p", BUILD_DIR,
+    "-p", args.build_dir,
     "-header-filter=.*/lib/(inc|src)/.*",
     *(["-fix"] if args.fix else []),
     *file_filters,
