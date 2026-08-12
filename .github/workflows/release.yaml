@@ -104,6 +104,14 @@ jobs:
         modules: qtmultimedia
         tools: 'tools_qtcreator,qt.tools.qtcreator'
 
+    - name: "[preprocess] Install packaging dependencies"
+      # patchelf: linuxdeploy が RPATH を書き換えるために必要.
+      # libxcb-cursor0: Qt の xcb プラットフォームプラグインの実行時依存
+      #   (未導入だと linuxdeploy の依存解決で "Could not find dependency" となる).
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y patchelf libxcb-cursor0
+
     - name: "[build] Configure CMake"
       run:  |
         cmake --preset app-linux \
@@ -119,15 +127,50 @@ jobs:
     - name: "[package] Install"
       run: cmake --install build/app-linux --prefix install
 
-    - name: "[package] Archive"
+    - name: "[package] Fetch linuxdeploy"
+      # ランナーに FUSE が無いため, AppImage を直接実行せず展開して使う.
       run: |
-        (cd install && zip -r ../SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.zip .)
+        curl -sL -o linuxdeploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+        curl -sL -o linuxdeploy-plugin-qt.AppImage https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+        chmod +x linuxdeploy.AppImage linuxdeploy-plugin-qt.AppImage
+
+        ./linuxdeploy.AppImage --appimage-extract >/dev/null
+        mv squashfs-root linuxdeploy.AppDir
+        ./linuxdeploy-plugin-qt.AppImage --appimage-extract >/dev/null
+        mv squashfs-root linuxdeploy-plugin-qt.AppDir
+
+        # 展開済みの AppDir を使うため元の .AppImage は不要. 残しておくと
+        # 後続ステップの *.AppImage glob が生成物と衝突するため削除する.
+        rm -f linuxdeploy.AppImage linuxdeploy-plugin-qt.AppImage
+
+        mkdir -p tools
+        ln -s "$PWD/linuxdeploy.AppDir/AppRun" tools/linuxdeploy
+        ln -s "$PWD/linuxdeploy-plugin-qt.AppDir/AppRun" tools/linuxdeploy-plugin-qt
+        echo "$PWD/tools" >> "$GITHUB_PATH"
+
+    - name: "[package] Build AppImage"
+      # LD_LIBRARY_PATH を明示することで, ランナーに別バージョンの Qt が
+      # システムインストールされていても install-qt-action で導入した
+      # Qt を優先して同梱させる.
+      run: |
+        export QMAKE="$QT_ROOT_DIR/bin/qmake6"
+        export LD_LIBRARY_PATH="$QT_ROOT_DIR/lib"
+
+        linuxdeploy \
+          --appdir AppDir \
+          -e install/bin/SignalProcessingPracticeApp \
+          -d app/packaging/linux/SignalProcessingPracticeApp.desktop \
+          -i app/packaging/linux/SignalProcessingPracticeApp.png \
+          --plugin qt \
+          --output appimage
+
+        mv ./*.AppImage SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.AppImage
 
     - name: "[package] Upload artifact"
       uses: actions/upload-artifact@v4
       with:
         name: linux-package
-        path: SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.zip
+        path: SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.AppImage
 
   release:
     runs-on: ubuntu-latest
@@ -152,4 +195,4 @@ jobs:
           --title "$version" \
           --generate-notes \
           artifacts/windows-package/*.zip \
-          artifacts/linux-package/*.zip
+          artifacts/linux-package/*.AppImage

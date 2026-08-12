@@ -65,6 +65,10 @@ if(WIN32)
 endif()
 
 if(WIN32)
+    # Qt の共有ライブラリ/プラグイン一式を install 先へ同梱する.
+    # NOTE: qt_generate_deploy_app_script() は Linux 向けの共有ライブラリ同梱を
+    # サポートしていない (実行しても何もせず skip される)。Linux は
+    # release ワークフロー側で linuxdeploy を使って別途 AppImage化する。
     qt_generate_deploy_app_script(
         TARGET SignalProcessingPracticeApp
         OUTPUT_SCRIPT deploy_script
