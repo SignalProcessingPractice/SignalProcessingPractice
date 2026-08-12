@@ -1,7 +1,19 @@
-#include <iostream>
+///
+/// @file main.cpp
+///
 
-int main() {
-    std::cout << "Hello, world!" << std::endl;
+#include <QApplication>
 
-    return 0;
+#include "presenter/MainPresenter.h"
+#include "view/MainWindow.h"
+
+auto main(int argc, char* argv[]) -> int {
+    QApplication app(argc, argv);
+
+    MainWindow window;
+    MainPresenter presenter(&window);
+
+    window.show();
+
+    return QApplication::exec();
 }

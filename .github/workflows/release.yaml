@@ -1,0 +1,198 @@
+# main ブランチへのマージ (push) をトリガーに、Windows/Linux の
+# デスクトップアプリをビルドして GitHub Release を作成するワークフロー。
+name: Release the desktop application.
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+    - name: "[preprocess] Checkout"
+      uses: actions/checkout@v4
+
+    - name: "[version] Read version from CMakeLists.txt"
+      id: version
+      run: |
+        version=$(grep -oP '^\s*VERSION\s+\K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
+        if [ -z "$version" ]; then
+          echo "Failed to determine version from CMakeLists.txt" >&2
+          exit 1
+        fi
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build-windows:
+    runs-on: windows-latest
+    needs: determine-version
+
+    steps:
+    - name: "[preprocess] Checkout"
+      uses: actions/checkout@v4
+
+    - name: "[preprocess] Install Qt"
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.*'
+        host: windows
+        target: desktop
+        arch: win64_mingw
+        dir: '${{ github.workspace }}/qt/'
+        install-deps: true
+        modules: qtmultimedia
+        tools: 'tools_mingw1310,qt.tools.win64_mingw1310'
+
+    - name: "[preprocess] Set QT_TOOLCHAIN_ROOT"
+      shell: bash
+      run: echo "QT_TOOLCHAIN_ROOT=$IQTA_TOOLS/mingw1310_64" >> "$GITHUB_ENV"
+
+    - name: "[build] Configure CMake"
+      shell: bash
+      run:  |
+        cmake --preset app-win \
+         -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: "[build] Build"
+      shell: bash
+      run: cmake --build build/app-win --config ${{env.BUILD_TYPE}}
+
+    - name: "[test] Test"
+      shell: bash
+      working-directory: build/app-win
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: "[package] Install"
+      shell: bash
+      run: cmake --install build/app-win --config ${{env.BUILD_TYPE}}
+
+    - name: "[package] Archive"
+      shell: pwsh
+      run: |
+        Compress-Archive `
+          -Path install/* `
+          -DestinationPath SignalProcessingPractice-windows-v${{ needs.determine-version.outputs.version }}.zip
+
+    - name: "[package] Upload artifact"
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-package
+        path: SignalProcessingPractice-windows-v${{ needs.determine-version.outputs.version }}.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    needs: determine-version
+
+    steps:
+    - name: "[preprocess] Checkout"
+      uses: actions/checkout@v4
+
+    - name: "[preprocess] Install Qt"
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.*'
+        host: linux
+        target: desktop
+        dir: '${{ github.workspace }}/qt/'
+        install-deps: true
+        modules: qtmultimedia
+        tools: 'tools_qtcreator,qt.tools.qtcreator'
+
+    - name: "[preprocess] Install packaging dependencies"
+      # patchelf: linuxdeploy が RPATH を書き換えるために必要.
+      # libxcb-cursor0: Qt の xcb プラットフォームプラグインの実行時依存
+      #   (未導入だと linuxdeploy の依存解決で "Could not find dependency" となる).
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y patchelf libxcb-cursor0
+
+    - name: "[build] Configure CMake"
+      run:  |
+        cmake --preset app-linux \
+         -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: "[build] Build"
+      run: cmake --build build/app-linux --config ${{env.BUILD_TYPE}}
+
+    - name: "[test] Test"
+      working-directory: build/app-linux
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: "[package] Install"
+      run: cmake --install build/app-linux --prefix install
+
+    - name: "[package] Fetch linuxdeploy"
+      # ランナーに FUSE が無いため, AppImage を直接実行せず展開して使う.
+      run: |
+        curl -sL -o linuxdeploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+        curl -sL -o linuxdeploy-plugin-qt.AppImage https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+        chmod +x linuxdeploy.AppImage linuxdeploy-plugin-qt.AppImage
+
+        ./linuxdeploy.AppImage --appimage-extract >/dev/null
+        mv squashfs-root linuxdeploy.AppDir
+        ./linuxdeploy-plugin-qt.AppImage --appimage-extract >/dev/null
+        mv squashfs-root linuxdeploy-plugin-qt.AppDir
+
+        # 展開済みの AppDir を使うため元の .AppImage は不要. 残しておくと
+        # 後続ステップの *.AppImage glob が生成物と衝突するため削除する.
+        rm -f linuxdeploy.AppImage linuxdeploy-plugin-qt.AppImage
+
+        mkdir -p tools
+        ln -s "$PWD/linuxdeploy.AppDir/AppRun" tools/linuxdeploy
+        ln -s "$PWD/linuxdeploy-plugin-qt.AppDir/AppRun" tools/linuxdeploy-plugin-qt
+        echo "$PWD/tools" >> "$GITHUB_PATH"
+
+    - name: "[package] Build AppImage"
+      # LD_LIBRARY_PATH を明示することで, ランナーに別バージョンの Qt が
+      # システムインストールされていても install-qt-action で導入した
+      # Qt を優先して同梱させる.
+      run: |
+        export QMAKE="$QT_ROOT_DIR/bin/qmake6"
+        export LD_LIBRARY_PATH="$QT_ROOT_DIR/lib"
+
+        linuxdeploy \
+          --appdir AppDir \
+          -e install/bin/SignalProcessingPracticeApp \
+          -d app/packaging/linux/SignalProcessingPracticeApp.desktop \
+          -i app/packaging/linux/SignalProcessingPracticeApp.png \
+          --plugin qt \
+          --output appimage
+
+        mv ./*.AppImage SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.AppImage
+
+    - name: "[package] Upload artifact"
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-package
+        path: SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.AppImage
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [determine-version, build-windows, build-linux]
+    permissions:
+      contents: write
+
+    steps:
+    - name: "[release] Download artifacts"
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: "[release] Create GitHub Release"
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        version="v${{ needs.determine-version.outputs.version }}"
+        gh release create "$version" \
+          --repo "${{ github.repository }}" \
+          --target "${{ github.sha }}" \
+          --title "$version" \
+          --generate-notes \
+          artifacts/windows-package/*.zip \
+          artifacts/linux-package/*.AppImage

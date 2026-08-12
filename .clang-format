@@ -1,0 +1,70 @@
+BasedOnStyle: Google
+
+# 80 は狭すぎることが多い
+ColumnLimit: 100
+
+# 名前空間のインデントは付けない
+NamespaceIndentation: None
+
+# private:, public: をインデントしない
+AccessModifierOffset: -4
+
+# 短い関数の1行化は禁止
+AllowShortFunctionsOnASingleLine: None
+
+# if (...) return ...; の1行化は禁止
+AllowShortIfStatementsOnASingleLine: Never
+
+# ラムダも展開
+AllowShortLambdasOnASingleLine: None
+
+# C++11 のリスト初期化を尊重
+Cpp11BracedListStyle: true
+
+# include を整理
+SortIncludes: true
+
+# Google Style のグループ順に include を再グループ化する
+#   1. 対応ヘッダ (Priority 0, 自動判定)
+#   2. C システムヘッダ
+#   3. C++ 標準ライブラリ
+#   4. 他ライブラリ (Qt, ETL, CMSIS-DSP, gtest)
+#   5. 自プロジェクト
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^<Q[A-Z]'
+    Priority: 4
+  - Regex: '^<(etl|gtest|gmock)/'
+    Priority: 4
+  - Regex: '^<arm_.*\.h>'
+    Priority: 4
+  - Regex: '^<.*\.h>'
+    Priority: 2
+  - Regex: '^<.*'
+    Priority: 3
+  - Regex: '.*'
+    Priority: 5
+
+# コメント位置の調整
+ReflowComments: true
+
+# ポインタを型側に寄せる
+PointerAlignment: Left
+
+# 連続代入の整列は行わない
+AlignConsecutiveAssignments: false
+
+# 連続宣言の整列は行わない
+AlignConsecutiveDeclarations: false
+
+# case ラベルを見やすく
+IndentCaseLabels: true
+
+# 空行を適度に維持
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# Doxygen コメントを壊しにくくする
+CommentPragmas: '^!|^<|^/'
+
+IndentWidth: 4
+ContinuationIndentWidth: 8

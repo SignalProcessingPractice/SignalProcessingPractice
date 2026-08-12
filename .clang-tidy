@@ -1,0 +1,14 @@
+Checks: >
+  bugprone-*,
+  cppcoreguidelines-*,
+  google-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  clang-analizer-*,
+  -cppcoreguidelines-avoid-magic-numbers
+
+WarningsAsErrors: '*'
+
+HeaderFilterRegex: >
+  '^(.*[/\\])?(app|lib)/'

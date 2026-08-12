@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 4.00)
-project(CPP_PRACTICE CXX)
+cmake_minimum_required(VERSION 3.28)
+project(CPP_PRACTICE 
+    VERSION 0.1.0
+    LANGUAGES CXX)
 
 #
 # Set the C++ standard
@@ -15,6 +17,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #
 # Add subdirectories
 #
-include(${CMAKE_SOURCE_DIR}/app/app.cmake)
+option(BUILD_APP "Build the application target" ON)
+if(BUILD_APP)
+    include(${CMAKE_SOURCE_DIR}/app/app.cmake)
+endif()
 include(${CMAKE_SOURCE_DIR}/lib/lib.cmake)
-include(${CMAKE_SOURCE_DIR}/tests/tests.cmake)

@@ -7,23 +7,33 @@
   },
   "configurePresets": [
     {
-      "name": "app-win",
-      "displayName": "Win App (Debug)",
+      "name": "gtest-debug-clang",
+      "displayName": "GTest Clang (Debug)",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/app",
+      "binaryDir": "${sourceDir}/build/gtest-clang",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x64-gcc-toolchain.cmake",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/gtest-clang-toolchain.cmake",
+        "BUILD_APP": "OFF"
       }
     },
     {
-      "name": "gtest-debug-gcc",
-      "displayName": "GTest GCC (Debug)",
+      "name": "app-win",
+      "displayName": "Win App (Debug)",
       "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/gtest-gcc",
+      "binaryDir": "${sourceDir}/build/app-win",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/gtest-gcc-toolchain.cmake",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_PREFIX_PATH": "$env{QT_ROOT_DIR}/",
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x64-windows-qt-toolchain.cmake",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/install"
+      }
+    },
+    {
+      "name": "app-linux",
+      "displayName": "Linux App (Debug)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/app-linux",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/cmake/toolchains/x64-linux-clang-toolchain.cmake"
       }
     }
   ]

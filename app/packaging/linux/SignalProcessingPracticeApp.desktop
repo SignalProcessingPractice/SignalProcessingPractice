@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Signal Processing Practice
+Exec=SignalProcessingPracticeApp
+Icon=SignalProcessingPracticeApp
+Categories=AudioVideo;Audio;
+Terminal=false
