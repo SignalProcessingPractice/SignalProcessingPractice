@@ -61,6 +61,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(cmsis_dsp)
 
 #
+# CMSIS-DSP のヘッダを SYSTEM 扱いにする.
+# (clang-tidy 等の静的解析時間を抑えるため. Qt/ETL/GoogleTest は各々の
+#  CMake 設定で SYSTEM 扱いになっているが, CMSISDSP ターゲットはなっていない.)
+#
+get_target_property(CMSIS_DSP_INCLUDES CMSISDSP INTERFACE_INCLUDE_DIRECTORIES)
+set_target_properties(CMSISDSP PROPERTIES
+    INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${CMSIS_DSP_INCLUDES}")
+
+#
 # Add a library target
 #
 add_library(SIGNAL_PROCESSING_PRACTICE_LIB
