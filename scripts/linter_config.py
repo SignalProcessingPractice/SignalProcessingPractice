@@ -8,6 +8,9 @@ TARGET_DIR = Path("..")
 EXCLUDE_DIRS = {
     "build",
     ".git",
+    # CI (jurplel/install-qt-action) がリポジトリ直下にインストールする Qt SDK.
+    # サードパーティコードのため解析対象から除外する.
+    "qt",
 }
 
 SOURCE_EXTENSIONS = {
