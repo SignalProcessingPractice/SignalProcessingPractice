@@ -35,16 +35,16 @@ file(GLOB SRC_FILES
 #
 # 実行ファイルのターゲット定義
 #
-qt_add_executable(APP
+qt_add_executable(SignalProcessingPracticeApp
     ${SRC_FILES}
 )
 
-target_include_directories(APP
+target_include_directories(SignalProcessingPracticeApp
     PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
-target_link_libraries(APP
+target_link_libraries(SignalProcessingPracticeApp
     PRIVATE
         Qt6::Core
         Qt6::Gui
@@ -53,20 +53,20 @@ target_link_libraries(APP
         SIGNAL_PROCESSING_PRACTICE_LIB
 )
 
-install(TARGETS APP
+install(TARGETS SignalProcessingPracticeApp
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 if(WIN32)
-    set_target_properties(APP PROPERTIES
+    set_target_properties(SignalProcessingPracticeApp PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
 endif()
 
 if(WIN32)
     qt_generate_deploy_app_script(
-        TARGET APP
+        TARGET SignalProcessingPracticeApp
         OUTPUT_SCRIPT deploy_script
         NO_UNSUPPORTED_PLATFORM_ERROR
     )
