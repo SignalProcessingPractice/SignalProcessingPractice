@@ -1,0 +1,155 @@
+# main ブランチへのマージ (push) をトリガーに、Windows/Linux の
+# デスクトップアプリをビルドして GitHub Release を作成するワークフロー。
+name: Release the desktop application.
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  determine-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+    - name: "[preprocess] Checkout"
+      uses: actions/checkout@v4
+
+    - name: "[version] Read version from CMakeLists.txt"
+      id: version
+      run: |
+        version=$(grep -oP '^\s*VERSION\s+\K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
+        if [ -z "$version" ]; then
+          echo "Failed to determine version from CMakeLists.txt" >&2
+          exit 1
+        fi
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  build-windows:
+    runs-on: windows-latest
+    needs: determine-version
+
+    steps:
+    - name: "[preprocess] Checkout"
+      uses: actions/checkout@v4
+
+    - name: "[preprocess] Install Qt"
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.*'
+        host: windows
+        target: desktop
+        arch: win64_mingw
+        dir: '${{ github.workspace }}/qt/'
+        install-deps: true
+        modules: qtmultimedia
+        tools: 'tools_mingw1310,qt.tools.win64_mingw1310'
+
+    - name: "[preprocess] Set QT_TOOLCHAIN_ROOT"
+      shell: bash
+      run: echo "QT_TOOLCHAIN_ROOT=$IQTA_TOOLS/mingw1310_64" >> "$GITHUB_ENV"
+
+    - name: "[build] Configure CMake"
+      shell: bash
+      run:  |
+        cmake --preset app-win \
+         -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: "[build] Build"
+      shell: bash
+      run: cmake --build build/app-win --config ${{env.BUILD_TYPE}}
+
+    - name: "[test] Test"
+      shell: bash
+      working-directory: build/app-win
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: "[package] Install"
+      shell: bash
+      run: cmake --install build/app-win --config ${{env.BUILD_TYPE}}
+
+    - name: "[package] Archive"
+      shell: pwsh
+      run: |
+        Compress-Archive `
+          -Path install/* `
+          -DestinationPath SignalProcessingPractice-windows-v${{ needs.determine-version.outputs.version }}.zip
+
+    - name: "[package] Upload artifact"
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-package
+        path: SignalProcessingPractice-windows-v${{ needs.determine-version.outputs.version }}.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    needs: determine-version
+
+    steps:
+    - name: "[preprocess] Checkout"
+      uses: actions/checkout@v4
+
+    - name: "[preprocess] Install Qt"
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.*'
+        host: linux
+        target: desktop
+        dir: '${{ github.workspace }}/qt/'
+        install-deps: true
+        modules: qtmultimedia
+        tools: 'tools_qtcreator,qt.tools.qtcreator'
+
+    - name: "[build] Configure CMake"
+      run:  |
+        cmake --preset app-linux \
+         -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: "[build] Build"
+      run: cmake --build build/app-linux --config ${{env.BUILD_TYPE}}
+
+    - name: "[test] Test"
+      working-directory: build/app-linux
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: "[package] Install"
+      run: cmake --install build/app-linux --prefix install
+
+    - name: "[package] Archive"
+      run: |
+        tar -czf SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.tar.gz -C install .
+
+    - name: "[package] Upload artifact"
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-package
+        path: SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.tar.gz
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [determine-version, build-windows, build-linux]
+    permissions:
+      contents: write
+
+    steps:
+    - name: "[release] Download artifacts"
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: "[release] Create GitHub Release"
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        version="v${{ needs.determine-version.outputs.version }}"
+        gh release create "$version" \
+          --repo "${{ github.repository }}" \
+          --target "${{ github.sha }}" \
+          --title "$version" \
+          --generate-notes \
+          artifacts/windows-package/*.zip \
+          artifacts/linux-package/*.tar.gz
