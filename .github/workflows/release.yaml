@@ -121,13 +121,13 @@ jobs:
 
     - name: "[package] Archive"
       run: |
-        tar -czf SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.tar.gz -C install .
+        (cd install && zip -r ../SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.zip .)
 
     - name: "[package] Upload artifact"
       uses: actions/upload-artifact@v4
       with:
         name: linux-package
-        path: SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.tar.gz
+        path: SignalProcessingPractice-linux-v${{ needs.determine-version.outputs.version }}.zip
 
   release:
     runs-on: ubuntu-latest
@@ -152,4 +152,4 @@ jobs:
           --title "$version" \
           --generate-notes \
           artifacts/windows-package/*.zip \
-          artifacts/linux-package/*.tar.gz
+          artifacts/linux-package/*.zip
