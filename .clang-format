@@ -60,6 +60,15 @@ AlignConsecutiveDeclarations: false
 # case ラベルを見やすく
 IndentCaseLabels: true
 
+# コンストラクタ初期化子リストは常にコロン前で改行する
+PackConstructorInitializers: Never
+
+# 関数本体の開き波括弧を次行に配置する（Allman 風）
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  SplitEmptyFunction: true
+
 # 空行を適度に維持
 KeepEmptyLinesAtTheStartOfBlocks: false
 
