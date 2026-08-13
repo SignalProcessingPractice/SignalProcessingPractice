@@ -12,22 +12,27 @@
 #include "model/AudioInputBuffer.h"
 
 InputSource::InputSource(AudioInputBuffer* buffer)
-    : buffer_(buffer), generator_([] {
+    : buffer_(buffer),
+      generator_([] {
           return FrameSyncProcess::AudioHop{kAppSampleRate};
-      }) {
+      })
+{
 }
 
-void InputSource::SetGenerator(HopGenerator generator) {
+void InputSource::SetGenerator(HopGenerator generator)
+{
     const std::lock_guard<std::mutex> guard{generator_mutex_};
     generator_ = std::move(generator);
 }
 
-void InputSource::RunWithGeneratorLock(const std::function<void()>& func) {
+void InputSource::RunWithGeneratorLock(const std::function<void()>& func)
+{
     const std::lock_guard<std::mutex> guard{generator_mutex_};
     func();
 }
 
-void InputSource::Start() {
+void InputSource::Start()
+{
     if (thread_.joinable()) {
         return;
     }
@@ -36,14 +41,16 @@ void InputSource::Start() {
     }};
 }
 
-void InputSource::Stop() {
+void InputSource::Stop()
+{
     if (thread_.joinable()) {
         thread_.request_stop();
         thread_.join();
     }
 }
 
-void InputSource::Run(const std::stop_token& stop_token) {
+void InputSource::Run(const std::stop_token& stop_token)
+{
     auto next_deadline = std::chrono::steady_clock::now() + kHopPeriod;
     while (!stop_token.stop_requested()) {
         const auto hop = GenerateHop();
@@ -53,7 +60,8 @@ void InputSource::Run(const std::stop_token& stop_token) {
     }
 }
 
-auto InputSource::GenerateHop() -> FrameSyncProcess::AudioHop {
+auto InputSource::GenerateHop() -> FrameSyncProcess::AudioHop
+{
     const std::lock_guard<std::mutex> guard{generator_mutex_};
     auto hop = generator_();
     hop.set_sample_rate(kAppSampleRate);

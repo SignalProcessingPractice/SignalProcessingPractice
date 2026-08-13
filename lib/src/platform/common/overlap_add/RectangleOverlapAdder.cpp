@@ -13,7 +13,8 @@
 ///
 
 auto RectangleOverlapAdder::Exec(const FrameSyncProcess::AudioFrame& frame)
-        -> FrameSyncProcess::AudioHop {
+        -> FrameSyncProcess::AudioHop
+{
     constexpr auto kHopLength = static_cast<std::ptrdiff_t>(FrameSyncProcess::audio_hop_length);
 
     // frame の先頭部と前フレームの末尾部を加算する.
@@ -29,7 +30,8 @@ auto RectangleOverlapAdder::Exec(const FrameSyncProcess::AudioFrame& frame)
     return hop_buffer_;
 }
 
-auto RectangleOverlapAdder::Reset() -> void {
+auto RectangleOverlapAdder::Reset() -> void
+{
     hop_buffer_ = FrameSyncProcess::AudioHop{};
     frame_buffer_ = FrameSyncProcess::AudioFrame{};
 }

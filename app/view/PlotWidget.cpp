@@ -46,7 +46,8 @@ constexpr int kTickPrecision = 3;
 ///
 /// 目盛り値をラベル文字列へ変換する (最大値側の目盛りには単位を付記).
 ///
-auto FormatTick(float value, const QString& unit, bool is_max_tick) -> QString {
+auto FormatTick(float value, const QString& unit, bool is_max_tick) -> QString
+{
     QString text = QString::number(value, 'g', kTickPrecision);
     if (is_max_tick && !unit.isEmpty()) {
         text += QStringLiteral(" ") + unit;
@@ -56,21 +57,26 @@ auto FormatTick(float value, const QString& unit, bool is_max_tick) -> QString {
 
 }  // namespace
 
-PlotWidget::PlotWidget(QWidget* parent) : QWidget(parent) {
+PlotWidget::PlotWidget(QWidget* parent)
+    : QWidget(parent)
+{
 }
 
-void PlotWidget::SetAxes(const PlotAxis& x_axis, const PlotAxis& y_axis) {
+void PlotWidget::SetAxes(const PlotAxis& x_axis, const PlotAxis& y_axis)
+{
     x_axis_ = x_axis;
     y_axis_ = y_axis;
     update();
 }
 
-void PlotWidget::SetSamples(std::span<const float> samples) {
+void PlotWidget::SetSamples(std::span<const float> samples)
+{
     samples_.assign(samples.begin(), samples.end());
     update();
 }
 
-void PlotWidget::paintEvent([[maybe_unused]] QPaintEvent* event) {
+void PlotWidget::paintEvent([[maybe_unused]] QPaintEvent* event)
+{
     QPainter painter{this};
     painter.fillRect(rect(), kBackgroundColor);
 
@@ -87,11 +93,13 @@ void PlotWidget::paintEvent([[maybe_unused]] QPaintEvent* event) {
     DrawSamples(&painter, area);
 }
 
-auto PlotWidget::PlotArea() const -> QRect {
+auto PlotWidget::PlotArea() const -> QRect
+{
     return rect().adjusted(kMarginLeft, kMarginTop, -kMarginRight, -kMarginBottom);
 }
 
-void PlotWidget::DrawAxes(QPainter* painter, const QRect& area) const {
+void PlotWidget::DrawAxes(QPainter* painter, const QRect& area) const
+{
     const QFontMetrics metrics{painter->font()};
 
     // 縦軸 (y): 下から上へ min → max.
@@ -132,7 +140,8 @@ void PlotWidget::DrawAxes(QPainter* painter, const QRect& area) const {
     }
 }
 
-void PlotWidget::DrawSamples(QPainter* painter, const QRect& area) const {
+void PlotWidget::DrawSamples(QPainter* painter, const QRect& area) const
+{
     if (samples_.size() < 2 || y_axis_.max_value <= y_axis_.min_value) {
         return;
     }

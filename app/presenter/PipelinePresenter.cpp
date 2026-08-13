@@ -9,7 +9,9 @@
 #include "model/MainModel.h"
 
 PipelinePresenter::PipelinePresenter(MainModel* model, PipelineViewHooks hooks)
-    : model_(model), hooks_(std::move(hooks)) {
+    : model_(model),
+      hooks_(std::move(hooks))
+{
     hooks_.attach_selection([this](PipelineStage stage, int index) {
         OnStrategySelected(stage, index);
     });
@@ -27,7 +29,8 @@ PipelinePresenter::PipelinePresenter(MainModel* model, PipelineViewHooks hooks)
     });
 }
 
-void PipelinePresenter::OnStrategySelected(PipelineStage stage, int index) {
+void PipelinePresenter::OnStrategySelected(PipelineStage stage, int index)
+{
     model_->ApplyStrategySelection(stage, index);
 
     if (stage == PipelineStage::kOutput) {
@@ -59,18 +62,22 @@ void PipelinePresenter::OnStrategySelected(PipelineStage stage, int index) {
     }
 }
 
-void PipelinePresenter::OnDeviceSelected(int device_index) {
+void PipelinePresenter::OnDeviceSelected(int device_index)
+{
     model_->ApplyDeviceSelection(device_index);
 }
 
-void PipelinePresenter::OnSineFrequencyChanged(int frequency_hz) {
+void PipelinePresenter::OnSineFrequencyChanged(int frequency_hz)
+{
     model_->ApplySineFrequency(frequency_hz);
 }
 
-void PipelinePresenter::OnFileSelected(const std::string& path) {
+void PipelinePresenter::OnFileSelected(const std::string& path)
+{
     model_->ApplyFileSelection(path);
 }
 
-void PipelinePresenter::OnOutputDeviceSelected(int device_index) {
+void PipelinePresenter::OnOutputDeviceSelected(int device_index)
+{
     model_->ApplyOutputDeviceSelection(device_index);
 }

@@ -84,7 +84,8 @@ MainPresenter::MainPresenter(MainWindow* view)
                               [view] {
                                   view->HideOutputDeviceSelector();
                               },
-              }) {
+              })
+{
     // NOTE: 開始/停止 UI の実装までは, Presenter 構築と同時に処理を開始する.
     model_->Start();
 }

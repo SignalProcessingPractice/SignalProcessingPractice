@@ -14,7 +14,8 @@ MainModel::MainModel()
     : device_input_(std::make_unique<DeviceInput>(&input_buffer_)),
       sine_generator_({.frequency = SineGenerator::kDefaultFrequency,
                        .amplitude = SineGenerator::kDefaultAmplitude}),
-      device_output_(std::make_unique<DeviceOutput>(&output_buffer_)) {
+      device_output_(std::make_unique<DeviceOutput>(&output_buffer_))
+{
     process_.SetConfig(FrameSyncProcess::AcquireTag{},
                        FrameSyncProcess::AudioAcquireStrategy{&ring_buffer_acquire_});
     process_.Attach(
@@ -22,11 +23,13 @@ MainModel::MainModel()
                                                               &MainModel::OnFrameProcessed>(*this));
 }
 
-MainModel::~MainModel() {
+MainModel::~MainModel()
+{
     Stop();
 }
 
-void MainModel::Start() {
+void MainModel::Start()
+{
     if (processing_thread_.joinable()) {
         return;
     }
@@ -36,7 +39,8 @@ void MainModel::Start() {
     }};
 }
 
-void MainModel::Stop() {
+void MainModel::Stop()
+{
     device_output_->Stop();
     device_input_->Stop();
     input_source_.Stop();
@@ -46,7 +50,8 @@ void MainModel::Stop() {
     }
 }
 
-void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
+void MainModel::ApplyStrategySelection(PipelineStage stage, int index)
+{
     switch (stage) {
         case PipelineStage::kAcquire:
             // 入力は Acquire Strategy を差し替えず, Producer を排他的に切り替える.
@@ -119,11 +124,13 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index) {
     }
 }
 
-auto MainModel::GetAudioInputDeviceNames() -> std::vector<std::string> {
+auto MainModel::GetAudioInputDeviceNames() -> std::vector<std::string>
+{
     return DeviceInput::GetDeviceNames();
 }
 
-void MainModel::ApplyDeviceSelection(int device_index) {
+void MainModel::ApplyDeviceSelection(int device_index)
+{
     if (!device_mode_) {
         return;
     }
@@ -131,25 +138,29 @@ void MainModel::ApplyDeviceSelection(int device_index) {
     device_input_->Start(device_index);
 }
 
-void MainModel::ApplySineFrequency(int frequency_hz) {
+void MainModel::ApplySineFrequency(int frequency_hz)
+{
     // Producer スレッドの Exec() と排他して周波数を更新する.
     input_source_.RunWithGeneratorLock([this, frequency_hz] {
         sine_generator_.SetFrequency(static_cast<double>(frequency_hz));
     });
 }
 
-void MainModel::ApplyFileSelection(const std::string& path) {
+void MainModel::ApplyFileSelection(const std::string& path)
+{
     // Producer スレッドの NextHop() と排他してロードする.
     input_source_.RunWithGeneratorLock([this, &path] {
         file_player_.Load(path);
     });
 }
 
-auto MainModel::GetAudioOutputDeviceNames() -> std::vector<std::string> {
+auto MainModel::GetAudioOutputDeviceNames() -> std::vector<std::string>
+{
     return DeviceOutput::GetDeviceNames();
 }
 
-void MainModel::ApplyOutputDeviceSelection(int device_index) {
+void MainModel::ApplyOutputDeviceSelection(int device_index)
+{
     if (!output_device_mode_) {
         return;
     }
@@ -157,20 +168,24 @@ void MainModel::ApplyOutputDeviceSelection(int device_index) {
     device_output_->Start(device_index);
 }
 
-auto MainModel::Process() -> FrameSyncProcess& {
+auto MainModel::Process() -> FrameSyncProcess&
+{
     return process_;
 }
 
-auto MainModel::GetProcessedFrameCount() const -> std::uint64_t {
+auto MainModel::GetProcessedFrameCount() const -> std::uint64_t
+{
     return processed_frame_count_.load(std::memory_order_relaxed);
 }
 
-void MainModel::RunProcessing(const std::stop_token& stop_token) {
+void MainModel::RunProcessing(const std::stop_token& stop_token)
+{
     while (input_buffer_.WaitForHop(stop_token)) {
         process_.ProcessFrame();
     }
 }
 
-void MainModel::OnFrameProcessed([[maybe_unused]] const PipelineResult& result) {
+void MainModel::OnFrameProcessed([[maybe_unused]] const PipelineResult& result)
+{
     processed_frame_count_.fetch_add(1, std::memory_order_relaxed);
 }

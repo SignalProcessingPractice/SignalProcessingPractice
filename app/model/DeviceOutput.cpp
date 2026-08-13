@@ -18,14 +18,18 @@
 #include "common/AudioConfig.h"
 #include "model/AudioOutputBuffer.h"
 
-AudioPullDevice::AudioPullDevice(AudioOutputBuffer* buffer) : buffer_(buffer) {
+AudioPullDevice::AudioPullDevice(AudioOutputBuffer* buffer)
+    : buffer_(buffer)
+{
 }
 
-void AudioPullDevice::SetSampleFormat(QAudioFormat::SampleFormat format) {
+void AudioPullDevice::SetSampleFormat(QAudioFormat::SampleFormat format)
+{
     sample_format_ = format;
 }
 
-auto AudioPullDevice::readData(char* data, qint64 max_size) -> qint64 {
+auto AudioPullDevice::readData(char* data, qint64 max_size) -> qint64
+{
     if (sample_format_ == QAudioFormat::Float) {
         const auto count = static_cast<std::size_t>(max_size) / sizeof(float);
         const std::span<float> out{std::bit_cast<float*>(data), count};
@@ -51,12 +55,14 @@ auto AudioPullDevice::readData(char* data, qint64 max_size) -> qint64 {
 }
 
 auto AudioPullDevice::writeData([[maybe_unused]] const char* data,
-                                [[maybe_unused]] qint64 size) -> qint64 {
+                                [[maybe_unused]] qint64 size) -> qint64
+{
     // 読み出し専用デバイスのため書き込みは非対応.
     return -1;
 }
 
-auto AudioPullDevice::bytesAvailable() const -> qint64 {
+auto AudioPullDevice::bytesAvailable() const -> qint64
+{
     // 不足分は無音で埋めて常に読み出し可能とするため, 固定の見かけ上のバイト数を返す.
     // (既定の QIODevice::bytesAvailable() は 0 を返し, atEnd() が true になる結果
     //  QAudioSink が readData() を呼び出さなくなり, 無音のまま再生されない.)
@@ -64,14 +70,18 @@ auto AudioPullDevice::bytesAvailable() const -> qint64 {
     return kApparentAvailableBytes + QIODevice::bytesAvailable();
 }
 
-DeviceOutput::DeviceOutput(AudioOutputBuffer* buffer) : pull_device_(buffer) {
+DeviceOutput::DeviceOutput(AudioOutputBuffer* buffer)
+    : pull_device_(buffer)
+{
 }
 
-DeviceOutput::~DeviceOutput() {
+DeviceOutput::~DeviceOutput()
+{
     Stop();
 }
 
-auto DeviceOutput::GetDeviceNames() -> std::vector<std::string> {
+auto DeviceOutput::GetDeviceNames() -> std::vector<std::string>
+{
     const auto devices = QMediaDevices::audioOutputs();
     std::vector<std::string> names;
     names.reserve(static_cast<std::size_t>(devices.size()));
@@ -81,7 +91,8 @@ auto DeviceOutput::GetDeviceNames() -> std::vector<std::string> {
     return names;
 }
 
-auto DeviceOutput::Start(int device_index) -> bool {
+auto DeviceOutput::Start(int device_index) -> bool
+{
     if (audio_sink_ != nullptr) {
         return true;
     }
@@ -128,7 +139,8 @@ auto DeviceOutput::Start(int device_index) -> bool {
     return true;
 }
 
-void DeviceOutput::Stop() {
+void DeviceOutput::Stop()
+{
     if (audio_sink_ != nullptr) {
         audio_sink_->stop();
         audio_sink_.reset();

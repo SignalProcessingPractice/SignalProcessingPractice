@@ -18,19 +18,23 @@ using ProcessCompleteObserver = FrameSyncProcess::ProcessCompleteObserver;
 ///
 class ObserverSpy {
 public:
-    auto OnProcessFrame(const PipelineResult& result) -> void {
+    auto OnProcessFrame(const PipelineResult& result) -> void
+    {
         ++call_count_;
         last_result_ = result;
     }
 
-    [[nodiscard]] auto call_count() const -> int {
+    [[nodiscard]] auto call_count() const -> int
+    {
         return call_count_;
     }
-    [[nodiscard]] auto last_result() const -> const PipelineResult& {
+    [[nodiscard]] auto last_result() const -> const PipelineResult&
+    {
         return last_result_;
     }
 
-    [[nodiscard]] auto as_delegate() -> ProcessCompleteObserver {
+    [[nodiscard]] auto as_delegate() -> ProcessCompleteObserver
+    {
         return ProcessCompleteObserver::create<ObserverSpy, &ObserverSpy::OnProcessFrame>(*this);
     }
 
@@ -45,13 +49,17 @@ private:
 ///
 class OutputCapture {
 public:
-    explicit OutputCapture(FrameSyncProcess::AudioHop* dest) : dest_(dest) {
+    explicit OutputCapture(FrameSyncProcess::AudioHop* dest)
+        : dest_(dest)
+    {
     }
 
-    auto Exec(const FrameSyncProcess::AudioHop& hop) -> void {
+    auto Exec(const FrameSyncProcess::AudioHop& hop) -> void
+    {
         *dest_ = hop;
     }
-    auto Reset() -> void {
+    auto Reset() -> void
+    {
         *dest_ = FrameSyncProcess::AudioHop{};
     }
 
@@ -62,7 +70,8 @@ private:
 ///
 /// ProcessFrame() の後に Observer が呼び出されることを確認する.
 ///
-TEST(FrameSyncObserver, ObserverCalledAfterProcessFrame) {
+TEST(FrameSyncObserver, ObserverCalledAfterProcessFrame)
+{
     ObserverSpy spy;
     FrameSyncProcess proc{FrameSyncProcessConfig{}};
     proc.Attach(spy.as_delegate());
@@ -77,7 +86,8 @@ TEST(FrameSyncObserver, ObserverCalledAfterProcessFrame) {
 ///
 /// Attach しない場合は Observer が呼び出されないことを確認する.
 ///
-TEST(FrameSyncObserver, NotCalledWithoutAttach) {
+TEST(FrameSyncObserver, NotCalledWithoutAttach)
+{
     ObserverSpy spy;
     FrameSyncProcess proc{FrameSyncProcessConfig{}};
 
@@ -89,7 +99,8 @@ TEST(FrameSyncObserver, NotCalledWithoutAttach) {
 ///
 /// 複数の Observer がすべて通知されることを確認する.
 ///
-TEST(FrameSyncObserver, MultipleObserversAllNotified) {
+TEST(FrameSyncObserver, MultipleObserversAllNotified)
+{
     ObserverSpy spy1;
     ObserverSpy spy2;
     ObserverSpy spy3;
@@ -108,7 +119,8 @@ TEST(FrameSyncObserver, MultipleObserversAllNotified) {
 ///
 /// Detach した Observer はその後の ProcessFrame() で呼び出されないことを確認する.
 ///
-TEST(FrameSyncObserver, DetachedObserverNotCalled) {
+TEST(FrameSyncObserver, DetachedObserverNotCalled)
+{
     ObserverSpy spy;
     FrameSyncProcess proc{FrameSyncProcessConfig{}};
     proc.Attach(spy.as_delegate());
@@ -126,7 +138,8 @@ TEST(FrameSyncObserver, DetachedObserverNotCalled) {
 ///
 /// Overlapper の初期遅延を超えるため 2 フレーム処理してから比較する.
 ///
-TEST(FrameSyncObserver, GetResultMatchesObserverResult) {
+TEST(FrameSyncObserver, GetResultMatchesObserverResult)
+{
     constexpr SineGenerator::Params kParams{SineGenerator::kDefaultFrequency,
                                             SineGenerator::kDefaultAmplitude};
     constexpr int kFramesToProcess = 2;
@@ -168,7 +181,8 @@ TEST(FrameSyncObserver, GetResultMatchesObserverResult) {
 ///
 /// Overlapper の初期遅延を超えるため 2 フレーム処理する.
 ///
-TEST(FrameSyncObserver, ObserverResultOutputHopMatchesPipelineOutput) {
+TEST(FrameSyncObserver, ObserverResultOutputHopMatchesPipelineOutput)
+{
     constexpr SineGenerator::Params kParams{SineGenerator::kDefaultFrequency,
                                             SineGenerator::kDefaultAmplitude};
     constexpr int kFramesToProcess = 2;

@@ -19,7 +19,8 @@
 /// デフォルト構築では既定 Strategy 構成がバインドされ, ProcessFrame() が
 /// クラッシュせず実行でき, 結果が無音 (既定入力は NullInput) となることを確認する.
 ///
-TEST(FrameSync, DefaultConstructedProcessFrameIsSafe) {
+TEST(FrameSync, DefaultConstructedProcessFrameIsSafe)
+{
     FrameSyncProcess proc;
     proc.ProcessFrame();
 
@@ -34,7 +35,8 @@ TEST(FrameSync, DefaultConstructedProcessFrameIsSafe) {
 /// Hann 窓 + RectangleOverlapAdder 構成で, 2 フレーム処理した結果が
 /// サイン波と一致することを確認する.
 ///
-TEST(FrameSync, InputEqualOutput) {
+TEST(FrameSync, InputEqualOutput)
+{
     static constexpr std::size_t kDisplaySamples = 8U;
     static constexpr int kPrecision = 6;
     static constexpr float kTolerance = 1e-5F;
@@ -48,10 +50,13 @@ TEST(FrameSync, InputEqualOutput) {
     class OutputValidator {
     public:
         OutputValidator(SineGenerator* validator, std::size_t* counter)
-            : validator_(validator), counter_(counter) {
+            : validator_(validator),
+              counter_(counter)
+        {
         }
 
-        auto Exec(const FrameSyncProcess::AudioHop& hop) -> void {
+        auto Exec(const FrameSyncProcess::AudioHop& hop) -> void
+        {
             if (first_call_) {
                 first_call_ = false;
                 return;
@@ -75,7 +80,8 @@ TEST(FrameSync, InputEqualOutput) {
             ++(*counter_);
         }
 
-        auto Reset() -> void {
+        auto Reset() -> void
+        {
             first_call_ = true;
         }
 
@@ -110,7 +116,8 @@ TEST(FrameSync, InputEqualOutput) {
 ///
 /// デフォルト設定で生成した FrameSyncProcess が ProcessFrame() を実行できる.
 ///
-TEST(FrameSync, DefaultConfigProcessFrameDoesNotCrash) {
+TEST(FrameSync, DefaultConfigProcessFrameDoesNotCrash)
+{
     FrameSyncProcess proc{FrameSyncProcessConfig{}};
     proc.ProcessFrame();
 }
@@ -120,7 +127,8 @@ TEST(FrameSync, DefaultConfigProcessFrameDoesNotCrash) {
 ///
 /// Overlapper の初期遅延があるため 2 フレーム以上処理してからサイン波の存在を確認する.
 ///
-TEST(FrameSync, MoveCtorTransfersWorkingState) {
+TEST(FrameSync, MoveCtorTransfersWorkingState)
+{
     constexpr int kFramesToProcess = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
     SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,
@@ -157,7 +165,8 @@ TEST(FrameSync, MoveCtorTransfersWorkingState) {
 ///
 /// Overlapper の初期遅延があるため 2 フレーム以上処理してからサイン波の存在を確認する.
 ///
-TEST(FrameSync, MoveAssignmentTransfersWorkingState) {
+TEST(FrameSync, MoveAssignmentTransfersWorkingState)
+{
     constexpr int kFramesToProcess = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
     SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,
@@ -195,7 +204,8 @@ TEST(FrameSync, MoveAssignmentTransfersWorkingState) {
 ///
 /// Overlapper の初期遅延があるため 2 フレーム以上処理してからサイン波の存在を確認する.
 ///
-TEST(FrameSync, GetResultReturnsCurrentFrameData) {
+TEST(FrameSync, GetResultReturnsCurrentFrameData)
+{
     constexpr int kFramesToProcess = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
     SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,
@@ -232,7 +242,8 @@ TEST(FrameSync, GetResultReturnsCurrentFrameData) {
 /// SineGenerator で 2 フレーム warm-up して output_hop にサイン波が出ることを確認した後,
 /// NullInput へ切り替えると次フレームの input_hop がゼロになることで検証する.
 ///
-TEST(FrameSync, SetConfigAcquireStrategyAppliesAtFrameBoundary) {
+TEST(FrameSync, SetConfigAcquireStrategyAppliesAtFrameBoundary)
+{
     constexpr int kWarmUpFrames = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
     SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,
@@ -286,7 +297,8 @@ TEST(FrameSync, SetConfigAcquireStrategyAppliesAtFrameBoundary) {
 /// NullInput へ切り替えると Overlapper がリセットされ output_hop がゼロになることで検証する.
 /// リセットなしでは Overlapper の残留状態により output_hop が非ゼロになる.
 ///
-TEST(FrameSync, SetConfigTriggersPipelineReset) {
+TEST(FrameSync, SetConfigTriggersPipelineReset)
+{
     constexpr int kWarmUpFrames = 2;
     constexpr float kMinSignalMagnitude = 0.1F;
     SineGenerator gen{SineGenerator::Params{SineGenerator::kDefaultFrequency,

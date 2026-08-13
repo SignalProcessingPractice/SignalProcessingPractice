@@ -27,14 +27,16 @@ constexpr std::uint16_t kBitsPerSampleFloat32 = 32;
 ///
 /// リトルエンディアンのバイト列から整数を組み立てる.
 ///
-auto ReadU16(std::ifstream& stream) -> std::uint16_t {
+auto ReadU16(std::ifstream& stream) -> std::uint16_t
+{
     std::array<unsigned char, 2> bytes{};
     stream.read(std::bit_cast<char*>(bytes.data()), bytes.size());
     return static_cast<std::uint16_t>(bytes[0] |
                                       (static_cast<std::uint16_t>(bytes[1]) << kBitsPerByte));
 }
 
-auto ReadU32(std::ifstream& stream) -> std::uint32_t {
+auto ReadU32(std::ifstream& stream) -> std::uint32_t
+{
     std::array<unsigned char, 4> bytes{};
     stream.read(std::bit_cast<char*>(bytes.data()), bytes.size());
     return static_cast<std::uint32_t>(bytes[0]) |
@@ -43,7 +45,8 @@ auto ReadU32(std::ifstream& stream) -> std::uint32_t {
            (static_cast<std::uint32_t>(bytes[3]) << (3U * kBitsPerByte));
 }
 
-auto ReadChunkId(std::ifstream& stream) -> std::string {
+auto ReadChunkId(std::ifstream& stream) -> std::string
+{
     std::array<char, 4> bytes{};
     stream.read(bytes.data(), bytes.size());
     return std::string{bytes.data(), bytes.size()};
@@ -63,7 +66,8 @@ struct WavFormat {
 /// data チャンクのバイト列をモノラル float 列へ変換する.
 ///
 auto ConvertToMono(const std::vector<unsigned char>& raw,
-                   const WavFormat& format) -> std::vector<float> {
+                   const WavFormat& format) -> std::vector<float>
+{
     const std::size_t bytes_per_sample = format.bits_per_sample / kBitsPerByte;
     const std::size_t frame_size = bytes_per_sample * format.channels;
     const std::size_t frame_count = raw.size() / frame_size;
@@ -98,7 +102,8 @@ auto ConvertToMono(const std::vector<unsigned char>& raw,
 
 }  // namespace
 
-auto FilePlayer::Load(const std::string& path) -> bool {
+auto FilePlayer::Load(const std::string& path) -> bool
+{
     std::ifstream stream{path, std::ios::binary};
     if (!stream) {
         std::cerr << "FilePlayer: failed to open '" << path << "'\n";
@@ -173,11 +178,13 @@ auto FilePlayer::Load(const std::string& path) -> bool {
     return true;
 }
 
-void FilePlayer::Rewind() {
+void FilePlayer::Rewind()
+{
     position_ = 0;
 }
 
-auto FilePlayer::NextHop() -> FrameSyncProcess::AudioHop {
+auto FilePlayer::NextHop() -> FrameSyncProcess::AudioHop
+{
     FrameSyncProcess::AudioHop hop{kAppSampleRate};
     if (samples_.empty()) {
         return hop;

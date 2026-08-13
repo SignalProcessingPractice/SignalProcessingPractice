@@ -4,7 +4,8 @@
 
 #include "model/AudioOutputBuffer.h"
 
-auto AudioOutputBuffer::Push(std::span<const float> samples) -> bool {
+auto AudioOutputBuffer::Push(std::span<const float> samples) -> bool
+{
     if (queue_.available() < samples.size()) {
         return false;
     }
@@ -14,7 +15,8 @@ auto AudioOutputBuffer::Push(std::span<const float> samples) -> bool {
     return true;
 }
 
-auto AudioOutputBuffer::Pop(std::span<float> out) -> std::size_t {
+auto AudioOutputBuffer::Pop(std::span<float> out) -> std::size_t
+{
     std::size_t popped = 0;
     for (float& sample : out) {
         if (!queue_.pop(sample)) {
@@ -25,6 +27,7 @@ auto AudioOutputBuffer::Pop(std::span<float> out) -> std::size_t {
     return popped;
 }
 
-void AudioOutputBuffer::Clear() {
+void AudioOutputBuffer::Clear()
+{
     queue_.clear();
 }

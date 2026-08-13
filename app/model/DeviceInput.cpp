@@ -17,20 +17,25 @@
 #include "common/AudioConfig.h"
 #include "model/AudioInputBuffer.h"
 
-AudioPushDevice::AudioPushDevice(AudioInputBuffer* buffer) : buffer_(buffer) {
+AudioPushDevice::AudioPushDevice(AudioInputBuffer* buffer)
+    : buffer_(buffer)
+{
 }
 
-void AudioPushDevice::SetSampleFormat(QAudioFormat::SampleFormat format) {
+void AudioPushDevice::SetSampleFormat(QAudioFormat::SampleFormat format)
+{
     sample_format_ = format;
 }
 
 auto AudioPushDevice::readData([[maybe_unused]] char* data,
-                               [[maybe_unused]] qint64 max_size) -> qint64 {
+                               [[maybe_unused]] qint64 max_size) -> qint64
+{
     // 書き込み専用デバイスのため読み出しは非対応.
     return -1;
 }
 
-auto AudioPushDevice::writeData(const char* data, qint64 size) -> qint64 {
+auto AudioPushDevice::writeData(const char* data, qint64 size) -> qint64
+{
     if (sample_format_ == QAudioFormat::Float) {
         const auto count = static_cast<std::size_t>(size) / sizeof(float);
         buffer_->Push(std::span<const float>{std::bit_cast<const float*>(data), count});
@@ -51,14 +56,18 @@ auto AudioPushDevice::writeData(const char* data, qint64 size) -> qint64 {
     return size;
 }
 
-DeviceInput::DeviceInput(AudioInputBuffer* buffer) : push_device_(buffer) {
+DeviceInput::DeviceInput(AudioInputBuffer* buffer)
+    : push_device_(buffer)
+{
 }
 
-DeviceInput::~DeviceInput() {
+DeviceInput::~DeviceInput()
+{
     Stop();
 }
 
-auto DeviceInput::GetDeviceNames() -> std::vector<std::string> {
+auto DeviceInput::GetDeviceNames() -> std::vector<std::string>
+{
     const auto devices = QMediaDevices::audioInputs();
     std::vector<std::string> names;
     names.reserve(static_cast<std::size_t>(devices.size()));
@@ -68,7 +77,8 @@ auto DeviceInput::GetDeviceNames() -> std::vector<std::string> {
     return names;
 }
 
-auto DeviceInput::Start(int device_index) -> bool {
+auto DeviceInput::Start(int device_index) -> bool
+{
     if (audio_source_ != nullptr) {
         return true;
     }
@@ -115,7 +125,8 @@ auto DeviceInput::Start(int device_index) -> bool {
     return true;
 }
 
-void DeviceInput::Stop() {
+void DeviceInput::Stop()
+{
     if (audio_source_ != nullptr) {
         audio_source_->stop();
         audio_source_.reset();

@@ -106,8 +106,8 @@ inline constexpr std::array<std::string_view, 2> kOutputNames{"Null", "Device"};
 /// View の ComboBox 項目と Model の index 解釈の単一情報源とする.
 /// index 0 が既定の Strategy に対応する.
 ///
-[[nodiscard]] inline auto GetStrategyNames(PipelineStage stage)
-        -> std::span<const std::string_view> {
+[[nodiscard]] inline auto GetStrategyNames(PipelineStage stage) -> std::span<const std::string_view>
+{
     namespace detail = pipeline_selection_detail;
     switch (stage) {
         case PipelineStage::kAcquire:

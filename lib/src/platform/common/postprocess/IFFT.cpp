@@ -5,7 +5,8 @@
 
 #include "arm_math.h"
 
-IFFT::IFFT() {
+IFFT::IFFT()
+{
     // コンストラクタで IFFT インスタンスを初期化する（固定サイズを想定）
     const auto fftSize = static_cast<uint32_t>(FrameSyncProcess::audio_frame_length);
     if (arm_rfft_fast_init_f32(&rfft_instance_, fftSize) == ARM_MATH_SUCCESS) {
@@ -13,7 +14,8 @@ IFFT::IFFT() {
     }
 }
 
-auto IFFT::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame {
+auto IFFT::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame
+{
     const auto fftSize = static_cast<uint32_t>(frame.size());
     if (fftSize < 2 || !initialized_) {
         return frame;
@@ -26,7 +28,8 @@ auto IFFT::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::
     return frame_buffer_;
 }
 
-auto IFFT::Reset() -> void {
+auto IFFT::Reset() -> void
+{
     input_buffer_ = FrameSyncProcess::AudioFrame{};
     frame_buffer_ = FrameSyncProcess::AudioFrame{};
 }

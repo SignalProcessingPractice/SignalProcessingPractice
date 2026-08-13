@@ -5,7 +5,8 @@
 #include "Strategies/RectangleOverlapAdder.hpp"
 #include "Strategies/SineGenerator.hpp"
 
-TEST(SineGeneratorReset, OutputMatchesFreshGeneratorAfterReset) {
+TEST(SineGeneratorReset, OutputMatchesFreshGeneratorAfterReset)
+{
     constexpr SineGenerator::Params kParams{SineGenerator::kDefaultFrequency,
                                             SineGenerator::kDefaultAmplitude};
     SineGenerator gen_a{kParams};
@@ -19,7 +20,8 @@ TEST(SineGeneratorReset, OutputMatchesFreshGeneratorAfterReset) {
     EXPECT_EQ(gen_a.Exec(), gen_b.Exec());
 }
 
-TEST(OverlapperReset, OutputMatchesFreshInstanceAfterReset) {
+TEST(OverlapperReset, OutputMatchesFreshInstanceAfterReset)
+{
     constexpr float kSampleScale = 0.001F;
     Overlapper overlapper_a;
 
@@ -37,7 +39,8 @@ TEST(OverlapperReset, OutputMatchesFreshInstanceAfterReset) {
     EXPECT_EQ(overlapper_a.Exec(test_hop), overlapper_b.Exec(test_hop));
 }
 
-TEST(RectangleOverlapAdderReset, OutputMatchesFreshInstanceAfterReset) {
+TEST(RectangleOverlapAdderReset, OutputMatchesFreshInstanceAfterReset)
+{
     constexpr float kSampleScale = 0.001F;
     RectangleOverlapAdder adder_a;
 

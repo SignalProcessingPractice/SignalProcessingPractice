@@ -62,42 +62,53 @@ constexpr int kSineFrequencyDefault = 440;
 
 }  // namespace
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow(parent),
+      ui(new Ui::MainWindow)
+{
     ui->setupUi(this);
     SetupPipelineComboBoxes();
     SetupPlotWidgets();
     SetupFrameTick();
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     delete ui;
 }
 
-auto MainWindow::GetInferResultWidget() const -> QWidget* {
+auto MainWindow::GetInferResultWidget() const -> QWidget*
+{
     return ui->widgetInferResult;
 }
 
-void MainWindow::AttachPipelineObserver(PipelineSelectionObserver observer) {
+void MainWindow::AttachPipelineObserver(PipelineSelectionObserver observer)
+{
     pipeline_observers_.push_back(std::move(observer));
 }
 
-void MainWindow::AttachAcquireDeviceObserver(AcquireDeviceObserver observer) {
+void MainWindow::AttachAcquireDeviceObserver(AcquireDeviceObserver observer)
+{
     acquire_device_observers_.push_back(std::move(observer));
 }
 
-void MainWindow::AttachSineFrequencyObserver(SineFrequencyObserver observer) {
+void MainWindow::AttachSineFrequencyObserver(SineFrequencyObserver observer)
+{
     sine_frequency_observers_.push_back(std::move(observer));
 }
 
-void MainWindow::AttachFileSelectionObserver(FileSelectionObserver observer) {
+void MainWindow::AttachFileSelectionObserver(FileSelectionObserver observer)
+{
     file_selection_observers_.push_back(std::move(observer));
 }
 
-void MainWindow::AttachOutputDeviceObserver(OutputDeviceObserver observer) {
+void MainWindow::AttachOutputDeviceObserver(OutputDeviceObserver observer)
+{
     output_device_observers_.push_back(std::move(observer));
 }
 
-void MainWindow::ShowAcquireDeviceSelector(const std::vector<std::string>& device_names) {
+void MainWindow::ShowAcquireDeviceSelector(const std::vector<std::string>& device_names)
+{
     QComboBox* combo_box = ui->comboBoxAcquireDevice;
 
     // 選択肢の入れ替え中に不定な index で通知しないようシグナルを止め,
@@ -115,28 +126,34 @@ void MainWindow::ShowAcquireDeviceSelector(const std::vector<std::string>& devic
     }
 }
 
-void MainWindow::HideAcquireDeviceSelector() {
+void MainWindow::HideAcquireDeviceSelector()
+{
     ui->comboBoxAcquireDevice->hide();
 }
 
-void MainWindow::ShowSineFrequencySelector() {
+void MainWindow::ShowSineFrequencySelector()
+{
     ui->spinBoxSineFrequency->show();
     NotifySineFrequency(ui->spinBoxSineFrequency->value());
 }
 
-void MainWindow::HideSineFrequencySelector() {
+void MainWindow::HideSineFrequencySelector()
+{
     ui->spinBoxSineFrequency->hide();
 }
 
-void MainWindow::ShowFileSelector() {
+void MainWindow::ShowFileSelector()
+{
     ui->pushButtonAcquireFile->show();
 }
 
-void MainWindow::HideFileSelector() {
+void MainWindow::HideFileSelector()
+{
     ui->pushButtonAcquireFile->hide();
 }
 
-void MainWindow::ShowOutputDeviceSelector(const std::vector<std::string>& device_names) {
+void MainWindow::ShowOutputDeviceSelector(const std::vector<std::string>& device_names)
+{
     QComboBox* combo_box = ui->comboBoxOutputDevice;
 
     // 選択肢の入れ替え中に不定な index で通知しないようシグナルを止め,
@@ -154,23 +171,28 @@ void MainWindow::ShowOutputDeviceSelector(const std::vector<std::string>& device
     }
 }
 
-void MainWindow::HideOutputDeviceSelector() {
+void MainWindow::HideOutputDeviceSelector()
+{
     ui->comboBoxOutputDevice->hide();
 }
 
-void MainWindow::AttachFrameTickObserver(FrameTickObserver observer) {
+void MainWindow::AttachFrameTickObserver(FrameTickObserver observer)
+{
     frame_tick_observers_.push_back(std::move(observer));
 }
 
-void MainWindow::UpdateWaveform(std::span<const float> samples) {
+void MainWindow::UpdateWaveform(std::span<const float> samples)
+{
     waveform_plot_->SetSamples(samples);
 }
 
-void MainWindow::UpdateSpectrum(std::span<const float> values) {
+void MainWindow::UpdateSpectrum(std::span<const float> values)
+{
     spectrum_plot_->SetSamples(values);
 }
 
-void MainWindow::SetupPipelineComboBoxes() {
+void MainWindow::SetupPipelineComboBoxes()
+{
     const std::array<std::pair<PipelineStage, QComboBox*>, kPipelineStageCount> combo_boxes{{
             {PipelineStage::kAcquire, ui->comboBoxAcquire},
             {PipelineStage::kPreProcess, ui->comboBoxPreProcess},
@@ -239,7 +261,8 @@ namespace {
 ///
 /// 生成したオブジェクトの所有権は Qt の親子機構 (placeholder) へ移譲する.
 ///
-auto EmbedPlotWidget(QWidget* placeholder) -> PlotWidget* {
+auto EmbedPlotWidget(QWidget* placeholder) -> PlotWidget*
+{
     auto plot = std::make_unique<PlotWidget>();
     auto layout = std::make_unique<QVBoxLayout>();
     layout->setContentsMargins(0, 0, 0, 0);
@@ -252,7 +275,8 @@ auto EmbedPlotWidget(QWidget* placeholder) -> PlotWidget* {
 
 }  // namespace
 
-void MainWindow::SetupPlotWidgets() {
+void MainWindow::SetupPlotWidgets()
+{
     waveform_plot_ = EmbedPlotWidget(ui->widgetWaveform);
     waveform_plot_->SetAxes(
             {.min_value = 0.0F, .max_value = kHopDurationMs, .unit = QStringLiteral("ms")},
@@ -266,7 +290,8 @@ void MainWindow::SetupPlotWidgets() {
              .unit = QStringLiteral("dB")});
 }
 
-void MainWindow::SetupFrameTick() {
+void MainWindow::SetupFrameTick()
+{
     // 所有権は Qt の親子機構 (this) へ移譲する.
     auto frame_tick_timer = std::make_unique<QTimer>(this);
     connect(frame_tick_timer.get(), &QTimer::timeout, this, [this] {
@@ -276,37 +301,43 @@ void MainWindow::SetupFrameTick() {
     frame_tick_timer_ = frame_tick_timer.release();
 }
 
-void MainWindow::NotifyPipelineSelection(PipelineStage stage, int index) {
+void MainWindow::NotifyPipelineSelection(PipelineStage stage, int index)
+{
     for (const auto& observer : pipeline_observers_) {
         observer(stage, index);
     }
 }
 
-void MainWindow::NotifyAcquireDeviceSelection(int device_index) {
+void MainWindow::NotifyAcquireDeviceSelection(int device_index)
+{
     for (const auto& observer : acquire_device_observers_) {
         observer(device_index);
     }
 }
 
-void MainWindow::NotifySineFrequency(int frequency_hz) {
+void MainWindow::NotifySineFrequency(int frequency_hz)
+{
     for (const auto& observer : sine_frequency_observers_) {
         observer(frequency_hz);
     }
 }
 
-void MainWindow::NotifyFileSelection(const std::string& path) {
+void MainWindow::NotifyFileSelection(const std::string& path)
+{
     for (const auto& observer : file_selection_observers_) {
         observer(path);
     }
 }
 
-void MainWindow::NotifyOutputDeviceSelection(int device_index) {
+void MainWindow::NotifyOutputDeviceSelection(int device_index)
+{
     for (const auto& observer : output_device_observers_) {
         observer(device_index);
     }
 }
 
-void MainWindow::NotifyFrameTick() {
+void MainWindow::NotifyFrameTick()
+{
     for (const auto& observer : frame_tick_observers_) {
         observer();
     }

@@ -12,13 +12,17 @@
 
 class OutputCollector {
 public:
-    explicit OutputCollector(FrameSyncProcess::AudioHop* dest) : dest_(dest) {
+    explicit OutputCollector(FrameSyncProcess::AudioHop* dest)
+        : dest_(dest)
+    {
     }
 
-    auto Exec(const FrameSyncProcess::AudioHop& hop) -> void {
+    auto Exec(const FrameSyncProcess::AudioHop& hop) -> void
+    {
         *dest_ = hop;
     }
-    auto Reset() -> void {
+    auto Reset() -> void
+    {
         *dest_ = FrameSyncProcess::AudioHop{};
     }
 
@@ -26,7 +30,8 @@ private:
     FrameSyncProcess::AudioHop* dest_;
 };
 
-TEST(PipelineContextReset, OutputMatchesFreshPipelineAfterReset) {
+TEST(PipelineContextReset, OutputMatchesFreshPipelineAfterReset)
+{
     constexpr float kTolerance = 1e-5F;
     constexpr int kWarmupFrames = 3;
     constexpr int kCompareFrames = 2;

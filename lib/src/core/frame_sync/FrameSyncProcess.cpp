@@ -27,10 +27,13 @@ struct PendingSlot {
     PendingSlot() = default;
 
     PendingSlot(const PendingSlot& other) noexcept
-        : value_(other.value_), flag_(other.flag_.load(std::memory_order_relaxed)) {
+        : value_(other.value_),
+          flag_(other.flag_.load(std::memory_order_relaxed))
+    {
     }
 
-    auto operator=(const PendingSlot& other) noexcept -> PendingSlot& {
+    auto operator=(const PendingSlot& other) noexcept -> PendingSlot&
+    {
         if (this != &other) {
             value_ = other.value_;
             flag_.store(other.flag_.load(std::memory_order_relaxed), std::memory_order_relaxed);
@@ -42,13 +45,15 @@ struct PendingSlot {
     auto operator=(PendingSlot&&) -> PendingSlot& = delete;
     ~PendingSlot() = default;
 
-    auto set(Strategy strategy) -> void {
+    auto set(Strategy strategy) -> void
+    {
         value_ = std::move(strategy);
         flag_.store(true, std::memory_order_release);
     }
 
     template <typename Fn>
-    [[nodiscard]] auto consume(Fn&& func) -> bool {
+    [[nodiscard]] auto consume(Fn&& func) -> bool
+    {
         if (flag_.exchange(false, std::memory_order_acquire)) {
             std::forward<Fn>(func)(std::move(value_));
             return true;
@@ -73,7 +78,9 @@ static constexpr std::size_t kMaxObservers = 8;
 ///
 struct FrameSyncProcess::Impl {
 public:
-    explicit Impl(const FrameSyncProcessConfig& config) : pipeline_(config) {
+    explicit Impl(const FrameSyncProcessConfig& config)
+        : pipeline_(config)
+    {
     }
 
     Impl(const Impl& other) noexcept
@@ -93,10 +100,12 @@ public:
           pending_infer_(other.pending_infer_),
           pending_post_process_(other.pending_post_process_),
           pending_overlap_add_(other.pending_overlap_add_),
-          pending_output_(other.pending_output_) {
+          pending_output_(other.pending_output_)
+    {
     }
 
-    auto operator=(const Impl& other) noexcept -> Impl& {
+    auto operator=(const Impl& other) noexcept -> Impl&
+    {
         if (this != &other) {
             pipeline_ = other.pipeline_;
             result_buffer_ = other.result_buffer_;
@@ -125,66 +134,86 @@ public:
     auto operator=(Impl&&) -> Impl& = delete;
     ~Impl() = default;
 
-    [[nodiscard]] auto pipeline() -> PipelineContext& {
+    [[nodiscard]] auto pipeline() -> PipelineContext&
+    {
         return pipeline_;
     }
-    [[nodiscard]] auto seq() -> std::atomic<uint32_t>& {
+    [[nodiscard]] auto seq() -> std::atomic<uint32_t>&
+    {
         return seq_;
     }
-    [[nodiscard]] auto seq() const -> const std::atomic<uint32_t>& {
+    [[nodiscard]] auto seq() const -> const std::atomic<uint32_t>&
+    {
         return seq_;
     }
-    [[nodiscard]] auto result_buffer() -> PipelineResult& {
+    [[nodiscard]] auto result_buffer() -> PipelineResult&
+    {
         return result_buffer_;
     }
-    [[nodiscard]] auto result_buffer() const -> const PipelineResult& {
+    [[nodiscard]] auto result_buffer() const -> const PipelineResult&
+    {
         return result_buffer_;
     }
-    [[nodiscard]] auto observers() -> std::array<ProcessCompleteObserver, kMaxObservers>& {
+    [[nodiscard]] auto observers() -> std::array<ProcessCompleteObserver, kMaxObservers>&
+    {
         return observers_;
     }
-    [[nodiscard]] auto observer_count() -> std::size_t& {
+    [[nodiscard]] auto observer_count() -> std::size_t&
+    {
         return observer_count_;
     }
-    [[nodiscard]] auto observer_count() const -> std::size_t {
+    [[nodiscard]] auto observer_count() const -> std::size_t
+    {
         return observer_count_;
     }
 
-    [[nodiscard]] auto pending_observers() -> std::array<ProcessCompleteObserver, kMaxObservers>& {
+    [[nodiscard]] auto pending_observers() -> std::array<ProcessCompleteObserver, kMaxObservers>&
+    {
         return pending_observers_;
     }
-    [[nodiscard]] auto pending_observer_count() -> std::size_t& {
+    [[nodiscard]] auto pending_observer_count() -> std::size_t&
+    {
         return pending_observer_count_;
     }
-    [[nodiscard]] auto pending_observers_flag() -> std::atomic<bool>& {
+    [[nodiscard]] auto pending_observers_flag() -> std::atomic<bool>&
+    {
         return pending_observers_flag_;
     }
 
-    [[nodiscard]] auto pending_acquire() -> PendingSlot<AudioAcquireStrategy>& {
+    [[nodiscard]] auto pending_acquire() -> PendingSlot<AudioAcquireStrategy>&
+    {
         return pending_acquire_;
     }
-    [[nodiscard]] auto pending_pre_process() -> PendingSlot<PreProcessStrategy>& {
+    [[nodiscard]] auto pending_pre_process() -> PendingSlot<PreProcessStrategy>&
+    {
         return pending_pre_process_;
     }
-    [[nodiscard]] auto pending_overlap() -> PendingSlot<OverlapStrategy>& {
+    [[nodiscard]] auto pending_overlap() -> PendingSlot<OverlapStrategy>&
+    {
         return pending_overlap_;
     }
-    [[nodiscard]] auto pending_window() -> PendingSlot<WindowStrategy>& {
+    [[nodiscard]] auto pending_window() -> PendingSlot<WindowStrategy>&
+    {
         return pending_window_;
     }
-    [[nodiscard]] auto pending_fft() -> PendingSlot<FftStrategy>& {
+    [[nodiscard]] auto pending_fft() -> PendingSlot<FftStrategy>&
+    {
         return pending_fft_;
     }
-    [[nodiscard]] auto pending_infer() -> PendingSlot<InferStrategy>& {
+    [[nodiscard]] auto pending_infer() -> PendingSlot<InferStrategy>&
+    {
         return pending_infer_;
     }
-    [[nodiscard]] auto pending_post_process() -> PendingSlot<PostProcessStrategy>& {
+    [[nodiscard]] auto pending_post_process() -> PendingSlot<PostProcessStrategy>&
+    {
         return pending_post_process_;
     }
-    [[nodiscard]] auto pending_overlap_add() -> PendingSlot<OverlapAddStrategy>& {
+    [[nodiscard]] auto pending_overlap_add() -> PendingSlot<OverlapAddStrategy>&
+    {
         return pending_overlap_add_;
     }
-    [[nodiscard]] auto pending_output() -> PendingSlot<AudioOutputStrategy>& {
+    [[nodiscard]] auto pending_output() -> PendingSlot<AudioOutputStrategy>&
+    {
         return pending_output_;
     }
 
@@ -225,7 +254,8 @@ private:
 ///
 /// @brief サイズ・アラインメント検証.
 ///
-void FrameSyncProcess::CheckImpl() {
+void FrameSyncProcess::CheckImpl()
+{
     static_assert(sizeof(Impl) <= kImplSize, "Impl is too large for static storage");
 
     static_assert(alignof(Impl) <= kImplAlign, "Impl alignment exceeds storage");
@@ -234,11 +264,13 @@ void FrameSyncProcess::CheckImpl() {
 ///
 /// @brief Impl キャスト.
 ///
-auto FrameSyncProcess::ImplPtr() -> Impl* {
+auto FrameSyncProcess::ImplPtr() -> Impl*
+{
     return std::launder(std::bit_cast<Impl*>(storage_.data()));
 }
 
-auto FrameSyncProcess::ImplPtr() const -> const Impl* {
+auto FrameSyncProcess::ImplPtr() const -> const Impl*
+{
     return std::launder(std::bit_cast<const Impl*>(storage_.data()));
 }
 ///
@@ -249,24 +281,32 @@ auto FrameSyncProcess::ImplPtr() const -> const Impl* {
 /// @name コンストラクタ / デストラクタ.
 /// @{
 ///
-FrameSyncProcess::FrameSyncProcess() : storage_{} {
+FrameSyncProcess::FrameSyncProcess()
+    : storage_{}
+{
     // 全 StrategySlot が未バインドの状態を作らないよう, 既定 Config で構築する.
     std::construct_at(ImplPtr(), FrameSyncProcessConfig{});
 }
 
-FrameSyncProcess::FrameSyncProcess(const FrameSyncProcessConfig& config) : storage_{} {
+FrameSyncProcess::FrameSyncProcess(const FrameSyncProcessConfig& config)
+    : storage_{}
+{
     std::construct_at(ImplPtr(), config);
 }
 
-FrameSyncProcess::~FrameSyncProcess() {
+FrameSyncProcess::~FrameSyncProcess()
+{
     std::destroy_at(ImplPtr());
 }
 
-FrameSyncProcess::FrameSyncProcess(FrameSyncProcess&& other) noexcept : storage_{} {
+FrameSyncProcess::FrameSyncProcess(FrameSyncProcess&& other) noexcept
+    : storage_{}
+{
     std::construct_at(ImplPtr(), *other.ImplPtr());
 }
 
-auto FrameSyncProcess::operator=(FrameSyncProcess&& other) noexcept -> FrameSyncProcess& {
+auto FrameSyncProcess::operator=(FrameSyncProcess&& other) noexcept -> FrameSyncProcess&
+{
     if (this != &other) {
         std::destroy_at(ImplPtr());
         std::construct_at(ImplPtr(), *other.ImplPtr());
@@ -281,7 +321,8 @@ auto FrameSyncProcess::operator=(FrameSyncProcess&& other) noexcept -> FrameSync
 /// @name 公開 API.
 /// @{
 ///
-void FrameSyncProcess::Attach(ProcessCompleteObserver delegate) {
+void FrameSyncProcess::Attach(ProcessCompleteObserver delegate)
+{
     auto& impl = *ImplPtr();
     if (impl.pending_observer_count() < kMaxObservers) {
         impl.pending_observers().at(impl.pending_observer_count()) = delegate;
@@ -290,7 +331,8 @@ void FrameSyncProcess::Attach(ProcessCompleteObserver delegate) {
     }
 }
 
-void FrameSyncProcess::Detach(ProcessCompleteObserver delegate) {
+void FrameSyncProcess::Detach(ProcessCompleteObserver delegate)
+{
     auto& impl = *ImplPtr();
     const auto count = impl.pending_observer_count();
     for (std::size_t i = 0; i < count; ++i) {
@@ -306,7 +348,8 @@ void FrameSyncProcess::Detach(ProcessCompleteObserver delegate) {
     }
 }
 
-void FrameSyncProcess::GetResult(PipelineResult* out) const {
+void FrameSyncProcess::GetResult(PipelineResult* out) const
+{
     const auto& impl = *ImplPtr();
     while (true) {
         const auto seq1 = impl.seq().load(std::memory_order_seq_cst);
@@ -321,36 +364,45 @@ void FrameSyncProcess::GetResult(PipelineResult* out) const {
     }
 }
 
-void FrameSyncProcess::SetConfig([[maybe_unused]] AcquireTag tag, AudioAcquireStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] AcquireTag tag, AudioAcquireStrategy strategy)
+{
     ImplPtr()->pending_acquire().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] PreProcessTag tag, PreProcessStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] PreProcessTag tag, PreProcessStrategy strategy)
+{
     ImplPtr()->pending_pre_process().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] OverlapTag tag, OverlapStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] OverlapTag tag, OverlapStrategy strategy)
+{
     ImplPtr()->pending_overlap().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] WindowTag tag, WindowStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] WindowTag tag, WindowStrategy strategy)
+{
     ImplPtr()->pending_window().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] FftTag tag, FftStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] FftTag tag, FftStrategy strategy)
+{
     ImplPtr()->pending_fft().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] InferTag tag, InferStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] InferTag tag, InferStrategy strategy)
+{
     ImplPtr()->pending_infer().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] PostProcessTag tag,
-                                 PostProcessStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] PostProcessTag tag, PostProcessStrategy strategy)
+{
     ImplPtr()->pending_post_process().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] OverlapAddTag tag, OverlapAddStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] OverlapAddTag tag, OverlapAddStrategy strategy)
+{
     ImplPtr()->pending_overlap_add().set(std::move(strategy));
 }
-void FrameSyncProcess::SetConfig([[maybe_unused]] OutputTag tag, AudioOutputStrategy strategy) {
+void FrameSyncProcess::SetConfig([[maybe_unused]] OutputTag tag, AudioOutputStrategy strategy)
+{
     ImplPtr()->pending_output().set(std::move(strategy));
 }
 
-void FrameSyncProcess::ProcessFrame() {
+void FrameSyncProcess::ProcessFrame()
+{
     auto& impl = *ImplPtr();
 
     bool any_applied = false;
