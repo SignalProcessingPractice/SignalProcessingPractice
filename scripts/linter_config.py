@@ -1,5 +1,14 @@
 from pathlib import Path
 import subprocess
+import sys
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+
+if Path.cwd().resolve() != SCRIPT_DIR:
+    sys.exit(
+        f"Error: このスクリプトは scripts/ ディレクトリから実行してください。\n"
+        f"  cd {SCRIPT_DIR} && python3 {Path(sys.argv[0]).name}"
+    )
 
 BUILD_DIR = "../build/gtest-clang"
 
