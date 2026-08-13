@@ -131,7 +131,7 @@ public:
     ///
     /// ProcessFrame() 完了時の通知コールバック.
     ///
-    using ObserverDelegate = etl::delegate<void(const PipelineResult &)>;
+    using ProcessCompleteObserver = etl::delegate<void(const PipelineResult &)>;
     /// @}
 
     ///
@@ -157,12 +157,12 @@ public:
     ///
     /// Observer 登録.
     ///
-    void Attach(ObserverDelegate delegate);
+    void Attach(ProcessCompleteObserver delegate);
 
     ///
     /// Observer 解除.
     ///
-    void Detach(ObserverDelegate delegate);
+    void Detach(ProcessCompleteObserver delegate);
 
     ///
     /// 直近の信号処理結果をスナップショットとして取得する.

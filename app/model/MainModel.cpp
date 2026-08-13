@@ -18,8 +18,8 @@ MainModel::MainModel()
     process_.SetConfig(FrameSyncProcess::AcquireTag{},
                        FrameSyncProcess::AudioAcquireStrategy{&ring_buffer_acquire_});
     process_.Attach(
-            FrameSyncProcess::ObserverDelegate::create<MainModel, &MainModel::OnFrameProcessed>(
-                    *this));
+            FrameSyncProcess::ProcessCompleteObserver::create<MainModel,
+                                                              &MainModel::OnFrameProcessed>(*this));
 }
 
 MainModel::~MainModel() {

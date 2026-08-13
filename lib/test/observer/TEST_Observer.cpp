@@ -11,7 +11,7 @@
 #include "Strategies/SineGenerator.hpp"
 #include "Strategies/null_strategies.hpp"
 
-using ObserverDelegate = FrameSyncProcess::ObserverDelegate;
+using ProcessCompleteObserver = FrameSyncProcess::ProcessCompleteObserver;
 
 ///
 /// Observer の呼び出しカウントと最後に受け取った PipelineResult を記録するテスト用 Observer.
@@ -30,8 +30,8 @@ public:
         return last_result_;
     }
 
-    [[nodiscard]] auto as_delegate() -> ObserverDelegate {
-        return ObserverDelegate::create<ObserverSpy, &ObserverSpy::OnProcessFrame>(*this);
+    [[nodiscard]] auto as_delegate() -> ProcessCompleteObserver {
+        return ProcessCompleteObserver::create<ObserverSpy, &ObserverSpy::OnProcessFrame>(*this);
     }
 
 private:

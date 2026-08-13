@@ -140,7 +140,7 @@ public:
     [[nodiscard]] auto result_buffer() const -> const PipelineResult& {
         return result_buffer_;
     }
-    [[nodiscard]] auto observers() -> std::array<ObserverDelegate, kMaxObservers>& {
+    [[nodiscard]] auto observers() -> std::array<ProcessCompleteObserver, kMaxObservers>& {
         return observers_;
     }
     [[nodiscard]] auto observer_count() -> std::size_t& {
@@ -150,7 +150,7 @@ public:
         return observer_count_;
     }
 
-    [[nodiscard]] auto pending_observers() -> std::array<ObserverDelegate, kMaxObservers>& {
+    [[nodiscard]] auto pending_observers() -> std::array<ProcessCompleteObserver, kMaxObservers>& {
         return pending_observers_;
     }
     [[nodiscard]] auto pending_observer_count() -> std::size_t& {
@@ -192,7 +192,7 @@ private:
     PipelineContext pipeline_;
     PipelineResult result_buffer_;
     std::atomic<uint32_t> seq_{0};
-    std::array<ObserverDelegate, kMaxObservers> observers_{};
+    std::array<ProcessCompleteObserver, kMaxObservers> observers_{};
     std::size_t observer_count_{0};
 
     ///
@@ -200,7 +200,7 @@ private:
     ///
     /// Attach()/Detach() から書き込まれ, ProcessFrame() の先頭でフレーム境界に適用される.
     /// @{
-    std::array<ObserverDelegate, kMaxObservers> pending_observers_{};
+    std::array<ProcessCompleteObserver, kMaxObservers> pending_observers_{};
     std::size_t pending_observer_count_{0};
     std::atomic<bool> pending_observers_flag_{false};
     /// @}
@@ -281,7 +281,7 @@ auto FrameSyncProcess::operator=(FrameSyncProcess&& other) noexcept -> FrameSync
 /// @name 公開 API.
 /// @{
 ///
-void FrameSyncProcess::Attach(ObserverDelegate delegate) {
+void FrameSyncProcess::Attach(ProcessCompleteObserver delegate) {
     auto& impl = *ImplPtr();
     if (impl.pending_observer_count() < kMaxObservers) {
         impl.pending_observers().at(impl.pending_observer_count()) = delegate;
@@ -290,7 +290,7 @@ void FrameSyncProcess::Attach(ObserverDelegate delegate) {
     }
 }
 
-void FrameSyncProcess::Detach(ObserverDelegate delegate) {
+void FrameSyncProcess::Detach(ProcessCompleteObserver delegate) {
     auto& impl = *ImplPtr();
     const auto count = impl.pending_observer_count();
     for (std::size_t i = 0; i < count; ++i) {
@@ -298,7 +298,7 @@ void FrameSyncProcess::Detach(ObserverDelegate delegate) {
             for (std::size_t j = i; j < count - 1U; ++j) {
                 impl.pending_observers().at(j) = impl.pending_observers().at(j + 1U);
             }
-            impl.pending_observers().at(count - 1U) = ObserverDelegate{};
+            impl.pending_observers().at(count - 1U) = ProcessCompleteObserver{};
             --impl.pending_observer_count();
             impl.pending_observers_flag().store(true, std::memory_order_release);
             return;
