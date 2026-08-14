@@ -2,7 +2,7 @@
 /// @file FilePlayer.cpp
 ///
 
-#include "model/FilePlayer.h"
+#include "Strategies/FilePlayer.hpp"
 
 #include <array>
 #include <bit>
@@ -10,7 +10,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "common/AudioConfig.h"
+#include "AudioConfig.hpp"
 
 namespace {
 

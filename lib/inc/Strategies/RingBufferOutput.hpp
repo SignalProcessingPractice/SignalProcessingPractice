@@ -1,5 +1,5 @@
 ///
-/// @file RingBufferOutput.h
+/// @file RingBufferOutput.hpp
 ///
 #pragma once
 

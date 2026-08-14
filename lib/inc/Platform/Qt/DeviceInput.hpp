@@ -1,5 +1,5 @@
 ///
-/// @file DeviceInput.h
+/// @file DeviceInput.hpp
 ///
 #pragma once
 

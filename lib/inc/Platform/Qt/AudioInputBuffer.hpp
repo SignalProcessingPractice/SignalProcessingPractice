@@ -1,5 +1,5 @@
 ///
-/// @file AudioInputBuffer.h
+/// @file AudioInputBuffer.hpp
 ///
 #pragma once
 

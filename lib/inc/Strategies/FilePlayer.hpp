@@ -1,5 +1,5 @@
 ///
-/// @file FilePlayer.h
+/// @file FilePlayer.hpp
 ///
 #pragma once
 

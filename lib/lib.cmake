@@ -36,6 +36,23 @@ file(GLOB SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/platform/common/window/*.hpp
     )
 
+#
+# Qt に依存するプラットフォーム実装は, BUILD_APP=ON (Qt が find_package 済み) の
+# ときのみビルド対象に含める. gtest-clang 等の Qt を用いないビルドを壊さないため.
+#
+if(BUILD_APP)
+    file(GLOB QT_SRC_FILES
+        ${CMAKE_CURRENT_LIST_DIR}/src/platform/qt/acquire/*.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/platform/qt/acquire/*.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/platform/qt/output/*.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/platform/qt/output/*.hpp
+        # Q_OBJECT を含む公開ヘッダ (Platform/Qt/) は, AUTOMOC が確実に検出できるよう
+        # ターゲットの SOURCES として明示的に含める.
+        ${CMAKE_CURRENT_LIST_DIR}/inc/Platform/Qt/*.hpp
+        )
+    list(APPEND SRC_FILES ${QT_SRC_FILES})
+endif()
+
 include(FetchContent)
 
 #
@@ -76,10 +93,24 @@ add_library(SIGNAL_PROCESSING_PRACTICE_LIB
             STATIC 
             ${SRC_FILES})
 
-target_link_libraries(SIGNAL_PROCESSING_PRACTICE_LIB 
+target_link_libraries(SIGNAL_PROCESSING_PRACTICE_LIB
                       PUBLIC
                       etl::etl
                       CMSISDSP)
+
+#
+# Qt に依存するソースを含む場合のみ, Qt をリンクし AUTOMOC (Q_OBJECT の moc 処理) を有効にする.
+# app.cmake が先に include() されているため, find_package(Qt6 ...) 済みの
+# Qt6::* ターゲットをここで参照できる.
+#
+if(BUILD_APP)
+    target_link_libraries(SIGNAL_PROCESSING_PRACTICE_LIB
+                          PUBLIC
+                          Qt6::Core
+                          Qt6::Multimedia)
+
+    set_target_properties(SIGNAL_PROCESSING_PRACTICE_LIB PROPERTIES AUTOMOC ON)
+endif()
 
 #
 # Set the PUBLIC include path

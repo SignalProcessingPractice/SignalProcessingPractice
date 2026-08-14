@@ -1,5 +1,5 @@
 ///
-/// @file DeviceOutput.h
+/// @file DeviceOutput.hpp
 ///
 #pragma once
 

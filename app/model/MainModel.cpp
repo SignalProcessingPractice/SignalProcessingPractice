@@ -8,11 +8,11 @@
 #include <mutex>
 #include <utility>
 
+#include "AudioConfig.hpp"
 #include "FrameSyncProcessConfig.hpp"
 #include "PipelineResult.hpp"
-#include "common/AudioConfig.h"
-#include "model/DeviceInput.h"
-#include "model/DeviceOutput.h"
+#include "Platform/Qt/DeviceInput.hpp"
+#include "Platform/Qt/DeviceOutput.hpp"
 
 MainModel::MainModel()
     : device_input_(std::make_unique<DeviceInput>(&ring_buffer_acquire_)),

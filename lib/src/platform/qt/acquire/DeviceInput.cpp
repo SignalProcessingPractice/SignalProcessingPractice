@@ -2,7 +2,7 @@
 /// @file DeviceInput.cpp
 ///
 
-#include "model/DeviceInput.h"
+#include "Platform/Qt/DeviceInput.hpp"
 
 #include <bit>
 #include <cstddef>
@@ -14,7 +14,7 @@
 #include <QAudioDevice>
 #include <QMediaDevices>
 
-#include "common/AudioConfig.h"
+#include "AudioConfig.hpp"
 
 AudioPushDevice::AudioPushDevice(RingBufferAcquire* ring_buffer_acquire)
     : ring_buffer_acquire_(ring_buffer_acquire)

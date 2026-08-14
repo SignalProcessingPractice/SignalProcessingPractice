@@ -1,5 +1,5 @@
 ///
-/// @file AudioConfig.h
+/// @file AudioConfig.hpp
 ///
 #pragma once
 
