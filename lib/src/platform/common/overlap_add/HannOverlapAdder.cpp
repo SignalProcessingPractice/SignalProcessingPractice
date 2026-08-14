@@ -1,13 +1,13 @@
 ///
 /// @file HannOverlapAdder.cpp
 ///
-#include "Strategies/HannOverlapAdder.hpp"
+#include "common/Strategies/HannOverlapAdder.hpp"
 
 #include <algorithm>
 #include <iterator>
 
-#include "FrameSyncProcess.hpp"
 #include "arm_math.h"
+#include "common/FrameSyncProcess.hpp"
 
 HannOverlapAdder::HannOverlapAdder()
 {

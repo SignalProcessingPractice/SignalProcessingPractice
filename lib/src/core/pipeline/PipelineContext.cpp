@@ -6,9 +6,9 @@
 
 #include <utility>
 
-#include "FrameSyncProcess.hpp"
-#include "FrameSyncProcessConfig.hpp"
-#include "PipelineResult.hpp"
+#include "common/FrameSyncProcess.hpp"
+#include "common/FrameSyncProcessConfig.hpp"
+#include "common/PipelineResult.hpp"
 
 PipelineContext::PipelineContext(const FrameSyncProcessConfig& config)
     : audio_acquire_strategy_(config.audio_acquire_strategy),

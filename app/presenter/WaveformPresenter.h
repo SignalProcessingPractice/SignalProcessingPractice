@@ -6,7 +6,7 @@
 #include <functional>
 #include <span>
 
-#include "PipelineResult.hpp"
+#include "common/PipelineResult.hpp"
 
 class MainModel;
 

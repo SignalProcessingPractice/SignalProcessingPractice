@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "FrameSyncProcess.hpp"
-#include "Strategies/Overlapper.hpp"
-#include "Strategies/RectangleOverlapAdder.hpp"
-#include "Strategies/SineGenerator.hpp"
+#include "common/FrameSyncProcess.hpp"
+#include "common/Strategies/Overlapper.hpp"
+#include "common/Strategies/RectangleOverlapAdder.hpp"
+#include "common/Strategies/SineGenerator.hpp"
 
 TEST(SineGeneratorReset, OutputMatchesFreshGeneratorAfterReset)
 {

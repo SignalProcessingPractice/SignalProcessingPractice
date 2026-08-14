@@ -3,7 +3,7 @@
 ///
 #pragma once
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 class Overlapper {
 public:

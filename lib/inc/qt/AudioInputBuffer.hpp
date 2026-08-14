@@ -10,7 +10,7 @@
 
 #include <etl/queue_spsc_atomic.h>
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 ///
 /// @brief 入力サンプルを受け渡す SPSC リングバッファ.

@@ -1,12 +1,12 @@
 ///
 /// @file RectangleOverlapAdder.cpp
 ///
-#include "Strategies/RectangleOverlapAdder.hpp"
+#include "common/Strategies/RectangleOverlapAdder.hpp"
 
 #include <algorithm>
 #include <iterator>
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 ///
 /// @todo 加算時の係数は, コンストラクタで設定可能にする.

@@ -1,7 +1,7 @@
 ///
 /// @file FFT.cpp
 ///
-#include "Strategies/FFT.hpp"
+#include "common/Strategies/FFT.hpp"
 
 #include "arm_math.h"
 

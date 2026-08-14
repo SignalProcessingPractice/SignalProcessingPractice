@@ -1,7 +1,7 @@
 ///
 /// @file SineGenerator.cpp
 ///
-#include "Strategies/SineGenerator.hpp"
+#include "common/Strategies/SineGenerator.hpp"
 
 #include <cmath>
 #include <numbers>

@@ -11,7 +11,7 @@
 #include <span>
 #include <stop_token>
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 ///
 /// @brief リングバッファの実体が満たすべき Concept.

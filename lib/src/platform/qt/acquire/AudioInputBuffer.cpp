@@ -2,11 +2,11 @@
 /// @file AudioInputBuffer.cpp
 ///
 
-#include "Platform/Qt/AudioInputBuffer.hpp"
+#include "qt/AudioInputBuffer.hpp"
 
 #include <utility>
 
-#include "AudioConfig.hpp"
+#include "common/AudioConfig.hpp"
 
 auto AudioInputBuffer::Push(std::span<const float> samples) -> bool
 {

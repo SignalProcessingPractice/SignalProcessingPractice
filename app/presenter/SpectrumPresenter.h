@@ -8,8 +8,8 @@
 #include <functional>
 #include <span>
 
-#include "FrameSyncProcess.hpp"
-#include "PipelineResult.hpp"
+#include "common/FrameSyncProcess.hpp"
+#include "common/PipelineResult.hpp"
 
 class MainModel;
 

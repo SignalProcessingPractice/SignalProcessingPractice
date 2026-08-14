@@ -46,9 +46,9 @@ if(BUILD_APP)
         ${CMAKE_CURRENT_LIST_DIR}/src/platform/qt/acquire/*.hpp
         ${CMAKE_CURRENT_LIST_DIR}/src/platform/qt/output/*.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/platform/qt/output/*.hpp
-        # Q_OBJECT を含む公開ヘッダ (Platform/Qt/) は, AUTOMOC が確実に検出できるよう
+        # Q_OBJECT を含む公開ヘッダ (inc/qt/) は, AUTOMOC が確実に検出できるよう
         # ターゲットの SOURCES として明示的に含める.
-        ${CMAKE_CURRENT_LIST_DIR}/inc/Platform/Qt/*.hpp
+        ${CMAKE_CURRENT_LIST_DIR}/inc/qt/*.hpp
         )
     list(APPEND SRC_FILES ${QT_SRC_FILES})
 endif()

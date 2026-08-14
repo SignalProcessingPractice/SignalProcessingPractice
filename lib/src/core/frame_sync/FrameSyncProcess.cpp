@@ -1,7 +1,7 @@
 ///
 /// @file FrameSyncProcess.cpp
 ///
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 #include <array>
 #include <atomic>
@@ -13,8 +13,8 @@
 #include <utility>
 
 #include "../pipeline/PipelineContext.hpp"
-#include "FrameSyncProcessConfig.hpp"
-#include "PipelineResult.hpp"
+#include "common/FrameSyncProcessConfig.hpp"
+#include "common/PipelineResult.hpp"
 
 ///
 /// @brief Strategy のペンディングスロット.

@@ -3,8 +3,8 @@
 ///
 #pragma once
 
-#include "FrameSyncProcess.hpp"
 #include "arm_math.h"
+#include "common/FrameSyncProcess.hpp"
 
 class IFFT {
 public:

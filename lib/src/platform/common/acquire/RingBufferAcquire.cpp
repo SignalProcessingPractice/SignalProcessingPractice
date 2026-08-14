@@ -1,7 +1,7 @@
 ///
 /// @file RingBufferAcquire.cpp
 ///
-#include "Strategies/RingBufferAcquire.hpp"
+#include "common/Strategies/RingBufferAcquire.hpp"
 
 auto RingBufferAcquire::Exec() -> FrameSyncProcess::AudioHop
 {

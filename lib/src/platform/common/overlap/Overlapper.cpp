@@ -1,11 +1,11 @@
 ///
 /// @file Overlapper.cpp
 ///
-#include "Strategies/Overlapper.hpp"
+#include "common/Strategies/Overlapper.hpp"
 
 #include <iterator>
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 ///
 /// @brief オーバーラッピング処理.

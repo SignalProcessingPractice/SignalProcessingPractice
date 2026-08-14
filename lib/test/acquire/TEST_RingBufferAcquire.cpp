@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "Strategies/RingBufferAcquire.hpp"
+#include "common/Strategies/RingBufferAcquire.hpp"
 
 namespace {
 

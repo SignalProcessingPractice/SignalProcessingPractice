@@ -1,14 +1,14 @@
 ///
 /// @file FrameSyncProcessConfig.cpp
 ///
-#include "FrameSyncProcessConfig.hpp"
+#include "common/FrameSyncProcessConfig.hpp"
 
-#include "Strategies/FFT.hpp"
-#include "Strategies/IFFT.hpp"
-#include "Strategies/Overlapper.hpp"
-#include "Strategies/RectangleOverlapAdder.hpp"
-#include "Strategies/RectangleWindow.hpp"
-#include "Strategies/null_strategies.hpp"
+#include "common/Strategies/FFT.hpp"
+#include "common/Strategies/IFFT.hpp"
+#include "common/Strategies/Overlapper.hpp"
+#include "common/Strategies/RectangleOverlapAdder.hpp"
+#include "common/Strategies/RectangleWindow.hpp"
+#include "common/Strategies/null_strategies.hpp"
 
 auto get_default_null_input_strategy() -> FrameSyncProcess::AudioAcquireStrategy
 {

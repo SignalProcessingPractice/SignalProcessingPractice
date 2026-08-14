@@ -1,7 +1,7 @@
 ///
 /// @file HannWindow.cpp
 ///
-#include "Strategies/HannWindow.hpp"
+#include "common/Strategies/HannWindow.hpp"
 
 #include "arm_math.h"
 

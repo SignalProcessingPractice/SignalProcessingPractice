@@ -11,7 +11,7 @@
 #include <QAudioSource>
 #include <QIODevice>
 
-#include "Strategies/RingBufferAcquire.hpp"
+#include "common/Strategies/RingBufferAcquire.hpp"
 
 ///
 /// @brief QAudioSource (push モード) の書き込み先として RingBufferAcquire へ転送する QIODevice.

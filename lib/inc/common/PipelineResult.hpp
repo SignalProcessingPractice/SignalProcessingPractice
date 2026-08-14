@@ -3,7 +3,7 @@
 ///
 #pragma once
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 ///
 /// @brief 1 フレーム分の信号処理結果.

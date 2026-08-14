@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "StrategySlot.hpp"
+#include "common/StrategySlot.hpp"
 
 class ResetSpy {
 public:

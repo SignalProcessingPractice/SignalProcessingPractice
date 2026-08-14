@@ -3,7 +3,7 @@
 ///
 #pragma once
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 ///
 /// @brief ハニング窓を使用した Overlap-Add.

@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 
-#include "FrameSyncProcessConfig.hpp"
 #include "PipelineContext.hpp"
-#include "Strategies/FFT.hpp"
-#include "Strategies/IFFT.hpp"
-#include "Strategies/Overlapper.hpp"
-#include "Strategies/RectangleOverlapAdder.hpp"
-#include "Strategies/RectangleWindow.hpp"
-#include "Strategies/SineGenerator.hpp"
-#include "Strategies/null_strategies.hpp"
+#include "common/FrameSyncProcessConfig.hpp"
+#include "common/Strategies/FFT.hpp"
+#include "common/Strategies/IFFT.hpp"
+#include "common/Strategies/Overlapper.hpp"
+#include "common/Strategies/RectangleOverlapAdder.hpp"
+#include "common/Strategies/RectangleWindow.hpp"
+#include "common/Strategies/SineGenerator.hpp"
+#include "common/Strategies/null_strategies.hpp"
 
 class OutputCollector {
 public:

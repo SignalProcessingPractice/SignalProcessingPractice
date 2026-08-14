@@ -6,7 +6,7 @@
 #include <chrono>
 #include <cstdint>
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 ///
 /// アプリケーションのサンプルレート.

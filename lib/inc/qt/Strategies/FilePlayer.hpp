@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 ///
 /// @brief WAV ファイルを読み込み, ホップ単位で供給する Producer 用データソース.

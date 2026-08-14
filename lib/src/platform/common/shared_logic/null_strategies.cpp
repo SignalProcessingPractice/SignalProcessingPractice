@@ -1,9 +1,9 @@
 ///
 /// @file null_strategies.cpp
 ///
-#include "Strategies/null_strategies.hpp"
+#include "common/Strategies/null_strategies.hpp"
 
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 auto NullInput::Exec() -> FrameSyncProcess::AudioHop
 {

@@ -12,16 +12,16 @@
 #include <thread>
 #include <vector>
 
-#include "FrameSyncProcess.hpp"
-#include "Platform/Qt/AudioInputBuffer.hpp"
-#include "Platform/Qt/AudioOutputBuffer.hpp"
-#include "Strategies/FilePlayer.hpp"
-#include "Strategies/HannOverlapAdder.hpp"
-#include "Strategies/HannWindow.hpp"
-#include "Strategies/RingBufferAcquire.hpp"
-#include "Strategies/RingBufferOutput.hpp"
-#include "Strategies/SineGenerator.hpp"
+#include "common/FrameSyncProcess.hpp"
 #include "common/PipelineSelection.h"
+#include "common/Strategies/HannOverlapAdder.hpp"
+#include "common/Strategies/HannWindow.hpp"
+#include "common/Strategies/RingBufferAcquire.hpp"
+#include "common/Strategies/RingBufferOutput.hpp"
+#include "common/Strategies/SineGenerator.hpp"
+#include "qt/AudioInputBuffer.hpp"
+#include "qt/AudioOutputBuffer.hpp"
+#include "qt/Strategies/FilePlayer.hpp"
 
 struct PipelineResult;
 class DeviceInput;

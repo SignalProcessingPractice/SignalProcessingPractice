@@ -7,8 +7,8 @@
 
 #include <etl/delegate.h>
 
-#include "AudioFrame.hpp"
-#include "StrategySlot.hpp"
+#include "common/AudioFrame.hpp"
+#include "common/StrategySlot.hpp"
 
 ///
 /// 前方宣言.

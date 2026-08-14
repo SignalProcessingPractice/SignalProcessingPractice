@@ -16,7 +16,7 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include "AudioConfig.hpp"
+#include "common/AudioConfig.hpp"
 #include "ui_MainWindow.h"
 #include "view/PlotWidget.h"
 

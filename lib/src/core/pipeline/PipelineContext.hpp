@@ -1,7 +1,7 @@
 ///
 /// @file PipelineContext.hpp
 ///
-#include "FrameSyncProcess.hpp"
+#include "common/FrameSyncProcess.hpp"
 
 struct PipelineResult;
 

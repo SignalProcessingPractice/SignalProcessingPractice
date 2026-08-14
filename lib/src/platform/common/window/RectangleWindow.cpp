@@ -1,7 +1,7 @@
 ///
 /// @file RectangleWindow.cpp
 ///
-#include "Strategies/RectangleWindow.hpp"
+#include "common/Strategies/RectangleWindow.hpp"
 
 RectangleWindow::RectangleWindow() = default;
 

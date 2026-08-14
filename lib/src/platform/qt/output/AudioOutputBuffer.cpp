@@ -2,7 +2,7 @@
 /// @file AudioOutputBuffer.cpp
 ///
 
-#include "Platform/Qt/AudioOutputBuffer.hpp"
+#include "qt/AudioOutputBuffer.hpp"
 
 auto AudioOutputBuffer::Push(std::span<const float> samples) -> bool
 {

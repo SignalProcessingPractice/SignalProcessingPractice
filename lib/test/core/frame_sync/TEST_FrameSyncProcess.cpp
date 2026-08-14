@@ -6,14 +6,14 @@
 
 #include <gtest/gtest.h>
 
-#include "FrameSyncProcess.hpp"
-#include "FrameSyncProcessConfig.hpp"
-#include "PipelineResult.hpp"
-#include "Strategies/HannWindow.hpp"
-#include "Strategies/Overlapper.hpp"
-#include "Strategies/RectangleOverlapAdder.hpp"
-#include "Strategies/SineGenerator.hpp"
-#include "Strategies/null_strategies.hpp"
+#include "common/FrameSyncProcess.hpp"
+#include "common/FrameSyncProcessConfig.hpp"
+#include "common/PipelineResult.hpp"
+#include "common/Strategies/HannWindow.hpp"
+#include "common/Strategies/Overlapper.hpp"
+#include "common/Strategies/RectangleOverlapAdder.hpp"
+#include "common/Strategies/SineGenerator.hpp"
+#include "common/Strategies/null_strategies.hpp"
 
 ///
 /// デフォルト構築では既定 Strategy 構成がバインドされ, ProcessFrame() が

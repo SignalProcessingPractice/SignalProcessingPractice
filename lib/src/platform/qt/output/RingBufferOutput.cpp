@@ -2,11 +2,11 @@
 /// @file RingBufferOutput.cpp
 ///
 
-#include "Strategies/RingBufferOutput.hpp"
+#include "common/Strategies/RingBufferOutput.hpp"
 
 #include <span>
 
-#include "Platform/Qt/AudioOutputBuffer.hpp"
+#include "qt/AudioOutputBuffer.hpp"
 
 RingBufferOutput::RingBufferOutput(AudioOutputBuffer* buffer)
     : buffer_(buffer)
