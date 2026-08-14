@@ -6,6 +6,7 @@
 #include <atomic>
 #include <cstdint>
 #include <memory>
+#include <mutex>
 #include <stop_token>
 #include <string>
 #include <thread>
@@ -14,13 +15,12 @@
 #include "FrameSyncProcess.hpp"
 #include "Strategies/HannOverlapAdder.hpp"
 #include "Strategies/HannWindow.hpp"
+#include "Strategies/RingBufferAcquire.hpp"
 #include "Strategies/SineGenerator.hpp"
 #include "common/PipelineSelection.h"
 #include "model/AudioInputBuffer.h"
 #include "model/AudioOutputBuffer.h"
 #include "model/FilePlayer.h"
-#include "model/InputSource.h"
-#include "model/RingBufferAcquire.h"
 #include "model/RingBufferOutput.h"
 
 struct PipelineResult;
@@ -30,8 +30,9 @@ class DeviceOutput;
 ///
 /// @brief MVP の Model 層.
 ///
-/// FrameSyncProcess と入力系 (Producer / リングバッファ) を所有し,
-/// 「1 ホップ分溜まったら ProcessFrame() を実行する」処理スレッドを管理する.
+/// FrameSyncProcess と入力系 (AudioAcquireStrategy の実体 / Device 用リングバッファ) を
+/// 所有し, 処理スレッドを管理する. Null / Sine / File は一定周期で, Device は
+/// リングバッファへのデータ到着を待って ProcessFrame() を実行する.
 ///
 class MainModel {
 public:
@@ -44,12 +45,12 @@ public:
     auto operator=(MainModel&&) -> MainModel& = delete;
 
     ///
-    /// Producer / 処理スレッドを起動する.
+    /// 処理スレッドを起動する.
     ///
     void Start();
 
     ///
-    /// Producer / 処理スレッドを停止する (join 完了まで待機).
+    /// 処理スレッドを停止する (join 完了まで待機).
     ///
     void Stop();
 
@@ -57,7 +58,7 @@ public:
     /// ComboBox の選択 (stage, index) に対応する Strategy を FrameSyncProcess へ設定する.
     ///
     /// index は GetStrategyNames(stage) の並びに対応する.
-    /// kAcquire は Acquire Strategy ではなく Producer (InputSource / DeviceInput) を切り替える.
+    /// kAcquire も他の段と同様に AudioAcquireStrategy そのものを切り替える.
     /// "Device" 選択時はキャプチャを開始せず, ApplyDeviceSelection() を待つ.
     ///
     void ApplyStrategySelection(PipelineStage stage, int index);
@@ -77,14 +78,14 @@ public:
     ///
     /// サイン波生成の周波数を設定する.
     ///
-    /// Producer スレッドと排他して SineGenerator を更新する (スレッドセーフ).
+    /// 処理スレッドの Exec() 呼び出しと排他して SineGenerator を更新する (スレッドセーフ).
     ///
     void ApplySineFrequency(int frequency_hz);
 
     ///
     /// 音声ファイル (WAV) を読み込む.
     ///
-    /// Producer スレッドと排他して FilePlayer を更新する (スレッドセーフ).
+    /// 処理スレッドの Exec() 呼び出しと排他して FilePlayer を更新する (スレッドセーフ).
     /// 読み込み失敗時は既存データ (未ロードなら無音) を維持する.
     ///
     void ApplyFileSelection(const std::string& path);
@@ -125,31 +126,36 @@ private:
     FrameSyncProcess process_;
 
     ///
-    /// @name 入力系 (Producer → リングバッファ → Acquire Strategy).
+    /// @name 入力系 (Device 選択時のみ使用する非同期経路).
     ///
-    /// Producer (InputSource / DeviceInput) は常にどちらか一方のみ動作させる.
+    /// Producer (DeviceInput) から Push() できるのは RingBufferAcquire の
+    /// 公開関数のみであり, AudioInputBuffer を直接参照するのは
+    /// RingBufferAcquire の内部実装だけである.
     /// {@
     AudioInputBuffer input_buffer_;
     RingBufferAcquire ring_buffer_acquire_{&input_buffer_};
-    InputSource input_source_{&input_buffer_};
     std::unique_ptr<DeviceInput> device_input_;
     /// @}
 
     ///
     /// @name 代替 Strategy の実体.
     ///
-    /// StrategySlot は非所有ポインタを bind するため, 実体は MainModel が所有する.
-    /// 既定 (index 0) の Strategy は FrameSyncProcessConfig の static 実体を再利用する.
+    /// StrategySlot / RingBufferAcquire は非所有ポインタを bind するため,
+    /// 実体は MainModel が所有する. Null / Sine / File / Device のいずれも,
+    /// ApplyStrategySelection() で対応する AudioAcquireStrategy を
+    /// FrameSyncProcess へ直接 bind することで切り替える.
+    /// 既定 (index 0 = Null) の Strategy は FrameSyncProcessConfig の
+    /// static 実体を再利用する.
     /// {@
     SineGenerator sine_generator_;
     HannWindow hann_window_;
     HannOverlapAdder hann_overlap_adder_;
-    /// @}
 
     ///
-    /// 音声ファイル入力のデータソース.
+    /// 音声ファイル入力のデータソース (AudioAcquireStrategy として直接 bind する).
     ///
     FilePlayer file_player_;
+    /// @}
 
     ///
     /// @name 出力系 (Output Strategy → リングバッファ → 出力デバイス).
@@ -164,9 +170,29 @@ private:
     std::atomic<std::uint64_t> processed_frame_count_{0};
 
     ///
-    /// 入力が "Device" 選択中かどうか (ApplyDeviceSelection() の有効判定に使用).
+    /// @name 入力切り替え / 排他制御.
+    ///
+    /// acquire_mutex_ は, ProcessFrame() (SineGenerator / FilePlayer の Exec()) と
+    /// ApplySineFrequency() / ApplyFileSelection() による状態変更, および
+    /// device_mode_ / device_wait_stop_source_ への読み書きを排他する.
+    /// {@
+    std::mutex acquire_mutex_;
+
+    ///
+    /// 入力が "Device" 選択中かどうか (ApplyDeviceSelection() の有効判定と
+    /// RunProcessing() の待機方式の切り替えに使用).
     ///
     bool device_mode_{false};
+
+    ///
+    /// Device モード中の RingBufferAcquire::WaitForHop() を, 入力切り替え時に
+    /// 即座に解除するための stop_source.
+    ///
+    /// Device モードへ切り替えるたびに新しい実体へ差し替える
+    /// (stop_source は一度 request_stop() すると再利用できないため).
+    ///
+    std::stop_source device_wait_stop_source_;
+    /// @}
 
     ///
     /// 出力が "Device" 選択中かどうか (ApplyOutputDeviceSelection() の有効判定に使用).

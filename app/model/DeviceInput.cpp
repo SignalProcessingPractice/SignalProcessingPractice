@@ -15,10 +15,9 @@
 #include <QMediaDevices>
 
 #include "common/AudioConfig.h"
-#include "model/AudioInputBuffer.h"
 
-AudioPushDevice::AudioPushDevice(AudioInputBuffer* buffer)
-    : buffer_(buffer)
+AudioPushDevice::AudioPushDevice(RingBufferAcquire* ring_buffer_acquire)
+    : ring_buffer_acquire_(ring_buffer_acquire)
 {
 }
 
@@ -38,7 +37,8 @@ auto AudioPushDevice::writeData(const char* data, qint64 size) -> qint64
 {
     if (sample_format_ == QAudioFormat::Float) {
         const auto count = static_cast<std::size_t>(size) / sizeof(float);
-        buffer_->Push(std::span<const float>{std::bit_cast<const float*>(data), count});
+        ring_buffer_acquire_->Push(
+                std::span<const float>{std::bit_cast<const float*>(data), count});
     } else {
         // Int16 → float へ変換して転送する.
         const auto count = static_cast<std::size_t>(size) / sizeof(std::int16_t);
@@ -49,15 +49,16 @@ auto AudioPushDevice::writeData(const char* data, qint64 size) -> qint64
         for (std::size_t i = 0; i < count; ++i) {
             convert_buffer_[i] = static_cast<float>(source[i]) * kInt16Scale;
         }
-        buffer_->Push(std::span<const float>{convert_buffer_.data(), convert_buffer_.size()});
+        ring_buffer_acquire_->Push(
+                std::span<const float>{convert_buffer_.data(), convert_buffer_.size()});
     }
 
     // バッファ満杯時は破棄する方針のため, 常に全量を消費したものとして扱う.
     return size;
 }
 
-DeviceInput::DeviceInput(AudioInputBuffer* buffer)
-    : push_device_(buffer)
+DeviceInput::DeviceInput(RingBufferAcquire* ring_buffer_acquire)
+    : push_device_(ring_buffer_acquire)
 {
 }
 

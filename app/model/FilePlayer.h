@@ -28,14 +28,16 @@ public:
     ///
     /// 読み出し位置を先頭へ戻す.
     ///
-    void Rewind();
+    /// AudioAcquireStrategy としての Reset() を兼ねる.
+    ///
+    void Reset();
 
     ///
     /// 現在位置から 1 ホップ分を返し, 位置を進める (末尾でループ).
     ///
-    /// 未ロード時は無音を返す.
+    /// 未ロード時は無音を返す. AudioAcquireStrategy としての Exec() を兼ねる.
     ///
-    auto NextHop() -> FrameSyncProcess::AudioHop;
+    auto Exec() -> FrameSyncProcess::AudioHop;
 
 private:
     ///

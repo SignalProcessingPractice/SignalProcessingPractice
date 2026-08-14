@@ -11,19 +11,19 @@
 #include <QAudioSource>
 #include <QIODevice>
 
-class AudioInputBuffer;
+#include "Strategies/RingBufferAcquire.hpp"
 
 ///
-/// @brief QAudioSource (push モード) の書き込み先として AudioInputBuffer へ転送する QIODevice.
+/// @brief QAudioSource (push モード) の書き込み先として RingBufferAcquire へ転送する QIODevice.
 ///
-/// writeData() で受信したサンプルを float へ変換し, AudioInputBuffer::Push() する.
+/// writeData() で受信したサンプルを float へ変換し, RingBufferAcquire::Push() する.
 /// push モードを使用することで, シグナル (readyRead) の購読なしにデータを受け取る.
 ///
 class AudioPushDevice : public QIODevice {
     Q_OBJECT
 
 public:
-    explicit AudioPushDevice(AudioInputBuffer* buffer);
+    explicit AudioPushDevice(RingBufferAcquire* ring_buffer_acquire);
 
     ///
     /// 受信データのサンプルフォーマットを設定する (Float / Int16 のみ対応).
@@ -35,7 +35,7 @@ protected:
     auto writeData(const char* data, qint64 size) -> qint64 override;
 
 private:
-    AudioInputBuffer* buffer_;
+    RingBufferAcquire* ring_buffer_acquire_;
     QAudioFormat::SampleFormat sample_format_{QAudioFormat::Float};
 
     ///
@@ -48,12 +48,12 @@ private:
 /// @brief デフォルト入力デバイスからの音声キャプチャ (Producer).
 ///
 /// Qt Multimedia (QAudioSource) を使用する. Qt イベントループ上で動作するため,
-/// AudioInputBuffer への Push はメインスレッドから行われる.
-/// InputSource とは排他的に動作させること (SPSC の Producer は常に 1 つ).
+/// RingBufferAcquire::Push() はメインスレッドから行われる.
+/// RingBufferAcquire::Push() を呼ぶ Producer は常に DeviceInput のみとすること (SPSC).
 ///
 class DeviceInput {
 public:
-    explicit DeviceInput(AudioInputBuffer* buffer);
+    explicit DeviceInput(RingBufferAcquire* ring_buffer_acquire);
     ~DeviceInput();
 
     DeviceInput(const DeviceInput&) = delete;

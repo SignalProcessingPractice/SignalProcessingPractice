@@ -27,5 +27,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/slot/TEST_StrategySlot.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/strategies/TEST_Reset.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/pipeline/TEST_PipelineContext.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/observer/TEST_Observer.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/acquire/TEST_RingBufferAcquire.cmake)
 
 enable_testing()

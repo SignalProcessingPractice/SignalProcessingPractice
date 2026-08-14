@@ -15,8 +15,8 @@
 ///
 /// @brief 入力サンプルを受け渡す SPSC リングバッファ.
 ///
-/// Producer (InputSource または将来のデバイスコールバック) と
-/// Consumer (処理スレッド) の 1:1 接続を前提とする.
+/// Producer (DeviceInput のコールバック) と Consumer (処理スレッド) の
+/// 1:1 接続を前提とする. RingBufferAcquire を介してのみアクセスされる.
 ///
 class AudioInputBuffer {
 public:

@@ -4,6 +4,10 @@
 
 #include "model/MainModel.h"
 
+#include <chrono>
+#include <mutex>
+#include <utility>
+
 #include "FrameSyncProcessConfig.hpp"
 #include "PipelineResult.hpp"
 #include "common/AudioConfig.h"
@@ -11,13 +15,12 @@
 #include "model/DeviceOutput.h"
 
 MainModel::MainModel()
-    : device_input_(std::make_unique<DeviceInput>(&input_buffer_)),
+    : device_input_(std::make_unique<DeviceInput>(&ring_buffer_acquire_)),
       sine_generator_({.frequency = SineGenerator::kDefaultFrequency,
                        .amplitude = SineGenerator::kDefaultAmplitude}),
       device_output_(std::make_unique<DeviceOutput>(&output_buffer_))
 {
-    process_.SetConfig(FrameSyncProcess::AcquireTag{},
-                       FrameSyncProcess::AudioAcquireStrategy{&ring_buffer_acquire_});
+    process_.SetConfig(FrameSyncProcess::AcquireTag{}, get_default_null_input_strategy());
     process_.Attach(
             FrameSyncProcess::ProcessCompleteObserver::create<MainModel,
                                                               &MainModel::OnFrameProcessed>(*this));
@@ -33,7 +36,6 @@ void MainModel::Start()
     if (processing_thread_.joinable()) {
         return;
     }
-    input_source_.Start();
     processing_thread_ = std::jthread{[this](const std::stop_token& stop_token) {
         RunProcessing(stop_token);
     }};
@@ -43,7 +45,10 @@ void MainModel::Stop()
 {
     device_output_->Stop();
     device_input_->Stop();
-    input_source_.Stop();
+    {
+        const std::lock_guard<std::mutex> guard{acquire_mutex_};
+        device_wait_stop_source_.request_stop();
+    }
     if (processing_thread_.joinable()) {
         processing_thread_.request_stop();
         processing_thread_.join();
@@ -54,30 +59,33 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index)
 {
     switch (stage) {
         case PipelineStage::kAcquire:
-            // 入力は Acquire Strategy を差し替えず, Producer を排他的に切り替える.
             if (index == kAcquireDeviceItemIndex) {
-                input_source_.Stop();
-                device_input_->Stop();
+                {
+                    const std::lock_guard<std::mutex> guard{acquire_mutex_};
+                    device_wait_stop_source_ = std::stop_source{};
+                    device_mode_ = true;
+                }
+                process_.SetConfig(FrameSyncProcess::AcquireTag{},
+                                   FrameSyncProcess::AudioAcquireStrategy{&ring_buffer_acquire_});
                 // キャプチャの開始はデバイス選択 (ApplyDeviceSelection) を待つ.
-                device_mode_ = true;
             } else {
-                device_mode_ = false;
+                {
+                    const std::lock_guard<std::mutex> guard{acquire_mutex_};
+                    device_mode_ = false;
+                    device_wait_stop_source_.request_stop();
+                }
                 device_input_->Stop();
                 if (index == kAcquireSineItemIndex) {
-                    input_source_.SetGenerator([this] {
-                        return sine_generator_.Exec();
-                    });
+                    process_.SetConfig(FrameSyncProcess::AcquireTag{},
+                                       FrameSyncProcess::AudioAcquireStrategy{&sine_generator_});
                 } else if (index == kAcquireFileItemIndex) {
                     // 未ロード時は FilePlayer が無音を返す. ファイル選択は ApplyFileSelection().
-                    input_source_.SetGenerator([this] {
-                        return file_player_.NextHop();
-                    });
+                    process_.SetConfig(FrameSyncProcess::AcquireTag{},
+                                       FrameSyncProcess::AudioAcquireStrategy{&file_player_});
                 } else {
-                    input_source_.SetGenerator([] {
-                        return FrameSyncProcess::AudioHop{kAppSampleRate};
-                    });
+                    process_.SetConfig(FrameSyncProcess::AcquireTag{},
+                                       get_default_null_input_strategy());
                 }
-                input_source_.Start();
             }
             break;
         case PipelineStage::kPreProcess:
@@ -140,18 +148,16 @@ void MainModel::ApplyDeviceSelection(int device_index)
 
 void MainModel::ApplySineFrequency(int frequency_hz)
 {
-    // Producer スレッドの Exec() と排他して周波数を更新する.
-    input_source_.RunWithGeneratorLock([this, frequency_hz] {
-        sine_generator_.SetFrequency(static_cast<double>(frequency_hz));
-    });
+    // 処理スレッドの Exec() 呼び出しと排他して周波数を更新する.
+    const std::lock_guard<std::mutex> guard{acquire_mutex_};
+    sine_generator_.SetFrequency(static_cast<double>(frequency_hz));
 }
 
 void MainModel::ApplyFileSelection(const std::string& path)
 {
-    // Producer スレッドの NextHop() と排他してロードする.
-    input_source_.RunWithGeneratorLock([this, &path] {
-        file_player_.Load(path);
-    });
+    // 処理スレッドの Exec() 呼び出しと排他してロードする.
+    const std::lock_guard<std::mutex> guard{acquire_mutex_};
+    file_player_.Load(path);
 }
 
 auto MainModel::GetAudioOutputDeviceNames() -> std::vector<std::string>
@@ -180,8 +186,33 @@ auto MainModel::GetProcessedFrameCount() const -> std::uint64_t
 
 void MainModel::RunProcessing(const std::stop_token& stop_token)
 {
-    while (input_buffer_.WaitForHop(stop_token)) {
-        process_.ProcessFrame();
+    auto next_deadline = std::chrono::steady_clock::now();
+    while (!stop_token.stop_requested()) {
+        bool device_mode = false;
+        std::stop_token device_wait_token;
+        {
+            const std::lock_guard<std::mutex> guard{acquire_mutex_};
+            device_mode = device_mode_;
+            device_wait_token = device_wait_stop_source_.get_token();
+        }
+
+        if (device_mode) {
+            // Device: リングバッファへのデータ到着 (または入力切り替え/停止) を待つ.
+            if (!ring_buffer_acquire_.WaitForHop(std::move(device_wait_token))) {
+                continue;
+            }
+            const std::lock_guard<std::mutex> guard{acquire_mutex_};
+            process_.ProcessFrame();
+            next_deadline = std::chrono::steady_clock::now();
+        } else {
+            // Null / Sine / File: 実デバイスのクロックが存在しないため, ホップ周期で自走する.
+            next_deadline += kHopPeriod;
+            {
+                const std::lock_guard<std::mutex> guard{acquire_mutex_};
+                process_.ProcessFrame();
+            }
+            std::this_thread::sleep_until(next_deadline);
+        }
     }
 }
 

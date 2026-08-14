@@ -178,12 +178,12 @@ auto FilePlayer::Load(const std::string& path) -> bool
     return true;
 }
 
-void FilePlayer::Rewind()
+void FilePlayer::Reset()
 {
     position_ = 0;
 }
 
-auto FilePlayer::NextHop() -> FrameSyncProcess::AudioHop
+auto FilePlayer::Exec() -> FrameSyncProcess::AudioHop
 {
     FrameSyncProcess::AudioHop hop{kAppSampleRate};
     if (samples_.empty()) {
