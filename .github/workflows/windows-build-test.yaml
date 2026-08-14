@@ -13,17 +13,17 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  ci-qt-win:
-    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
-    # You can convert this to a matrix build if you need cross-platform coverage.
-    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  prepare:
+    # ジョブは互いに独立した VM で実行されるため, 後続の各ジョブでも Qt の
+    # インストールをやり直す必要がある. このジョブは Qt のキャッシュ (cache: true)
+    # を温めておくことで, 後続ジョブでのインストールを高速化する目的で存在する.
     runs-on: windows-latest
 
     steps:
-    - name: "[preprocess] Checkout"
+    - name: "[prepare] Checkout"
       uses: actions/checkout@v4
 
-    - name: "[preprocess] Install Qt"
+    - name: "[prepare] Install Qt"
       uses: jurplel/install-qt-action@v4
       with:
         version: '6.8.*'
@@ -34,8 +34,30 @@ jobs:
         install-deps: true
         modules: qtmultimedia
         tools: 'tools_mingw1310,qt.tools.win64_mingw1310'
+        cache: true
 
-    - name: "[preprocess] Set QT_TOOLCHAIN_ROOT"
+  build:
+    needs: prepare
+    runs-on: windows-latest
+
+    steps:
+    - name: "[build] Checkout"
+      uses: actions/checkout@v4
+
+    - name: "[build] Install Qt"
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.*'
+        host: windows
+        target: desktop
+        arch: win64_mingw
+        dir: '${{ github.workspace }}/qt/'
+        install-deps: true
+        modules: qtmultimedia
+        tools: 'tools_mingw1310,qt.tools.win64_mingw1310'
+        cache: true
+
+    - name: "[build] Set QT_TOOLCHAIN_ROOT"
       # jurplel/install-qt-action does not export an env var pointing at the
       # MinGW toolchain it installs via `tools:`, so derive it from IQTA_TOOLS
       # (the Qt "Tools" directory it does export) and make it available to
@@ -55,6 +77,42 @@ jobs:
       # Build your program with the given configuration
       shell: bash
       run: cmake --build build/app-win --config ${{env.BUILD_TYPE}}
+
+    - name: "[build] Upload build directory"
+      # test ジョブは別 VM で動くため, ビルド成果物 (テストバイナリなど) を
+      # artifact 経由で引き渡す.
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-win-build
+        path: build/app-win
+        retention-days: 1
+
+  test:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+    - name: "[test] Install Qt"
+      # テストバイナリが Qt6::Core / Qt6::Multimedia の DLL に実行時リンクする
+      # ため, Qt のインストール (PATH への Qt bin ディレクトリ追加) が必要
+      # (バイナリ本体は build ジョブの artifact から取得する).
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.8.*'
+        host: windows
+        target: desktop
+        arch: win64_mingw
+        dir: '${{ github.workspace }}/qt/'
+        install-deps: true
+        modules: qtmultimedia
+        tools: 'tools_mingw1310,qt.tools.win64_mingw1310'
+        cache: true
+
+    - name: "[test] Download build directory"
+      uses: actions/download-artifact@v4
+      with:
+        name: app-win-build
+        path: build/app-win
 
     - name: "[test] Test"
       shell: bash
