@@ -19,9 +19,16 @@
 class AudioOutputBuffer {
 public:
     ///
-    /// バッファ容量 (4 ホップ分).
+    /// バッファ容量 (32 ホップ分, 約 372 ms @ 44.1 kHz).
     ///
-    static constexpr std::size_t kCapacity = FrameSyncProcess::audio_hop_length * 4;
+    /// Null / Sine / File 入力時は, 処理スレッドが std::this_thread::sleep_until()
+    /// で自走してこのバッファへ書き込む (MainModel::RunProcessing() 参照). 実時間
+    /// スケジューリングの保証がない通常優先度スレッドのため, OS のスケジューリング
+    /// 遅延をここで吸収できるだけの余裕を持たせる. 小さすぎると
+    /// AudioPullDevice::readData() が枯渇して無音で埋められ, 音切れ (ポップノイズ)
+    /// の原因になる.
+    ///
+    static constexpr std::size_t kCapacity = FrameSyncProcess::audio_hop_length * 32;
 
     ///
     /// サンプル列を書き込む.
