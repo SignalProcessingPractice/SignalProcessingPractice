@@ -74,6 +74,14 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build/app-linux --config ${{env.BUILD_TYPE}}
 
+    - name: "[build] Remove symlinks under _deps"
+      # _deps 配下 (FetchContent で取得したサードパーティ) に循環したシンボリック
+      # リンクが生成されており, actions/upload-artifact がこれを辿ろうとして
+      # ELOOP で失敗する. lint ジョブが参照する compile_commands.json はビルド
+      # ルート直下の実ファイルであり, _deps 配下のリンクは不要なため削除する.
+      # (find -type l は lstat ベースでシンボリックリンクを辿らないため安全.)
+      run: find build/app-linux/_deps -type l -delete
+
     - name: "[build] Upload build directory"
       # test / lint ジョブは別 VM で動くため, ビルド成果物 (バイナリと
       # compile_commands.json) を artifact 経由で引き渡す.
@@ -82,12 +90,6 @@ jobs:
         name: app-linux-build
         path: build/app-linux
         retention-days: 1
-        # CMSIS-DSP が _deps/cmsis_dsp-src 配下に自身の compile_commands.json を
-        # シンボリックリンクとして生成しており, デフォルトでは actions/upload-artifact
-        # がこれを辿って ELOOP (循環参照) で失敗するため無効化する.
-        # lint ジョブが参照する compile_commands.json はビルドルート直下の実ファイル
-        # であり, このリンクは不要.
-        follow-symbolic-links: false
 
   test:
     needs: build
