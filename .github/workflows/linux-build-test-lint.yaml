@@ -117,6 +117,12 @@ jobs:
         name: app-linux-build
         path: build/app-linux
 
+    - name: "[test] Restore executable permission"
+      # actions/upload-artifact は zip 化の際にファイルのパーミッションを保持しない
+      # (全ファイルが 644 になる) ため, ダウンロード後にテストバイナリの実行権限を
+      # 復元する.
+      run: chmod -R +x build/app-linux
+
     - name: "[test] Test"
       working-directory: ${{github.workspace}}/build/app-linux
       # Execute tests defined by the CMake configuration.
