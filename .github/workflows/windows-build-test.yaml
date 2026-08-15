@@ -86,6 +86,10 @@ jobs:
         name: app-win-build
         path: build/app-win
         retention-days: 1
+        # CMSIS-DSP が _deps/cmsis_dsp-src 配下に自身の compile_commands.json を
+        # シンボリックリンクとして生成しており, デフォルトでは actions/upload-artifact
+        # がこれを辿って ELOOP (循環参照) で失敗するため無効化する.
+        follow-symbolic-links: false
 
   test:
     needs: build
