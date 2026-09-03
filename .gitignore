@@ -12,6 +12,9 @@ CMakeCache.txt
 *.pyc
 __pycache__
 
+# Windows (WSL): ダウンロードファイルの Zone.Identifier ストリーム
+*:Zone.Identifier
+
 # Qt
 *.autosave
 *.TMP
