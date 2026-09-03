@@ -20,6 +20,25 @@
 struct FrameSyncProcessConfig;
 struct PipelineResult;
 
+namespace frame_sync_detail {
+
+///
+/// CMSIS-DSP (arm_rfft_fast_init_f32) が対応する FFT 長の範囲.
+///
+inline constexpr std::size_t kMinSupportedFftLength = 32;
+inline constexpr std::size_t kMaxSupportedFftLength = 4096;
+
+///
+/// @brief CMSIS-DSP (arm_rfft_fast_init_f32) が対応する FFT 長かどうかを判定する.
+///
+[[nodiscard]] constexpr auto IsSupportedFftLength(std::size_t length) noexcept -> bool
+{
+    return length >= kMinSupportedFftLength && length <= kMaxSupportedFftLength &&
+           (length & (length - 1)) == 0;
+}
+
+}  // namespace frame_sync_detail
+
 class FrameSyncProcess {
 public:
     ///
@@ -31,6 +50,12 @@ public:
     ///
     static constexpr std::size_t audio_frame_length = 1024;
     static constexpr std::size_t audio_hop_length = 512;
+
+    static_assert(frame_sync_detail::IsSupportedFftLength(audio_frame_length),
+                  "audio_frame_length は CMSIS-DSP (arm_rfft_fast_init_f32) が対応するサイズ "
+                  "(32/64/128/256/512/1024/2048/4096) である必要があります.");
+    static_assert(audio_hop_length > 0 && audio_hop_length <= audio_frame_length,
+                  "audio_hop_length は 1 以上 audio_frame_length 以下である必要があります.");
 
     ///
     /// オーディオホップ.
