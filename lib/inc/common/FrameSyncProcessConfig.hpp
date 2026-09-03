@@ -13,6 +13,7 @@ auto get_default_bypass_preprocess_strategy() -> FrameSyncProcess::PreProcessStr
 auto get_default_overlapper_strategy() -> FrameSyncProcess::OverlapStrategy;
 auto get_default_rectangle_window_strategy() -> FrameSyncProcess::WindowStrategy;
 auto get_default_fft_strategy() -> FrameSyncProcess::FftStrategy;
+auto get_default_bypass_fft_strategy() -> FrameSyncProcess::FftStrategy;
 auto get_default_bypass_infer_strategy() -> FrameSyncProcess::InferStrategy;
 auto get_default_ifft_postprocess_strategy() -> FrameSyncProcess::PostProcessStrategy;
 auto get_default_rectangle_overlap_adder_strategy() -> FrameSyncProcess::OverlapAddStrategy;

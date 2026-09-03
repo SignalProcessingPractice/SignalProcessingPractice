@@ -101,7 +101,9 @@ void MainModel::ApplyStrategySelection(PipelineStage stage, int index)
                                           : get_default_rectangle_window_strategy());
             break;
         case PipelineStage::kFft:
-            process_.SetConfig(FrameSyncProcess::FftTag{}, get_default_fft_strategy());
+            process_.SetConfig(
+                    FrameSyncProcess::FftTag{},
+                    index == 1 ? get_default_bypass_fft_strategy() : get_default_fft_strategy());
             break;
         case PipelineStage::kInfer:
             process_.SetConfig(FrameSyncProcess::InferTag{}, get_default_bypass_infer_strategy());

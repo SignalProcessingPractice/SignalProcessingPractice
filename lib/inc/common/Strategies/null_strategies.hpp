@@ -30,7 +30,7 @@ struct NullWindow {
     static auto Reset() -> void;
 };
 
-struct NullFft {
+struct BypassFft {
     static auto Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame;
     static auto Reset() -> void;
 };

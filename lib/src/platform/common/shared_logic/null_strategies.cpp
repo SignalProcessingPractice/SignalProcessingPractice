@@ -47,11 +47,11 @@ auto NullWindow::Reset() -> void
 {
 }
 
-auto NullFft::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame
+auto BypassFft::Exec(const FrameSyncProcess::AudioFrame& frame) -> FrameSyncProcess::AudioFrame
 {
     return frame;
 }
-auto NullFft::Reset() -> void
+auto BypassFft::Reset() -> void
 {
 }
 

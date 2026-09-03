@@ -45,6 +45,13 @@ auto get_default_fft_strategy() -> FrameSyncProcess::FftStrategy
     return slot;
 }
 
+auto get_default_bypass_fft_strategy() -> FrameSyncProcess::FftStrategy
+{
+    static BypassFft instance;
+    static FrameSyncProcess::FftStrategy slot{&instance};
+    return slot;
+}
+
 auto get_default_bypass_infer_strategy() -> FrameSyncProcess::InferStrategy
 {
     static BypassInfer instance;

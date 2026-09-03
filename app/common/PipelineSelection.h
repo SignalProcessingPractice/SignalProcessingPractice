@@ -92,7 +92,7 @@ inline constexpr std::array<std::string_view, 4> kAcquireNames{"Null", "Sine", "
 inline constexpr std::array<std::string_view, 1> kPreProcessNames{"Bypass"};
 inline constexpr std::array<std::string_view, 1> kOverlapNames{"Overlapper"};
 inline constexpr std::array<std::string_view, 2> kWindowNames{"Rectangle", "Hann"};
-inline constexpr std::array<std::string_view, 1> kFftNames{"FFT"};
+inline constexpr std::array<std::string_view, 2> kFftNames{"FFT", "Bypass"};
 inline constexpr std::array<std::string_view, 1> kInferNames{"Bypass"};
 inline constexpr std::array<std::string_view, 1> kPostProcessNames{"IFFT"};
 inline constexpr std::array<std::string_view, 2> kOverlapAddNames{"Rectangle", "Hann"};
